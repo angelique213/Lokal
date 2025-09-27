@@ -1,3 +1,0 @@
-window.wishlisthero_cartDotClasses = (window.wishlisthero_cartDotClasses || []).concat(['wishlist-hero-items-count-text-plain', 'cart-count-bubble']);
-window.wishlisthero_buttonProdPageClasses = (window.wishlisthero_buttonProdPageClasses || []).concat(['btn product__form--add-to-cart', 'btn', 'btn--secondary-accent', 'button button--full-width product-form__buttons']);
-window.wishlisthero_buttonProdPageFontSize = 'auto';
