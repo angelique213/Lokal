@@ -3,494 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Lokal</title>
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- header section -->
-    
 <header class="header">
-    
     <div class="logo">
         <img src="images/projectlogo.png" alt="logo" />
     </div>
-
     <nav class="navigation">
-        <ul class ="nav-links">
-            <li class="nav-link">
-                <a href= "#">Shop Local</a>
-            </li>
-            <li class="nav-link">
-                <a href="#">Best Picks</a>
-            </li>
-            <li class="nav-link">
-                <a href="#">Shop All</a>
-            </li>
-            <li class="nav-link">
-                <a href="#">Shop by Category</a>
-
-                </li>
-
+        <ul class="nav-links">
+            <li class="nav-link"><a href="shop-local.html">Shop Local</a></li>
+            <li class="nav-link"><a href="best-picks.html">Best Picks</a></li>
+            <li class="nav-link"><a href="shop-all.html">Shop All</a></li>
+            <li class="nav-link"><a href="categories.html">Shop by Category</a></li>
         </ul>
-
     </nav>
-    
     <nav class="utils">
         <ul class="nav-links">
-            <li class="nav-link">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </li>
-            <li class="nav-link">
-                <i class="fa-solid fa-user"></i>
-            </li>
-            <li class="nav-link">
-                <i class="fa-solid fa-cart-shopping"></i>
-
-            </li>
-            <li class="nav-link">
-                <i class="fa-regular fa-heart"></i>
-            </li>
-            <li class="nav-link">
-                <i class="fa-solid fa-headset"></i>
-            </li>
-            
-
+            <li class="nav-link"><a href="search.html"><i class="fa-solid fa-magnifying-glass"></i></a></li>
+            <li class="nav-link"><a href="login.html"><i class="fa-solid fa-user"></i></a></li>
+            <li class="nav-link"><a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a></li>
+            <li class="nav-link"><a href="wishlist.html"><i class="fa-regular fa-heart"></i></a></li>
+            <li class="nav-link"><a href="support.html"><i class="fa-solid fa-headset"></i></a></li>
         </ul>
-
     </nav>
-
-
 </header>
 
-    <!-- header section -->
-
-    <section class="banner"> 
+<section class="banner">
+    <div class="banner-slider">
+        <div class="slide active">
+            <div class="slide-details">
+                <h1>Supporting Local, One Purchase at a Time.</h1>
+                <p>Discover a wide variety of everyday essentials and unique finds from trusted local sellers. Every purchase you make supports small businesses and strengthens our community.</p>
+                <button class="button" onclick="location.href='shop-all.html'">Shop Now</button>
+            </div>
+        </div>
         <div class="slide">
-            <div>
-
+            <div class="slide-details">
+                <h1>Handmade Crafts for Every Occasion.</h1>
+                <p>Unique gifts and décor made with love. Each purchase supports artisans in your community.</p>
+                <button class="button" onclick="location.href='crafts.html'">Explore Crafts</button>
+            </div>
         </div>
-
-        <div class="slide-details">
-            <h1>Supporting Local, One Purchase at a Time.</h1>
-            <p>Discover a wide variety of everyday essentials and unique finds from trusted local sellers. Every purchase you make supports small businesses and strengthens our community.</p>
-            
-            <button class="button">
-                Browse Local Finds
-            </button>
+        <div class="slide">
+            <div class="slide-details">
+                <h1>Celebrate Christmas with Local Gifts!</h1>
+                <p>Find the perfect holiday gifts handcrafted by local artisans. Make this season special while supporting small businesses in your community.</p>
+                <button class="button" onclick="location.href='christmas.html'">Shop Christmas</button>
+            </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- featured section -->
-
-    <section class="featured">
-
-        <div class="featured-box-1">
-
+<section class="featured">
+    <div class="featured-box-1">
+        <div class="overlay">
+            <button class="button btn" onclick="location.href='clothing.html'">Shop Local Clothing</button>
+        </div>
+        <div class="bg-image">
+            <img src="images/filipiniana.png" alt="product">
+        </div>
+    </div>
+    <div class="featured-box-2">
+        <div class="featured-box-2-box-1">
             <div class="overlay">
-
-                <button class="button btn">
-                    Shop Local Clothing
-                </button>
-                
+                <button class="button btn" onclick="location.href='crafts.html'">Shop Local Crafts</button>
             </div>
-            
-
             <div class="bg-image">
-                <img src="images/filipiniana.png" alt="product">
-
+                <img src="images/16.png" alt="product">
             </div>
-
         </div>
-
-        <div class="featured-box-2">
-
-            <div class="featured-box-2-box-1">
-                <div class="overlay">
-
-                    <button class="button btn">
-                        Shop Local Crafts
-                    </button>
-                    
-                </div>
-                
-                <div class="bg-image">
-                    <img src="images/16.png" alt="product">
-    
-                </div>
-            </div>
-            
-            <div class="featured-box-2-box-2">
-                <div class="overlay">
-
-                    <button class="button btn">
-                        Shop Accessories
-                    </button>
-                    
-                </div>
-                
-                <div class="bg-image">
-                    <img src="images/4p.webp" alt="product">
-                </div>
-            </div>
-
-            <div class="featured-box-2-box-3">
-                <div class="overlay">
-
-                    <button class="button btn">
-                        Shop Footwear
-                    </button>
-                    
-                </div>
-                
-                <div class="bg-image">
-                    <img src="images/footware.png" alt="product">
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="featured-box-3">
-
-                        
+        <div class="featured-box-2-box-2">
             <div class="overlay">
-
-                <button class="button btn">
-                    Shop Local Flavors
-                </button>
-                
+                <button class="button btn" onclick="location.href='accessories.html'">Shop Accessories</button>
             </div>
-
             <div class="bg-image">
-                <img src="images/delicacies.png" alt="product">
-
+                <img src="images/4p.webp" alt="product">
             </div>
-
-            
         </div>
-
-    </section>
-
-    <!-- product section -->
-
-        <section class="products">
-
-            <h1 class="section-title">Top products of the Season</h1>
-
-            <div class="products-list">
-
-                <div class="product">
-
-                    <div class="product-image">
-
-                        <div class="main-image">
-                            <img src="images/main-image.png" alt="product">
-                        </div>
-                        <div class="effect-image">
-                            <img src="images/effect-image.png" alt="product">
-                        </div>
-                        <div class="overlay-image">
-                            <button class="button btn">
-                                Add To Cart
-
-                            </button>
-                        </div>
-
-
-                    </div>
-
-                    <div class="product-details">
-                        <p class="product-name">Santa Ornament</p>
-                        <p>₱479.00</p>
-                
-                    </div>
-
-
-
-                </div>
-
-                <div class="product">
-
-                    <div class="product-image">
-
-                        <div class="main-image">
-                            <img src="images/main-image2.png" alt="product">
-                        </div>
-                        <div class="effect-image">
-                            <img src="images/effect-image2.png" alt="product">
-                        </div>
-                        <div class="overlay-image">
-                            <button class="button btn">
-                                Add To Cart
-
-                            </button>
-                        </div>
-
-
-                    </div>
-
-                    <div class="product-details">
-                        <p class="product-name">Christmas Parol </p>
-                        <p>₱900.00</p>
-                
-                    </div>
-
-
-
-                </div>
-
-
-                <div class="product">
-
-                    <div class="product-image">
-
-                        <div class="main-image">
-                            <img src="images/main-image3.png" alt="product">
-                        </div>
-                        <div class="effect-image">
-                            <img src="images/effect-image3.png" alt="product">
-                        </div>
-                        <div class="overlay-image">
-                            <button class="button btn">
-                                Add To Cart
-
-                            </button>
-                        </div>
-
-
-                    </div>
-
-                    <div class="product-details">
-                        <p class="product-name">Santa Stockings</p>
-                        <p>₱295.00</p>
-                
-                    </div>
-
-                </div>
-
-
-                <div class="product">
-
-                    <div class="product-image">
-
-                        <div class="main-image">
-                            <img src="images/main-image4.png" alt="product">
-                        </div>
-                        <div class="effect-image">
-                            <img src="images/effect-image4.png" alt="product">
-                        </div>
-                        <div class="overlay-image">
-                            <button class="button btn">
-                                Add To Cart
-
-                            </button>
-                        </div>
-
-
-                    </div>
-                    
-                    <div class="product-details">
-                        <p class="product-name">Queso de Bola</p>
-                        <p>₱300.00</p>
-                
-                    </div>
-
-                </div>
-
-            
-
+        <div class="featured-box-2-box-3">
+            <div class="overlay">
+                <button class="button btn" onclick="location.href='footwear.html'">Shop Footwear</button>
             </div>
-
-        </section>
-
-        <!-- category section -->
-
-        <section class="categories">
-
-            <div class="category">
-                
-                <div class="cat-img">
-                    <img src="images/category1.png" alt="category">
-                </div>
-
-                <div class="product-details">
-                    <p class="product-name">Cebu's Best</p>        
-                </div>
-
-
-                
+            <div class="bg-image">
+                <img src="images/footware.png" alt="product">
             </div>
+        </div>
+    </div>
+    <div class="featured-box-3">
+        <div class="overlay">
+            <button class="button btn" onclick="location.href='flavors.html'">Shop Local Flavors</button>
+        </div>
+        <div class="bg-image">
+            <img src="images/delicacies.png" alt="product">
+        </div>
+    </div>
+</section>
 
-
-            <div class="category">
-                
-                <div class="cat-img">
-                    <img src="images/category2.png" alt="category">
-                </div>
-
-                <div class="product-details">
-                    <p class="product-name">Cavite's Best</p>        
-                </div>
-
-
-                
+<section class="products">
+    <h1 class="section-title">Top products of the Season</h1>
+    <div class="products-list">
+        <div class="product" data-aos="fade-up" data-aos-delay="200">
+            <div class="product-image">
+                <div class="main-image"><img src="images/main-image.png" alt="product"></div>
+                <div class="effect-image"><img src="images/effect-image.png" alt="product"></div>
+                <div class="overlay-image"><button class="button btn">Add To Cart</button></div>
             </div>
-
-
-            <div class="category">
-                
-                <div class="cat-img">
-                    <img src="images/category3.png" alt="category">
-                </div>
-
-                <div class="product-details">
-                    <p class="product-name">Laguna's Best</p>        
-                </div>
-
-
-                
+            <div class="product-details">
+                <p class="product-name">Santa Ornament</p>
+                <p>₱479.00</p>
             </div>
-
-        </section>
-
-        <!-- product section 2 -->
-
-
-        <section class="products">
-
-            <h1 class="section-title">Heritage Inspired Home</h1>
-
-            <div class="products-list">
-
-                <div class="product">
-
-                    <div class="product-image">
-
-                        <div class="main-image">
-                            <img src="images/main2-image1.png" alt="product">
-                        </div>
-                        <div class="effect-image">
-                            <img src="images/effect2-image1.png" alt="product">
-                        </div>
-                        <div class="overlay-image">
-                            <button class="button btn">
-                                Add To Cart
-
-                            </button>
-                        </div>
-
-
-                    </div>
-
-                    <div class="product-details">
-                        <p class="product-name">Picture Frame</p>
-                        <p>₱1,599.00</p>
-                
-                    </div>
-
-
-
-                </div>
-
-                <div class="product">
-
-                    <div class="product-image">
-
-                        <div class="main-image">
-                            <img src="images/main2-image2.png" alt="product">
-                        </div>
-                        <div class="effect-image">
-                            <img src="images/effect2-image2.png" alt="product">
-                        </div>
-                        <div class="overlay-image">
-                            <button class="button btn">
-                                Add To Cart
-
-                            </button>
-                        </div>
-
-
-                    </div>
-
-                    <div class="product-details">
-                        <p class="product-name">Coco Planter  </p>
-                        <p>₱1,500.00</p>
-                
-                    </div>
-
-
-
-                </div>
-
-
-                <div class="product">
-
-                    <div class="product-image">
-
-                        <div class="main-image">
-                            <img src="images/main2-image3.png" alt="product">
-                        </div>
-                        <div class="effect-image">
-                            <img src="images/effect2-image3.png" alt="product">
-                        </div>
-                        <div class="overlay-image">
-                            <button class="button btn">
-                                Add To Cart
-
-                            </button>
-                        </div>
-
-
-                    </div>
-
-                    <div class="product-details">
-                        <p class="product-name">Picnic Basket</p>
-                        <p>₱2,000.00</p>
-                
-                    </div>
-
-                </div>
-
-
-                <div class="product">
-
-                    <div class="product-image">
-
-                        <div class="main-image">
-                            <img src="images/main2-image4.png" alt="product">
-                        </div>
-                        <div class="effect-image">
-                            <img src="images/effect2-image4.png" alt="product">
-                        </div>
-                        <div class="overlay-image">
-                            <button class="button btn">
-                                Add To Cart
-
-                            </button>
-                        </div>
-
-
-                    </div>
-                    
-                    <div class="product-details">
-                        <p class="product-name">Wooden Cup</p>
-                        <p>₱499.00</p>
-                
-                    </div>
-
-                </div>
-
-            
-
+        </div>
+        <div class="product" data-aos="fade-up" data-aos-delay="200">
+            <div class="product-image">
+                <div class="main-image"><img src="images/main-image2.png" alt="product"></div>
+                <div class="effect-image"><img src="images/effect-image2.png" alt="product"></div>
+                <div class="overlay-image"><button class="button btn">Add To Cart</button></div>
             </div>
+            <div class="product-details">
+                <p class="product-name">Christmas Parol</p>
+                <p>₱900.00</p>
+            </div>
+        </div>
+        <div class="product" data-aos="fade-up" data-aos-delay="200">
+            <div class="product-image">
+                <div class="main-image"><img src="images/main-image3.png" alt="product"></div>
+                <div class="effect-image"><img src="images/effect-image3.png" alt="product"></div>
+                <div class="overlay-image"><button class="button btn">Add To Cart</button></div>
+            </div>
+            <div class="product-details">
+                <p class="product-name">Santa Stockings</p>
+                <p>₱295.00</p>
+            </div>
+        </div>
+        <div class="product" data-aos="fade-up" data-aos-delay="200">
+            <div class="product-image">
+                <div class="main-image"><img src="images/main-image4.png" alt="product"></div>
+                <div class="effect-image"><img src="images/effect-image4.png" alt="product"></div>
+                <div class="overlay-image"><button class="button btn">Add To Cart</button></div>
+            </div>
+            <div class="product-details">
+                <p class="product-name">Queso de Bola</p>
+                <p>₱300.00</p>
+            </div>
+        </div>
+    </div>
+</section>
 
-        </section>
+<section class="categories">
+    <div class="category" data-aos="fade-up" data-aos-delay="200">
+        <div class="cat-img"><img src="images/category1.png" alt="category"></div>
+        <div class="product-details"><p class="product-name">Cebu's Best</p></div>
+    </div>
+    <div class="category" data-aos="fade-up" data-aos-delay="200">
+        <div class="cat-img"><img src="images/category2.png" alt="category"></div>
+        <div class="product-details"><p class="product-name">Cavite's Best</p></div>
+    </div>
+    <div class="category">
+        <div class="cat-img" data-aos="fade-up" data-aos-delay="200"><img src="images/category3.png" alt="category"></div>
+        <div class="product-details"><p class="product-name">Laguna's Best</p></div>
+    </div>
+</section>
 
-        <!-- shop from insta section -->
+<section class="products">
+    <h1 class="section-title">Heritage Inspired Home</h1>
+    <div class="products-list">
+        <div class="product" data-aos="fade-up" data-aos-delay="200">
+            <div class="product-image">
+                <div class="main-image"><img src="images/main2-image1.png" alt="product"></div>
+                <div class="effect-image"><img src="images/effect2-image1.png" alt="product"></div>
+                <div class="overlay-image"><button class="button btn">Add To Cart</button></div>
+            </div>
+            <div class="product-details"><p class="product-name">Picture Frame</p><p>₱1,599.00</p></div>
+        </div>
+        <div class="product" data-aos="fade-up" data-aos-delay="200">
+            <div class="product-image">
+                <div class="main-image"><img src="images/main2-image2.png" alt="product"></div>
+                <div class="effect-image"><img src="images/effect2-image2.png" alt="product"></div>
+                <div class="overlay-image"><button class="button btn">Add To Cart</button></div>
+            </div>
+            <div class="product-details"><p class="product-name">Coco Planter</p><p>₱1,500.00</p></div>
+        </div>
+        <div class="product" data-aos="fade-up" data-aos-delay="200">
+            <div class="product-image">
+                <div class="main-image"><img src="images/main2-image3.png" alt="product"></div>
+                <div class="effect-image"><img src="images/effect2-image3.png" alt="product"></div>
+                <div class="overlay-image"><button class="button btn">Add To Cart</button></div>
+            </div>
+            <div class="product-details"><p class="product-name">Picnic Basket</p><p>₱2,000.00</p></div>
+        </div>
+        <div class="product" data-aos="fade-up" data-aos-delay="200">
+            <div class="product-image">
+                <div class="main-image"><img src="images/main2-image4.png" alt="product"></div>
+                <div class="effect-image"><img src="images/effect2-image4.png" alt="product"></div>
+                <div class="overlay-image"><button class="button btn">Add To Cart</button></div>
+            </div>
+            <div class="product-details"><p class="product-name">Wooden Cup</p><p>₱499.00</p></div>
+        </div>
+    </div>
+</section>
 
+<section class="insta">
+    <h1 class="section-title">Shop Now</h1>
+    <div class="posts">
+        <div class="post-image" data-aos="zoom-in" data-aos-delay="200"><img src="images/insta1.png" alt="insta"></div>
+        <div class="post-image" data-aos="zoom-in" data-aos-delay="200"><img src="images/insta2.png" alt="insta"></div>
+        <div class="post-image" data-aos="zoom-in" data-aos-delay="200"><img src="images/insta3.png" alt="insta"></div>
+        <div class="post-image" data-aos="zoom-in" data-aos-delay="200"><img src="images/insta4.png" alt="insta"></div>
+        <div class="post-image" data-aos="zoom-in" data-aos-delay="200"><img src="images/insta5.png" alt="insta"></div>
+        <div class="post-image" data-aos="zoom-in" data-aos-delay="200"><img src="images/insta6.png" alt="insta"></div>
+    </div>
+</section>
 
+<footer class="footer">
+    <div class="footer-section">
+        <h1>Contact Us</h1>
+        <ul class="footer-list">
+            <li>lokal@info.com</li>
+            <li>lokal@admin.com</li>
+            <li>Manila Philippines</li>
+            <li class="border-list"></li>
+            <li class="socials">
+                <i class="fa-brands fa-square-instagram"></i>
+                <i class="fa-brands fa-square-facebook"></i>
+                <i class="fa-brands fa-tiktok"></i>
+            </li>
+        </ul>
+    </div>
+    <div class="footer-section">
+        <h1>Quick Links</h1>
+        <ul class="footer-list">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="shop-all.html">Shop All</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="terms.html">Terms & Conditions</a></li>
+        </ul>
+    </div>
+    <div class="footer-section">
+        <h1>Subscribe to Newsletter</h1>
+        <ul class="footer-list">
+            <li>A local marketplace is a community hub where people buy, sell, or trade goods and services within their area.</li>
+            <li class="sub">
+                <input type="text">
+                <button class="button">Subscribe</button>
+            </li>
+        </ul>
+    </div>
+</footer>
 
-
+<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script>
+  AOS.init();
+</script>
+<script src="lokal.js"></script>
 </body>
 </html>
