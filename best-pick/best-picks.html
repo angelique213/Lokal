@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Best Picks | Lokal</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" crossorigin="anonymous" />
+    <link rel="stylesheet" href="../style.css">
+
+    <style>
+        /* Products Section */
+        .products { padding: 60px 20px; }
+        .section-title { text-align: center; font-size: 2.5em; margin-bottom: 40px; color: #333; }
+        .products-list { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; max-width: 1200px; margin: auto; }
+        .best-product { background: #fff; border-radius: 10px; overflow: hidden; text-align: center; position: relative; transition: transform 0.3s, box-shadow 0.3s; }
+        .best-product:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .best-product img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; transition: transform 0.3s; }
+        .best-product:hover img { transform: scale(1.05); }
+        .best-product .details { padding: 15px; }
+        .best-product .details p:first-child { font-weight: bold; margin-bottom: 8px; color: #333; }
+        .best-product .details p:last-child { color: #555; font-weight: bold; }
+        .best-product button.button { background: #C9C78B; color: #fff; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; font-weight: bold; transition: background 0.3s; }
+        .best-product button.button:hover { background: #A9A74F; }
+        .img-container { position: relative; }
+        .quick-view-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0; transition: opacity 0.3s; padding: 6px 12px; font-weight: bold; background: rgba(0,0,0,0.7); color: #fff; border: none; border-radius: 3px; cursor: pointer; }
+        .img-container:hover .quick-view-btn { opacity: 1; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:1000; }
+        .modal-content { background:#fff; padding:20px; border-radius:10px; max-width:600px; width:90%; position: relative; text-align: center; }
+        .modal-content img { width:100%; max-height:300px; object-fit:cover; border-radius:10px; }
+        .modal-details { margin-top:15px; text-align:left; }
+        .modal-details h3 { margin: 0 0 5px; font-size: 1em; color: #888; }
+        .modal-details h2 { margin:0 0 10px; font-size:1.5em; }
+        .modal-details p { margin:5px 0; }
+        .modal-details .reviews { color: #ff9900; font-weight: bold; }
+        .modal-details .quantity { margin: 10px 0; display: flex; align-items: center; gap: 10px; }
+        .modal-details .quantity input { width: 60px; padding: 5px; border-radius: 5px; border: 1px solid #ccc; }
+        .close-modal { position: absolute; top: 10px; right: 15px; font-size:1.5em; cursor:pointer; }
+
+        @media (max-width: 992px){ .products-list { grid-template-columns: repeat(3,1fr); } }
+        @media (max-width: 768px){ .products-list { grid-template-columns: repeat(2,1fr); } }
+        @media (max-width: 480px){ .products-list { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+    <div class="logo"><img src="../images/projectlogo.png" alt="logo" /></div>
+    <nav class="navigation">
+        <ul class="nav-links">
+            <li class="nav-link"><a href="../index.html">Home</a></li>
+            <li class="nav-link"><a href="../best-pick/best-picks.html">Best Picks</a></li>
+            <li class="nav-link"><a href="../shop-all.html">Shop All</a></li>
+            <li class="nav-link"><a href="../categories.html">Shop by Category</a></li>
+        </ul>
+    </nav>
+    <nav class="utils">
+        <ul class="nav-links">
+            <li class="nav-link"><a href="../search.html"><i class="fa-solid fa-magnifying-glass"></i></a></li>
+            <li class="nav-link"><a href="../login.html"><i class="fa-solid fa-user"></i></a></li>
+            <li class="nav-link"><a href="../cart.html"><i class="fa-solid fa-cart-shopping"></i></a></li>
+            <li class="nav-link"><a href="../wishlist.html"><i class="fa-regular fa-heart"></i></a></li>
+            <li class="nav-link"><a href="../support.html"><i class="fa-solid fa-headset"></i></a></li>
+        </ul>
+    </nav>
+</header>
+
+<!-- PRODUCTS -->
+<section class="products">
+    <h1 class="section-title">Best Picks</h1>
+    <div class="products-list"></div>
+</section>
+
+<!-- Quick View Modal -->
+<div class="modal" id="quickViewModal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <img id="modal-img" src="" alt="">
+        <div class="modal-details">
+            <h3>Lokal</h3>
+            <h2 id="modal-name"></h2>
+            <p id="modal-desc"></p>
+            <p id="modal-price"></p>
+            <div class="quantity">
+                <label>Quantity:</label>
+                <input type="number" value="1" min="1">
+            </div>
+            <button class="button">Add to Cart</button>
+            <p class="reviews" id="modal-rating"></p>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="footer-section">
+        <h1>Contact Us</h1>
+        <ul class="footer-list">
+            <li>lokal@info.com</li>
+            <li>lokal@admin.com</li>
+            <li>Manila Philippines</li>
+            <li class="border-list"></li>
+            <li class="socials">
+                <i class="fa-brands fa-square-instagram"></i>
+                <i class="fa-brands fa-square-facebook"></i>
+                <i class="fa-brands fa-tiktok"></i>
+            </li>
+        </ul>
+    </div>
+    <div class="footer-section">
+        <h1>Quick Links</h1>
+        <ul class="footer-list">
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../shop-all.html">Shop All</a></li>
+            <li><a href="../about.html">About Us</a></li>
+            <li><a href="../terms.html">Terms & Conditions</a></li>
+        </ul>
+    </div>
+    <div class="footer-section">
+        <h1>Subscribe to Newsletter</h1>
+        <ul class="footer-list">
+            <li>A local marketplace is a community hub where people buy, sell, or trade goods and services within their area.</li>
+            <li class="sub">
+                <input type="text">
+                <button class="button">Subscribe</button>
+            </li>
+        </ul>
+    </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script>
+const productImages = [
+  "../images/flavors/cebu/flavors1.png",
+  "../images/flavors/cebu/flavors2.png","../images/flavors/cebu/flavors5.png","../images/flavors/cebu/flavors6.png","../images/crafts/crafts1.png",
+  "../images/clothing/clothing1.png","../images/placeholder.png","../images/placeholder.png","../images/placeholder.png","../images/placeholder.png",
+  "../images/placeholder.png","../images/placeholder.png","../images/placeholder.png","../images/placeholder.png","../images/placeholder.png",
+  "../images/placeholder.png","../images/placeholder.png","../images/placeholder.png","../images/placeholder.png","../images/placeholder.png"
+];
+
+const productNames = [
+  "Shamrock Otap","Shamrock Rosquillos","Mango Flavorful Candy ","7D Dried Mangoes Dark Chocolate Enrobed ","Model Jeepney ",
+  "Bolero","Product 7","Product 8","Product 9","Product 10",
+  "Product 11","Product 12","Product 13","Product 14","Product 15",
+  "Product 16","Product 17","Product 18","Product 19","Product 20"
+];
+
+const productPrices = [
+  "₱120","₱120","₱100","₱170","₱200",
+  "₱0","₱0","₱0","₱0","₱0",
+  "₱0","₱0","₱0","₱0","₱0",
+  "₱0","₱0","₱0","₱0","₱0"
+];
+
+const productDescriptions = [
+  "Made from shamrock famous fresh eggs and flour folded into delicate layers, for a deliciously crisp puff pastry biscuits with a sprinkling of sweetness.",
+  "Iconic Filipino biscuits from Cebu, known for their crisp, buttery goodness and signature ring shape.","A soft, chewy treat with the sweet and natural taste of mango in every bite.","Sweet, tart, and chewy 7D dried mangoes coated in rich dark chocolate. A premium Filipino treat in every bite!","The iconic King of the Road will make an awesome addition to your car collection!",
+  "Description for Product 6","Description for Product 7","Description for Product 8","Description for Product 9","Description for Product 10",
+  "Description for Product 11","Description for Product 12","Description for Product 13","Description for Product 14","Description for Product 15",
+  "Description for Product 16","Description for Product 17","Description for Product 18","Description for Product 19","Description for Product 20"
+];
+
+const productRatings = [
+  "★★★★★","★★★★","★★★★★","★★★★","★★★★★",
+  "★★★","★★★★","★★★★★","★★★★","★★★★★",
+  "★★★","★★★★","★★★★★","★★★★","★★★★★",
+  "★★★","★★★★","★★★★★","★★★★","★★★★★"
+];
+
+const productsContainer = document.querySelector('.products-list');
+
+for (let i = 0; i < 20; i++) {
+    const productDiv = document.createElement('div');
+    productDiv.className = 'best-product';
+    productDiv.dataset.name = productNames[i];
+    productDiv.dataset.price = productPrices[i];
+    productDiv.dataset.img = productImages[i];
+    productDiv.dataset.desc = productDescriptions[i];
+    productDiv.dataset.rating = productRatings[i];
+
+    productDiv.innerHTML = `
+        <div class="img-container">
+            <img src="${productImages[i]}" alt="${productNames[i]}">
+            <button class="quick-view-btn">Quick View</button>
+        </div>
+        <div class="details">
+            <p>${productNames[i]}</p>
+            <p>${productPrices[i]}</p>
+            <button class="button">Add to Cart</button>
+        </div>
+    `;
+    productsContainer.appendChild(productDiv);
+}
+
+// Modal & Add to Cart
+const modal = document.getElementById("quickViewModal");
+const modalImg = document.getElementById("modal-img");
+const modalName = document.getElementById("modal-name");
+const modalDesc = document.getElementById("modal-desc");
+const modalPrice = document.getElementById("modal-price");
+const modalRating = document.getElementById("modal-rating");
+const closeModal = document.querySelector(".close-modal");
+const modalAddBtn = modal.querySelector("button");
+
+document.addEventListener('click', function(e){
+    if(e.target.classList.contains('quick-view-btn')){
+        const product = e.target.closest(".best-product");
+        modalImg.src = product.dataset.img;
+        modalName.textContent = product.dataset.name;
+        modalDesc.textContent = product.dataset.desc;
+        modalPrice.textContent = product.dataset.price;
+        modalRating.textContent = product.dataset.rating;
+        modal.querySelector("input").value = 1;
+        modal.style.display = "flex";
+    }
+});
+
+closeModal.addEventListener("click", ()=> modal.style.display="none");
+window.addEventListener("click", (e)=> { if(e.target === modal) modal.style.display="none"; });
+
+function addToCart(product){
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const index = cart.findIndex(item => item.name === product.name);
+    if(index > -1){ cart[index].quantity += product.quantity; }
+    else { cart.push(product); }
+    localStorage.setItem("cart", JSON.stringify(cart));
+    alert(`${product.name} added to cart!`);
+}
+
+document.addEventListener("click", function(e){
+    if(e.target.classList.contains("button") && e.target.closest(".best-product")){
+        const p = e.target.closest(".best-product");
+        addToCart({
+            img: p.dataset.img,
+            name: p.dataset.name,
+            price: p.dataset.price,
+            desc: p.dataset.desc,
+            quantity: 1
+        });
+    }
+});
+
+modalAddBtn.addEventListener("click", ()=>{
+    const qty = parseInt(modal.querySelector("input").value) || 1;
+    addToCart({
+        img: modalImg.src,
+        name: modalName.textContent,
+        price: modalPrice.textContent,
+        desc: modalDesc.textContent,
+        quantity: qty
+    });
+    modal.style.display = "none";
+});
+</script>
+
+</body>
+</html>
