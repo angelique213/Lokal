@@ -1,260 +1,517 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Best Picks | Lokal</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Best Picks | Lokal</title>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" crossorigin="anonymous" />
-    <link rel="stylesheet" href="../style.css">
+  <!-- Icons (FA6 stable) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
 
-    <style>
-        /* Products Section */
-        .products { padding: 60px 20px; }
-        .section-title { text-align: center; font-size: 2.5em; margin-bottom: 40px; color: #333; }
-        .products-list { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; max-width: 1200px; margin: auto; }
-        .best-product { background: #fff; border-radius: 10px; overflow: hidden; text-align: center; position: relative; transition: transform 0.3s, box-shadow 0.3s; }
-        .best-product:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .best-product img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; transition: transform 0.3s; }
-        .best-product:hover img { transform: scale(1.05); }
-        .best-product .details { padding: 15px; }
-        .best-product .details p:first-child { font-weight: bold; margin-bottom: 8px; color: #333; }
-        .best-product .details p:last-child { color: #555; font-weight: bold; }
-        .best-product button.button { background: #C9C78B; color: #fff; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; font-weight: bold; transition: background 0.3s; }
-        .best-product button.button:hover { background: #A9A74F; }
-        .img-container { position: relative; }
-        .quick-view-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0; transition: opacity 0.3s; padding: 6px 12px; font-weight: bold; background: rgba(0,0,0,0.7); color: #fff; border: none; border-radius: 3px; cursor: pointer; }
-        .img-container:hover .quick-view-btn { opacity: 1; }
+  <!-- Site / Cart styles -->
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../cart.css">
 
-        /* Modal */
-        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:1000; }
-        .modal-content { background:#fff; padding:20px; border-radius:10px; max-width:600px; width:90%; position: relative; text-align: center; }
-        .modal-content img { width:100%; max-height:300px; object-fit:cover; border-radius:10px; }
-        .modal-details { margin-top:15px; text-align:left; }
-        .modal-details h3 { margin: 0 0 5px; font-size: 1em; color: #888; }
-        .modal-details h2 { margin:0 0 10px; font-size:1.5em; }
-        .modal-details p { margin:5px 0; }
-        .modal-details .reviews { color: #ff9900; font-weight: bold; }
-        .modal-details .quantity { margin: 10px 0; display: flex; align-items: center; gap: 10px; }
-        .modal-details .quantity input { width: 60px; padding: 5px; border-radius: 5px; border: 1px solid #ccc; }
-        .close-modal { position: absolute; top: 10px; right: 15px; font-size:1.5em; cursor:pointer; }
+  <!-- Page-only styles (Best Picks grid + Quick View) -->
+  <style>
+    .products { padding: 60px 20px; }
+    .section-title { text-align: center; font-size: 2.2rem; margin-bottom: 32px; color: #333; }
 
-        @media (max-width: 992px){ .products-list { grid-template-columns: repeat(3,1fr); } }
-        @media (max-width: 768px){ .products-list { grid-template-columns: repeat(2,1fr); } }
-        @media (max-width: 480px){ .products-list { grid-template-columns: 1fr; } }
-    </style>
+    .products-list {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: 24px; max-width: 1200px; margin: auto;
+    }
+
+    .best-product {
+      background: #fff; border-radius: 12px; overflow: hidden;
+      text-align: center; position: relative; transition: transform .3s, box-shadow .3s;
+      border: 1px solid #eee;
+    }
+    .best-product:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,.08); }
+
+    .best-product .img-wrap{ background:#f2f1e7; display:grid; place-items:center; padding:0; aspect-ratio:1/1; overflow:hidden; }
+    .best-product img{ width:100%; height:100%; object-fit:cover; transform:none; }
+    .best-product .details { padding: 14px 16px 18px; }
+    .best-product .details p.name { font-weight: 700; margin: 0 0 6px; color: #2b1f1a; }
+    .best-product .details p.price { color: #2b1f1a; font-weight: 800; margin: 0; }
+
+    .product-link { display:block; color: inherit; text-decoration: none; }
+    .product-link:focus-visible { outline: 2px solid #6d6a33; outline-offset: 3px; }
+
+    /* Quick View button (overlay on image) */
+    .quick-view{
+      position:absolute; left:50%; top:36%; transform:translate(-50%,-50%);
+      opacity:0; pointer-events:none; background:#2b1f1a; color:#fff; border:0;
+      padding:10px 14px; border-radius:8px; font-weight:700; cursor:pointer; transition:opacity .25s;
+    }
+    .best-product:hover .quick-view{ opacity:.96; pointer-events:auto; }
+
+    @media (max-width: 992px){ .products-list{ grid-template-columns: repeat(3,1fr); } }
+    @media (max-width: 768px){ .products-list{ grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 480px){ .products-list{ grid-template-columns: 1fr; } }
+
+    /* -------- Quick View Modal -------- */
+    .qv-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.45); opacity:0; visibility:hidden; transition:.2s; z-index:1000; }
+    .qv-overlay.active{ opacity:1; visibility:visible; }
+    .qv-modal{ position:fixed; inset:0; padding:24px; display:grid; place-items:center; opacity:0; visibility:hidden; transition:.2s; z-index:1001; }
+    .qv-modal.active{ opacity:1; visibility:visible; }
+    .qv-shell{ width:min(1100px,96vw); background:#fff; border-radius:12px; overflow:hidden; display:grid; grid-template-columns:1.15fr 1fr; position:relative; }
+    .qv-close{ position:absolute; top:12px; right:12px; width:36px; height:36px; border-radius:999px; border:1px solid rgba(0,0,0,.15); background:#fff; color:#111; font-size:20px; display:grid; place-items:center; cursor:pointer; z-index:1; }
+    .qv-media{ background:#f6f6f4; display:grid; place-items:center; min-height:420px; }
+    .qv-media img{ width:100%; height:100%; object-fit:contain; aspect-ratio:4/3; max-height:80vh; }
+    .qv-info{ padding:28px 28px 32px; }
+    .qv-brand{ letter-spacing:.28em; font-size:.8rem; color:#6d6a33; margin:0 0 8px; text-transform:uppercase; }
+    .qv-title{ font-size:1.8rem; margin:0 0 6px; color:#2b1f1a; line-height:1.25; }
+    .qv-rating{ margin:8px 0 10px; color:#e0a106; }
+    .qv-price{ font-weight:800; margin:6px 0 14px; color:#2b1f1a; }
+    .qv-rule{ border:0; border-top:1px solid #eee; margin:16px 0 18px; }
+
+    .qv-qty{ display:inline-grid; grid-template-columns:44px 70px 44px; height:44px; border:1px solid #bbb; border-radius:8px; overflow:hidden; background:#fff; margin-bottom:12px; }
+    .qv-qty button{ background:#fff; border:0; font-size:22px; font-weight:700; color:#2b1f1a; cursor:pointer; border-right:1px solid #ddd; }
+    .qv-qty button:last-of-type{ border-right:0; border-left:1px solid #ddd; }
+    .qv-qty input{ border:0; width:70px; text-align:center; font-size:16px; outline:none; -webkit-appearance:none; appearance:textfield; color:#2b1f1a; }
+    .qv-qty input::-webkit-outer-spin-button,.qv-qty input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+
+    .qv-btn{ width:100%; height:48px; border-radius:8px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:10px; transition:filter .15s; }
+    .qv-btn:active{ filter:brightness(.96); }
+    .qv-btn-primary{ background:#6d6a33; color:#fff; border:0; margin-bottom:10px; }
+    .qv-btn-outline{ background:#fff; color:#2b1f1a; border:1px solid #ccc; }
+    .qv-btn-outline:hover { background:#C9C78B; color:#fff; border-color:#6d6a33; }
+
+    /* Size pills (clothing only) */
+    .qv-size{ margin:8px 0 12px; }
+    .qv-size-label{ display:block; font-weight:700; color:#2b1f1a; margin-bottom:8px; }
+    .size-pills{ display:flex; flex-wrap:wrap; gap:10px; }
+    .size-pills input{ position:absolute; opacity:0; pointer-events:none; }
+    .size-pills label{ display:inline-flex; align-items:center; justify-content:center; min-width:56px; height:36px; padding:0 12px; border:1px solid #cfc7c1; border-radius:999px; background:#fff; color:#2b1f1a; font-weight:700; cursor:pointer; transition:.15s; font-size:.95rem; }
+    .size-pills label:hover{ border-color:#6d6a33; box-shadow:0 0 0 3px rgba(109,106,51,.14); }
+    .size-pills input:checked + label{ background:#6d6a33; color:#fff; border-color:#6d6a33; }
+
+    @media (max-width: 820px){ .qv-shell{ grid-template-columns:1fr; } .qv-media{ min-height:300px; } .qv-media img{ aspect-ratio:4/3; max-height:60vh; } }
+
+    .lock-scroll { overflow:hidden; }
+  </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<header class="header">
-    <div class="logo"><img src="../images/projectlogo.png" alt="logo" /></div>
-    <nav class="navigation">
-        <ul class="nav-links">
-            <li class="nav-link"><a href="../index.html">Home</a></li>
-            <li class="nav-link"><a href="../best-pick/best-picks.html">Best Picks</a></li>
-            <li class="nav-link"><a href="../shop-all.html">Shop All</a></li>
-            <li class="nav-link"><a href="../categories.html">Shop by Category</a></li>
-        </ul>
-    </nav>
-    <nav class="utils">
-        <ul class="nav-links">
-            <li class="nav-link"><a href="../search.html"><i class="fa-solid fa-magnifying-glass"></i></a></li>
-            <li class="nav-link"><a href="../login.html"><i class="fa-solid fa-user"></i></a></li>
-            <li class="nav-link"><a href="../cart.html"><i class="fa-solid fa-cart-shopping"></i></a></li>
-            <li class="nav-link"><a href="../wishlist.html"><i class="fa-regular fa-heart"></i></a></li>
-            <li class="nav-link"><a href="../support.html"><i class="fa-solid fa-headset"></i></a></li>
-        </ul>
-    </nav>
-</header>
+  <!-- HEADER (paths are relative to /best-pick/) -->
+  <header class="header">
+    <div class="logo">
+      <a href="../index.html" aria-label="Home">
+        <img src="../images/projectlogo.png" alt="logo">
+      </a>
+    </div>
 
-<!-- PRODUCTS -->
-<section class="products">
+    <div class="nav-center">
+      <form class="site-search" action="../search.html" method="GET">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="search" name="q" placeholder="Search products, categories..." autocomplete="off"/>
+        <button type="submit">Search</button>
+      </form>
+
+      <nav class="main-links">
+        <ul>
+          <li><a href="../best-pick/best-picks.html" class="active">Best Picks</a></li>
+          <li><a href="../shop-all.html">Shop All</a></li>
+          <li class="has-megamenu">
+            <a href="#" class="catmenu-toggle" aria-expanded="false">
+              Shop by Category <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+            </a>
+            <div class="mega" id="catMega" role="menu" aria-label="Shop by Category">
+              <h3 class="cat-heading">All Categories</h3>
+              <ul class="cat-list">
+                <li><a href="../shop-all.html?cat=flavors"><i class="fa-solid fa-cookie-bite"></i> Flavors</a></li>
+                <li><a href="../shop-all.html?cat=accessories"><i class="fa-solid fa-gear"></i> Accessories</a></li>
+                <li><a href="../shop-all.html?cat=bags"><i class="fa-solid fa-bag-shopping"></i> Bags</a></li>
+                <li><a href="../shop-all.html?cat=clothing"><i class="fa-solid fa-shirt"></i> Clothing</a></li>
+                <li><a href="../shop-all.html?cat=home"><i class="fa-solid fa-mug-hot"></i> Home</a></li>
+                <li><a href="../shop-all.html?cat=crafts"><i class="fa-solid fa-scissors"></i> Crafts</a></li>
+                <li><a href="../shop-all.html?cat=christmas"><i class="fa-solid fa-snowflake"></i> Christmas</a></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <nav class="utils">
+      <ul class="nav-links">
+        <li><a href="../login.html" aria-label="Account"><i class="fa-solid fa-user"></i></a></li>
+        <li class="cart-icon">
+          <a href="#" id="openCart" aria-label="Open cart">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span class="cart-count">0</span>
+          </a>
+        </li>
+        <li><a href="../wishlist.html" aria-label="Wishlist"><i class="fa-regular fa-heart"></i></a></li>
+        <li><a href="../support.html" aria-label="Support"><i class="fa-solid fa-headset"></i></a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Cart Drawer -->
+  <div class="cd-overlay" id="cdOverlay" aria-hidden="true"></div>
+  <aside class="cd-drawer" id="cdDrawer" aria-hidden="true" role="dialog" aria-label="Cart drawer">
+    <div class="cd-header">
+      <h2>Cart</h2>
+      <button id="cdClose" class="cd-close" aria-label="Close cart">×</button>
+    </div>
+    <div class="cd-body">
+      <div id="cdItems" class="cd-items"></div>
+      <div class="cd-summary">
+        <div class="cd-row">
+          <span>Subtotal</span>
+          <strong id="cdSubtotal">₱0.00</strong>
+        </div>
+        <p class="cd-note">Shipping, taxes, and discount codes calculated at checkout.</p>
+        <label class="cd-terms">
+          <input id="cdAgree" type="checkbox">
+          <span>I agree with the <a href="../terms.html" target="_blank" rel="noopener">terms and conditions</a></span>
+        </label>
+        <button id="cdCheckout" class="cd-checkout" disabled>CHECK OUT</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- PRODUCTS -->
+  <section class="products">
     <h1 class="section-title">Best Picks</h1>
     <div class="products-list"></div>
-</section>
+  </section>
 
-<!-- Quick View Modal -->
-<div class="modal" id="quickViewModal">
-    <div class="modal-content">
-        <span class="close-modal">&times;</span>
-        <img id="modal-img" src="" alt="">
-        <div class="modal-details">
-            <h3>Lokal</h3>
-            <h2 id="modal-name"></h2>
-            <p id="modal-desc"></p>
-            <p id="modal-price"></p>
-            <div class="quantity">
-                <label>Quantity:</label>
-                <input type="number" value="1" min="1">
-            </div>
-            <button class="button">Add to Cart</button>
-            <p class="reviews" id="modal-rating"></p>
+  <!-- QUICK VIEW MODAL -->
+  <div class="qv-overlay" id="qvOverlay" aria-hidden="true"></div>
+  <div class="qv-modal" id="qvModal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Quick view">
+    <div class="qv-shell" role="document">
+      <button class="qv-close" id="qvClose" aria-label="Close">×</button>
+
+      <div class="qv-media">
+        <img id="qvImg" alt="">
+      </div>
+
+      <div class="qv-info">
+        <p class="qv-brand">Lokal</p>
+        <h2 class="qv-title" id="qvName"></h2>
+        <div class="qv-rating" id="qvRating" aria-label="Product rating"></div>
+        <p class="qv-price" id="qvPrice"></p>
+        <hr class="qv-rule" />
+
+        <div class="qv-size" id="qvSizeWrap" hidden>
+          <span class="qv-size-label">Size</span>
+          <div class="size-pills" role="radiogroup" aria-label="Choose size">
+            <input type="radio" name="qvSize" id="qvS" value="Small"><label for="qvS">S</label>
+            <input type="radio" name="qvSize" id="qvM" value="Medium"><label for="qvM">M</label>
+            <input type="radio" name="qvSize" id="qvL" value="Large"><label for="qvL">L</label>
+            <input type="radio" name="qvSize" id="qvXL" value="XL"><label for="qvXL">XL</label>
+          </div>
         </div>
-    </div>
-</div>
 
-<!-- FOOTER -->
-<footer class="footer">
+        <label class="qv-qty" aria-label="Quantity">
+          <button type="button" id="qvDec" aria-label="Decrease">−</button>
+          <input type="number" id="qvQty" value="1" min="1" aria-label="Quantity input">
+          <button type="button" id="qvInc" aria-label="Increase">+</button>
+        </label>
+
+        <p class="qv-stock" id="qvStock" hidden>Only 6 items in stock!</p>
+
+        <button class="qv-btn qv-btn-primary" id="qvAdd"><i class="fa-solid fa-cart-plus"></i> ADD TO CART</button>
+        <button class="qv-btn qv-btn-outline" id="qvView">View Details</button>
+
+        <div class="qv-desc" id="qvDesc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
     <div class="footer-section">
-        <h1>Contact Us</h1>
-        <ul class="footer-list">
-            <li>lokal@info.com</li>
-            <li>lokal@admin.com</li>
-            <li>Manila Philippines</li>
-            <li class="border-list"></li>
-            <li class="socials">
-                <i class="fa-brands fa-square-instagram"></i>
-                <i class="fa-brands fa-square-facebook"></i>
-                <i class="fa-brands fa-tiktok"></i>
-            </li>
-        </ul>
+      <h1>Contact Us</h1>
+      <ul class="footer-list">
+        <li>lokal@info.com</li>
+        <li>lokal@admin.com</li>
+        <li>Manila Philippines</li>
+        <li class="border-list"></li>
+        <li class="socials">
+          <i class="fa-brands fa-square-instagram"></i>
+          <i class="fa-brands fa-square-facebook"></i>
+          <i class="fa-brands fa-tiktok"></i>
+        </li>
+      </ul>
     </div>
     <div class="footer-section">
-        <h1>Quick Links</h1>
-        <ul class="footer-list">
-            <li><a href="../index.html">Home</a></li>
-            <li><a href="../shop-all.html">Shop All</a></li>
-            <li><a href="../about.html">About Us</a></li>
-            <li><a href="../terms.html">Terms & Conditions</a></li>
-        </ul>
+      <h1>Quick Links</h1>
+      <ul class="footer-list">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../shop-all.html">Shop All</a></li>
+        <li><a href="../about.html">About Us</a></li>
+        <li><a href="../terms.html">Terms & Conditions</a></li>
+      </ul>
     </div>
     <div class="footer-section">
-        <h1>Subscribe to Newsletter</h1>
-        <ul class="footer-list">
-            <li>A local marketplace is a community hub where people buy, sell, or trade goods and services within their area.</li>
-            <li class="sub">
-                <input type="text">
-                <button class="button">Subscribe</button>
-            </li>
-        </ul>
+      <h1>Subscribe to Newsletter</h1>
+      <ul class="footer-list">
+        <li>A local marketplace is a community hub where people buy, sell, or trade goods and services within their area.</li>
+        <li class="sub">
+          <input type="text" placeholder="Your email">
+          <button class="button">Subscribe</button>
+        </li>
+      </ul>
     </div>
-</footer>
+  </footer>
 
-<!-- SCRIPTS -->
-<script>
-const productImages = [
-  "../images/flavors/cebu/flavors1.png",
-  "../images/flavors/cebu/flavors2.png","../images/flavors/cebu/flavors5.png","../images/flavors/cebu/flavors6.png","../images/crafts/crafts1.png",
-  "../images/clothing/clothing1.png","../images/placeholder.png","../images/placeholder.png","../images/placeholder.png","../images/placeholder.png",
-  "../images/placeholder.png","../images/placeholder.png","../images/placeholder.png","../images/placeholder.png","../images/placeholder.png",
-  "../images/placeholder.png","../images/placeholder.png","../images/placeholder.png","../images/placeholder.png","../images/placeholder.png"
-];
+  <!-- PAGE SCRIPTS -->
+  <script>
+    /* ================= Helpers ================= */
+    // Always convert relative -> absolute; this is the key to fixing cart images from subfolders
+    const toAbs = (p) => { try { return new URL(p, location.href).href; } catch { return p; } };
 
-const productNames = [
-  "Shamrock Otap","Shamrock Rosquillos","Mango Flavorful Candy ","7D Dried Mangoes Dark Chocolate Enrobed ","Model Jeepney ",
-  "Bolero","Product 7","Product 8","Product 9","Product 10",
-  "Product 11","Product 12","Product 13","Product 14","Product 15",
-  "Product 16","Product 17","Product 18","Product 19","Product 20"
-];
+    const PRODUCT_PAGE = 'product.html';
 
-const productPrices = [
-  "₱120","₱120","₱100","₱170","₱200",
-  "₱0","₱0","₱0","₱0","₱0",
-  "₱0","₱0","₱0","₱0","₱0",
-  "₱0","₱0","₱0","₱0","₱0"
-];
+    function renderStars(r){
+      const full = Math.floor(r||0);
+      const half = (r - full >= .25 && r - full < .75) ? 1 : 0;
+      const roundedFull = half ? full : Math.round(r||0);
+      let html = '';
+      for (let i=0;i<roundedFull;i++) html += '<i class="fa-solid fa-star"></i>';
+      if (half) html += '<i class="fa-solid fa-star-half-stroke"></i>';
+      while ((html.match(/fa-star/g)||[]).length < 5) html += '<i class="fa-regular fa-star"></i>';
+      return html;
+    }
 
-const productDescriptions = [
-  "Made from shamrock famous fresh eggs and flour folded into delicate layers, for a deliciously crisp puff pastry biscuits with a sprinkling of sweetness.",
-  "Iconic Filipino biscuits from Cebu, known for their crisp, buttery goodness and signature ring shape.","A soft, chewy treat with the sweet and natural taste of mango in every bite.","Sweet, tart, and chewy 7D dried mangoes coated in rich dark chocolate. A premium Filipino treat in every bite!","The iconic King of the Road will make an awesome addition to your car collection!",
-  "Description for Product 6","Description for Product 7","Description for Product 8","Description for Product 9","Description for Product 10",
-  "Description for Product 11","Description for Product 12","Description for Product 13","Description for Product 14","Description for Product 15",
-  "Description for Product 16","Description for Product 17","Description for Product 18","Description for Product 19","Description for Product 20"
-];
+    function goToProductDetail(data){
+      const payload = {
+        ...data,
+        img: toAbs(data.img),
+        images: (Array.isArray(data.images) ? data.images : [data.img]).map(toAbs)
+      };
+      localStorage.setItem('productDetail', JSON.stringify(payload));
+      location.href = PRODUCT_PAGE;
+    }
 
-const productRatings = [
-  "★★★★★","★★★★","★★★★★","★★★★","★★★★★",
-  "★★★","★★★★","★★★★★","★★★★","★★★★★",
-  "★★★","★★★★","★★★★★","★★★★","★★★★★",
-  "★★★","★★★★","★★★★★","★★★★","★★★★★"
-];
+    function addToCart(product){
+      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const idx = cart.findIndex(i => i.baseName === product.baseName && i.size === product.size);
 
-const productsContainer = document.querySelector('.products-list');
+      // ensure absolute image is saved
+      const item = { ...product, img: toAbs(product.img) };
 
-for (let i = 0; i < 20; i++) {
-    const productDiv = document.createElement('div');
-    productDiv.className = 'best-product';
-    productDiv.dataset.name = productNames[i];
-    productDiv.dataset.price = productPrices[i];
-    productDiv.dataset.img = productImages[i];
-    productDiv.dataset.desc = productDescriptions[i];
-    productDiv.dataset.rating = productRatings[i];
+      if (idx > -1){ cart[idx].quantity += item.quantity; }
+      else { cart.push(item); }
 
-    productDiv.innerHTML = `
-        <div class="img-container">
-            <img src="${productImages[i]}" alt="${productNames[i]}">
-            <button class="quick-view-btn">Quick View</button>
-        </div>
+      localStorage.setItem('cart', JSON.stringify(cart));
+      if (typeof window.openCartDrawer === 'function') window.openCartDrawer();
+    }
+
+    /* ================= Demo Data ================= */
+    const productImages = [
+      "../images/flavors/cebu/flavors1.png","../images/flavors/cebu/flavors2.png","../images/flavors/cebu/flavors5.png","../images/flavors/cebu/flavors6.png","../images/crafts/crafts1.png",
+      "../images/clothing/clothing1.png","../images/bags/bag1.png","../images/accessories/accessories1.png","../images/accessories/accessories2.png","../images/clothing/clothing2.png",
+      "../images/accessories/accessories3.png","../images/accessories/accessories4.png","../images/flavors/flavors7.png","../images/flavors/flavors8.png","../images/flavors/flavors9.png",
+      "../images/flavors/flavors10.png","../images/home/home1.png","../images/home/home2.png","../images/home/home3.png","../images/home/home4.png"
+    ];
+    const productNames = [
+      "Shamrock Otap","Shamrock Rosquillos","Mango Flavorful Candy","7D Dried Mangoes Dark Chocolate","Model Jeepney",
+      "Bolero","Bayong Bag","Habing Maragondon Face Mask","Bucket Hat with PH Embroidery","Men's Cocoon Fully Callado Barong",
+      "Firebend 02","Sunglasses Cork Case","Davana Cassava Chips Barbeque","Auro Plant-based Chocolates","Pure Benguet Honey",
+      "Chocolea Choco Drink","Handwoven Bath Towels","Napkin Ring Floral","Mother of Pearl Utility Dish","Atin Reed Diffuser"
+    ];
+    const productPrices = [
+      "₱120","₱120","₱100","₱170","₱200",
+      "₱2,400","₱1,600","₱350","₱250","₱10,000",
+      "₱4,000","₱600","₱120","₱110","₱400",
+      "₱350","₱1,000","₱800","₱2,000","₱900"
+    ];
+    const productDescriptions = [
+      "Made from shamrock fresh eggs and flour folded into delicate layers.",
+      "Iconic biscuits from Cebu with crisp, buttery goodness.","Chewy treat with sweet natural mango taste.","7D dried mangoes coated in rich dark chocolate.","The iconic King of the Road for your collection!",
+      "Handmade Bolero from Cavite — skill and artistry.","Locally made Bayong Bag that blends culture and practicality.","First local handwoven mask meeting global standards.","Foldable wide brim hat you can easily take with you.","Formal barong with intricate cutwork embroidery.",
+      "Handcrafted bamboo frame with polarized lens.","Fold-flat sunglass case made of cork.","High-quality cassava chips.","Fiesta-inspired chocolate collection.","Locally produced pure Benguet honey.",
+      "Single-origin cocoa drink mix infused with coconut sugar.","Made of handwoven fabric from polyester yarn.","Table décor / party accessory.","Elegant multi-purpose Mother of Pearl utility dish.","Marine + jasmine + woody notes; tropical tranquility."
+    ];
+    const productRatings = [4.5,4.2,4.0,4.7,4.6,4.8,4.3,4.1,4.0,4.9,4.2,4.4,4.0,4.5,4.6,4.3,4.1,4.0,4.2,4.4];
+    const productReviews = new Array(productNames.length).fill(3);
+    const productGalleries = [
+      ["../images/flavors/cebu/flavors1.png","../images/flavors/cebu/flavors1a.png","../images/flavors/cebu/flavors1b.png","../images/flavors/cebu/flavors1c.png"],
+      ["../images/flavors/cebu/flavors2.png","../images/flavors/cebu/flavors2a.png"],
+      ["../images/flavors/cebu/flavors5.png","../images/flavors/cebu/flavors5a.png","../images/flavors/cebu/flavors5b.png"],
+      ["../images/flavors/cebu/flavors6.png","../images/flavors/cebu/flavors6a.png","../images/flavors/cebu/flavors6b.png"],
+      ["../images/crafts/crafts1.png","../images/crafts/crafts1a.png","../images/crafts/crafts1b.png"],
+      ["../images/clothing/clothing1.png"],
+      ["../images/bags/bag1.png","../images/bags/bag1a.png","../images/bags/bag1b.png"],
+      ["../images/accessories/accessories1.png","../images/accessories/accessories1a.png"],
+      ["../images/accessories/accessories2.png","../images/accessories/accessories2a.png"],
+      ["../images/clothing/clothing2.png","../images/clothing/clothing2a.png","../images/clothing/clothing2b.png","../images/clothing/clothing2c.png"],
+      ["../images/accessories/accessories3.png","../images/accessories/accessories3a.png"],
+      ["../images/accessories/accessories4.png","../images/accessories/accessories4a.png"],
+      ["../images/flavors/flavors7.png"],
+      ["../images/flavors/flavors8.png","../images/flavors/flavors8a.png","../images/flavors/flavors8b.png"],
+      ["../images/flavors/flavors9.png","../images/flavors/flavors9a.png"],
+      ["../images/flavors/flavors10.png","../images/flavors/flavors10a.png","../images/flavors/flavors10b.png"],
+      ["../images/home/home1.png","../images/home/home1a.png","../images/home/home1b.png"],
+      ["../images/home/home2.png","../images/home/home2a.png"],
+      ["../images/home/home3.png","../images/home/home3a.png"],
+      ["../images/home/home4.png","../images/home/home4a.png","../images/home/home4b.png"]
+    ];
+    const productBullets = [
+      ["Delicately layered pastry","Made with fresh eggs","Cebu’s favorite snack"],
+      ["Crisp buttery rings","Iconic Cebu pasalubong","Perfect with coffee"],
+      ["Tropical mango flavor","Chewy texture","Great for kids"],
+      ["Premium mangoes","Dark chocolate coated","Sweet and tart balance"],
+      ["Handcrafted metal","Made in the Philippines","Perfect souvenir"],
+      ["Elegant handmade bolero","Comfortable cotton fabric","Locally crafted"],
+      ["Sustainable materials","Spacious and durable","Modern Filipino design"],
+      ["Locally woven","Breathable and reusable","Stylish protection"],
+      ["Wide brim","Adjustable fit","PH embroidery detail"],
+      ["Classic barong style","Callado embroidery","Handmade with care"],
+      ["Bamboo frame","Polarized lenses","Eco-friendly design"],
+      ["Compact and foldable","Made of cork","Protective interior lining"],
+      ["Crispy cassava snack","Barbecue flavor","Locally sourced"],
+      ["Vegan and plant-based","Artisan chocolate","Fiesta-inspired taste"],
+      ["100% pure honey","From Benguet highlands","Perfect natural sweetener"],
+      ["Rich cocoa flavor","Coconut sugar blend","Single-origin chocolate"],
+      ["Soft texture","Locally handwoven","Elegant design"],
+      ["Floral motif","Perfect for tablescapes","Locally crafted"],
+      ["Shell inlay","Handcrafted elegance","Multi-purpose use"],
+      ["Tropical jasmine scent","Made in the Philippines","Long-lasting fragrance"]
+    ];
+
+    /* ================= Render cards ================= */
+    const productsContainer = document.querySelector('.products-list');
+
+    function isClothingIndex(i){
+      const name = (productNames[i]||"").toLowerCase();
+      const img  = (productImages[i]||"").toLowerCase();
+      return /(barong|bolero|shirt|dress|top|blouse|pants|trousers|skirt|coat|jacket)/i.test(name) || img.includes("/clothing/");
+    }
+
+    for (let i=0;i<productNames.length;i++){
+      const card = document.createElement('article');
+      card.className = 'best-product';
+      card.innerHTML = `
+        <a class="product-link img-wrap" href="${PRODUCT_PAGE}" data-i="${i}">
+          <img src="${productImages[i]}" alt="${productNames[i]}">
+        </a>
+        <button class="quick-view" type="button" data-qv="${i}" aria-haspopup="dialog">Quick View</button>
         <div class="details">
-            <p>${productNames[i]}</p>
-            <p>${productPrices[i]}</p>
-            <button class="button">Add to Cart</button>
+          <a class="product-link" href="${PRODUCT_PAGE}" data-i="${i}"><p class="name">${productNames[i]}</p></a>
+          <p class="price">${productPrices[i]}</p>
         </div>
-    `;
-    productsContainer.appendChild(productDiv);
-}
-
-// Modal & Add to Cart
-const modal = document.getElementById("quickViewModal");
-const modalImg = document.getElementById("modal-img");
-const modalName = document.getElementById("modal-name");
-const modalDesc = document.getElementById("modal-desc");
-const modalPrice = document.getElementById("modal-price");
-const modalRating = document.getElementById("modal-rating");
-const closeModal = document.querySelector(".close-modal");
-const modalAddBtn = modal.querySelector("button");
-
-document.addEventListener('click', function(e){
-    if(e.target.classList.contains('quick-view-btn')){
-        const product = e.target.closest(".best-product");
-        modalImg.src = product.dataset.img;
-        modalName.textContent = product.dataset.name;
-        modalDesc.textContent = product.dataset.desc;
-        modalPrice.textContent = product.dataset.price;
-        modalRating.textContent = product.dataset.rating;
-        modal.querySelector("input").value = 1;
-        modal.style.display = "flex";
+      `;
+      productsContainer.appendChild(card);
     }
-});
 
-closeModal.addEventListener("click", ()=> modal.style.display="none");
-window.addEventListener("click", (e)=> { if(e.target === modal) modal.style.display="none"; });
+    /* ================= Quick View ================= */
+    const qvOverlay = document.getElementById('qvOverlay');
+    const qvModal   = document.getElementById('qvModal');
+    const qvImg     = document.getElementById('qvImg');
+    const qvName    = document.getElementById('qvName');
+    const qvPrice   = document.getElementById('qvPrice');
+    const qvDesc    = document.getElementById('qvDesc');
+    const qvClose   = document.getElementById('qvClose');
+    const qvAdd     = document.getElementById('qvAdd');
+    const qvView    = document.getElementById('qvView');
+    const qvQty     = document.getElementById('qvQty');
+    const qvDec     = document.getElementById('qvDec');
+    const qvInc     = document.getElementById('qvInc');
+    const qvStock   = document.getElementById('qvStock');
+    const qvRating  = document.getElementById('qvRating');
+    const qvSizeWrap= document.getElementById('qvSizeWrap');
 
-function addToCart(product){
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const index = cart.findIndex(item => item.name === product.name);
-    if(index > -1){ cart[index].quantity += product.quantity; }
-    else { cart.push(product); }
-    localStorage.setItem("cart", JSON.stringify(cart));
-    alert(`${product.name} added to cart!`);
-}
+    let currentIndex = null;
 
-document.addEventListener("click", function(e){
-    if(e.target.classList.contains("button") && e.target.closest(".best-product")){
-        const p = e.target.closest(".best-product");
-        addToCart({
-            img: p.dataset.img,
-            name: p.dataset.name,
-            price: p.dataset.price,
-            desc: p.dataset.desc,
-            quantity: 1
-        });
+    function openQV(i){
+      currentIndex = i;
+      qvImg.src   = productImages[i];
+      qvImg.alt   = productNames[i];
+      qvName.textContent  = productNames[i];
+      qvPrice.textContent = productPrices[i];
+      qvDesc.textContent  = productDescriptions[i];
+      qvQty.value = 1;
+      qvRating.innerHTML = renderStars(productRatings[i] ?? 4.5);
+      qvStock.hidden = true;
+      qvSizeWrap.hidden = !isClothingIndex(i);
+      document.querySelectorAll('input[name="qvSize"]').forEach(r=> r.checked = false);
+      qvOverlay.classList.add('active'); qvModal.classList.add('active'); document.body.classList.add('lock-scroll'); qvClose.focus();
     }
-});
+    function closeQV(){ qvOverlay.classList.remove('active'); qvModal.classList.remove('active'); document.body.classList.remove('lock-scroll'); currentIndex=null; }
+    document.addEventListener('click',(e)=>{ const b=e.target.closest('button[data-qv]'); if(!b) return; e.preventDefault(); openQV(+b.dataset.qv); });
+    qvDec.addEventListener('click',()=>{ qvQty.value=Math.max(1,(parseInt(qvQty.value)||1)-1); });
+    qvInc.addEventListener('click',()=>{ qvQty.value=(parseInt(qvQty.value)||1)+1; });
+    qvClose.addEventListener('click',closeQV); qvOverlay.addEventListener('click',closeQV);
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && qvModal.classList.contains('active')) closeQV(); });
 
-modalAddBtn.addEventListener("click", ()=>{
-    const qty = parseInt(modal.querySelector("input").value) || 1;
-    addToCart({
-        img: modalImg.src,
-        name: modalName.textContent,
-        price: modalPrice.textContent,
-        desc: modalDesc.textContent,
-        quantity: qty
+    qvAdd.addEventListener('click', ()=>{
+      if(currentIndex==null) return;
+      const clothing = isClothingIndex(currentIndex);
+      let chosenSize = null;
+      if (clothing){
+        const r = Array.from(document.querySelectorAll('input[name="qvSize"]')).find(x=>x.checked);
+        chosenSize = r ? r.value : null;
+        if (!chosenSize){ alert('Please choose a size.'); return; }
+      }
+      const baseName = productNames[currentIndex];
+      addToCart({
+        baseName,
+        name: clothing && chosenSize ? `${baseName} (Size: ${chosenSize})` : baseName,
+        img: toAbs(productImages[currentIndex]),   // absolute!
+        price: productPrices[currentIndex],
+        desc: productDescriptions[currentIndex],
+        size: chosenSize || null,
+        quantity: Math.max(1, parseInt(qvQty.value)||1)
+      });
+      closeQV();
     });
-    modal.style.display = "none";
-});
-</script>
 
+    qvView.addEventListener('click', ()=>{
+      if(currentIndex==null) return;
+      const clothing = isClothingIndex(currentIndex);
+      const r = Array.from(document.querySelectorAll('input[name="qvSize"]')).find(x=>x.checked);
+      const chosenSize = clothing ? (r ? r.value : null) : null;
+      goToProductDetail({
+        img: productImages[currentIndex],
+        images: productGalleries[currentIndex],
+        name: productNames[currentIndex],
+        price: productPrices[currentIndex],
+        desc: productDescriptions[currentIndex],
+        rating: productRatings[currentIndex] || 0,
+        reviewsCount: productReviews[currentIndex] || 0,
+        bullets: productBullets[currentIndex] || [],
+        preselectedSize: chosenSize,
+        category: clothing ? "Clothing" : ""
+      });
+    });
+
+    /* ================= Card link -> product ================= */
+    document.addEventListener('click',(e)=>{
+      const link = e.target.closest('.product-link');
+      if (!link || link.dataset.i === undefined) return;
+      e.preventDefault();
+      const i = Number(link.dataset.i);
+      goToProductDetail({
+        img: productImages[i],
+        images: productGalleries[i],
+        name: productNames[i],
+        price: productPrices[i],
+        desc: productDescriptions[i],
+        rating: productRatings[i] || 0,
+        reviewsCount: productReviews[i] || 0,
+        bullets: productBullets[i] || [],
+        preselectedSize: null,
+        category: isClothingIndex(i) ? "Clothing" : ""
+      });
+    });
+  </script>
+
+  <!-- Cart drawer logic -->
+  <script src="../cart.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const drawer = document.getElementById('cdDrawer');
+      const toggleLock = () => {
+        document.body.classList.toggle('lock-scroll', drawer.classList.contains('active'));
+      };
+      new MutationObserver(toggleLock).observe(drawer, { attributes: true, attributeFilter: ['class'] });
+    });
+  </script>
 </body>
 </html>

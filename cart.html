@@ -1,57 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Cart | Lokal</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="cart.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" crossorigin="anonymous" />
-</head>
-<body>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Cart | Lokal</title>
 
-<!-- HEADER -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Cart</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-</head>
-<body>
-<header>
-    <header class="header">
-        <div class="logo"><img src="../images/projectlogo.png" alt="logo" /></div>
-        <nav class="navigation">
-            <ul class="nav-links">
-                <li class="nav-link"><a href="../best-pick/best-picks.html">Best Picks</a></li>
-                <li class="nav-link"><a href="../shop-all.html">Shop All</a></li>
-                <li class="nav-link"><a href="../categories.html">Shop by Category</a></li>
-            </ul>
-        </nav>
-        <nav class="utils">
-            <ul class="nav-links">
-                <li class="nav-link"><a href="../search.html"><i class="fa-solid fa-magnifying-glass"></i></a></li>
-                <li class="nav-link"><a href="../login.html"><i class="fa-solid fa-user"></i></a></li>
-                <li class="nav-link"><a href="../cart.html"><i class="fa-solid fa-cart-shopping"></i></a></li>
-                <li class="nav-link"><a href="../wishlist.html"><i class="fa-regular fa-heart"></i></a></li>
-                <li class="nav-link"><a href="../support.html"><i class="fa-solid fa-headset"></i></a></li>
-            </ul>
-        </nav>
-    </header>
-</header>
+  <!-- Fonts & Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" crossorigin="anonymous" />
 
-<main class="cart-page">
-    <h1>Your Cart</h1>
-    <div class="cart-items"></div>
-    <div class="cart-summary">
-        <p>Total: ₱<span id="cart-total">0.00</span></p>
-        <button class="checkout-btn">Proceed to Checkout</button>
+  <!-- Site Styles -->
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="cart.css">
+</head>
+
+<body>
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo">
+      <a href="index.html"><img src="images/projectlogo.png" alt="Lokal Logo" /></a>
     </div>
-</main>
 
-<script src="cart.js"></script>
+    <div class="nav-center">
+      <!-- Search Bar -->
+      <form class="site-search" action="search.html" method="GET">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="search" name="q" placeholder="Search products, categories..." autocomplete="off" />
+        <button type="submit">Search</button>
+      </form>
+
+      <!-- Main Links -->
+      <nav class="main-links">
+        <ul>
+          <li><a href="best-pick/best-picks.html">Best Picks</a></li>
+          <li><a href="shop-all.html">Shop All</a></li>
+          <li><a href="categories.html">Shop by Category</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Utilities -->
+    <nav class="utils">
+      <ul class="nav-links">
+        <li><a href="login.html"><i class="fa-solid fa-user"></i></a></li>
+        <li>
+          <a href="#" id="openCart"><i class="fa-solid fa-cart-shopping"></i><span class="cart-count">0</span></a>
+        </li>
+        <li><a href="wishlist.html"><i class="fa-regular fa-heart"></i></a></li>
+        <li><a href="support.html"><i class="fa-solid fa-headset"></i></a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- CART PAGE -->
+  <main class="cart-page">
+    <h1>Your Cart</h1>
+
+    <div class="cart-items" aria-live="polite"></div>
+
+    <div class="cart-summary">
+      <p>Total: <strong>₱<span id="cart-total">0.00</span></strong></p>
+      <button class="checkout-btn" id="checkoutBtn">Proceed to Checkout</button>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-section">
+      <h1>Contact Us</h1>
+      <ul class="footer-list">
+        <li>lokal@info.com</li>
+        <li>lokal@admin.com</li>
+        <li>Manila, Philippines</li>
+        <li class="border-list"></li>
+        <li class="socials">
+          <i class="fa-brands fa-square-instagram"></i>
+          <i class="fa-brands fa-square-facebook"></i>
+          <i class="fa-brands fa-tiktok"></i>
+        </li>
+      </ul>
+    </div>
+
+    <div class="footer-section">
+      <h1>Quick Links</h1>
+      <ul class="footer-list">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="shop-all.html">Shop All</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="terms.html">Terms & Conditions</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-section">
+      <h1>Subscribe to Newsletter</h1>
+      <ul class="footer-list">
+        <li>A local marketplace is a community hub where people buy, sell, or trade goods and services within their area.</li>
+        <li class="sub">
+          <input type="text" placeholder="Your email" />
+          <button class="button">Subscribe</button>
+        </li>
+      </ul>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script src="cart.js"></script>
+  <script src="wishlist.js"></script>
 </body>
 </html>
