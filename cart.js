@@ -1,7 +1,7 @@
 /* ========= Cart (drawer + page) =========
-   IMPORTANT: We DO NOT rewrite items in localStorage.
+   IMPORTANT: We DO NOT rewrite items when adding to cart.
    We only resolve image URLs at render-time so items added
-   from any subfolder show correctly everywhere.
+   from any subfolder show correctly everywhere (incl. GH Pages).
 */
 (function () {
   // ---------- helpers ----------
@@ -12,21 +12,44 @@
   const saveCart = (data) => localStorage.setItem('cart', JSON.stringify(data));
 
   // Make any stored img path displayable from ANY page.
-  // 1) absolute -> keep
-  // 2) leading slash -> keep (already site-root)
-  // 3) contains /images/... anywhere -> anchor to site root
-  // 4) otherwise -> resolve relative to current document
+  // We *never* force site-root ("/images/...") which breaks on GH Pages project sites.
   function resolveImg(p) {
     if (!p) return '';
+    // already absolute
     if (/^https?:\/\//i.test(p)) return p;
-    if (p.startsWith('/')) return p;
 
-    // normalize different relative forms to /images/...
-    const hit = p.match(/(?:^|\/)(images\/.+)$/i) || p.match(/(?:^|\/)(?:\.\.\/)+?(images\/.+)$/i);
-    if (hit && hit[1]) return '/' + hit[1].replace(/^\/+/, '');
+    // strip leading slashes (root-relative can break on project sites)
+    const cleaned = String(p).replace(/^\/+/, '');
 
-    try { return new URL(p, document.baseURI).href; }
-    catch { return p; }
+    // if it contains images/... anywhere, use that portion
+    const hit = cleaned.match(/(?:^|\/)(images\/.+)$/i);
+    const finalPath = hit ? hit[1] : cleaned;
+
+    try {
+      // resolve relative to current document (respects <base> if present)
+      return new URL(finalPath, document.baseURI).href;
+    } catch {
+      return finalPath; // last resort
+    }
+  }
+
+  // One-time migration: upgrade any saved relative/root paths to absolute URLs.
+  function migrateCartImagePaths() {
+    const cart = getCart();
+    let changed = false;
+    for (const it of cart) {
+      if (!it?.img) continue;
+      if (!/^https?:\/\//i.test(it.img)) {
+        const cleaned = String(it.img).replace(/^\/+/, ''); // drop leading slash
+        try {
+          it.img = new URL(cleaned, document.baseURI).href;
+          changed = true;
+        } catch {
+          // keep as-is if URL fails
+        }
+      }
+    }
+    if (changed) saveCart(cart);
   }
 
   // ---------- Drawer refs ----------
@@ -67,8 +90,8 @@
 
     if (cart.length === 0) {
       itemsEl.innerHTML = `<p style="color:#666;margin:8px 0;">Your cart is empty.</p>`;
-      subEl && (subEl.textContent = fmtPeso(0));
-      checkoutEl && (checkoutEl.disabled = !(agreeEl && agreeEl.checked));
+      if (subEl) subEl.textContent = fmtPeso(0);
+      if (checkoutEl) checkoutEl.disabled = !(agreeEl && agreeEl.checked);
       updateBadge();
       return;
     }
@@ -99,8 +122,8 @@
       itemsEl.appendChild(row);
     });
 
-    subEl && (subEl.textContent = fmtPeso(subtotal));
-    checkoutEl && agreeEl && (checkoutEl.disabled = !(agreeEl.checked && subtotal > 0));
+    if (subEl) subEl.textContent = fmtPeso(subtotal);
+    if (checkoutEl && agreeEl) checkoutEl.disabled = !(agreeEl.checked && subtotal > 0);
     updateBadge();
   }
 
@@ -153,7 +176,7 @@
   agreeEl && agreeEl.addEventListener('change', () => {
     const cart = getCart();
     const subtotal = cart.reduce((s, i) => s + parsePeso(i.price) * (i.quantity||1), 0);
-    checkoutEl && (checkoutEl.disabled = !(agreeEl.checked && subtotal > 0));
+    if (checkoutEl) checkoutEl.disabled = !(agreeEl.checked && subtotal > 0);
   });
 
   function openDrawer() {
@@ -194,8 +217,8 @@
 
     if (cart.length === 0) {
       pageItems.innerHTML = `<p style="color:#666;margin:8px 0;">Your cart is empty.</p>`;
-      pageTotal && (pageTotal.textContent = '0.00');
-      pageCheckout && (pageCheckout.disabled = true);
+      if (pageTotal) pageTotal.textContent = '0.00';
+      if (pageCheckout) pageCheckout.disabled = true;
       return;
     }
 
@@ -223,8 +246,10 @@
       pageItems.appendChild(row);
     });
 
-    pageTotal && (pageTotal.textContent = subtotal.toLocaleString('en-PH', { minimumFractionDigits:2, maximumFractionDigits:2 }));
-    pageCheckout && (pageCheckout.disabled = false);
+    if (pageTotal) {
+      pageTotal.textContent = subtotal.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    if (pageCheckout) pageCheckout.disabled = false;
   }
 
   // page events
@@ -264,7 +289,8 @@
     if (e.key === 'cart') { updateBadge(); renderDrawer(); renderPage(); }
   });
 
-  // initial paint
+  // ========= initial paint =========
+  migrateCartImagePaths();   // normalize any previously-saved relative/root paths
   updateBadge();
   renderPage();
 })();
