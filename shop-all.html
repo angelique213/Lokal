@@ -8,9 +8,11 @@
   <!-- Icons (FA6 stable) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
 
-  <!-- Site / Cart styles -->
+  <!-- Site / Cart / Wishlist styles -->
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="cart.css">
+  <link rel="stylesheet" href="wishlist.css">
+  <script src="wishlist.js" defer></script>
 
   <!-- Page-only styles -->
   <style>
@@ -24,11 +26,9 @@
       --card:#ffffff;
     }
 
-    /* Page scaffold */
     .shop-wrap{ max-width: 1200px; margin: 24px auto 60px; padding: 0 20px; }
     .section-title{ text-align:center; font-size:2.4rem; margin: 12px 0 18px; color:var(--ink); letter-spacing:.02em; }
 
-    /* Filter bar – compact, pill style */
     .filter-bar{
       display:grid;
       grid-template-columns: 1.6fr 1fr 1fr auto;
@@ -49,7 +49,6 @@
       background:transparent; padding:4px 0;
     }
 
-    /* nicer native selects */
     .filter-bar select{
       border:0; outline:0; width:100%; font-size:.98rem; color:var(--ink);
       background:
@@ -65,7 +64,6 @@
       color:var(--ink); opacity:.5; pointer-events:none;
     }
 
-    /* Smaller Reset button */
     .btn-reset{
       height:36px; padding:0 12px;
       border-radius:10px; border:1px solid #cfc7c1; background:#fff; cursor:pointer;
@@ -75,7 +73,6 @@
     .btn-reset:hover{ background:#f5f1ea; box-shadow:0 0 0 4px rgba(109,106,51,.10); }
     .btn-reset:active{ transform:translateY(1px); }
 
-    /* Grid */
     .products-list{
       display:grid; gap:24px; grid-template-columns: repeat(4, 1fr);
     }
@@ -98,6 +95,7 @@
     .card .price{ font-weight:800; color:var(--ink); margin:0; }
     .card .meta{ display:flex; justify-content:space-between; align-items:center; margin-top:8px; color:var(--ink-2); font-size:.9rem; }
 
+    /* Quick View button */
     .quick-btn{
       position:absolute; left:50%; top:36%; transform:translate(-50%,-50%);
       opacity:0; pointer-events:none; background:var(--ink); color:#fff; border:0; padding:10px 14px;
@@ -105,7 +103,11 @@
     }
     .card:hover .quick-btn{ opacity:.96; pointer-events:auto; }
 
-    /* Pagination */
+    /* Place the heart on each card (uses base styles in wishlist.css) */
+    .card .wishlist-btn{
+      position:absolute; right:10px; top:10px; z-index:2;
+    }
+
     .pager{
       display:flex; gap:8px; justify-content:center; align-items:center; margin-top:26px; flex-wrap:wrap;
     }
@@ -158,7 +160,6 @@
     .qv-price{ font-weight: 800; margin: 6px 0 14px; color:var(--ink); }
     .qv-rule{ border:0; border-top:1px solid #eee; margin: 16px 0 18px; }
 
-    /* Size pills in QV (for clothing only) */
     .qv-size{ margin:8px 0 12px; }
     .qv-size-label{ display:block; font-weight:700; color:var(--ink); margin-bottom:8px; }
     .size-pills{ display:flex; flex-wrap:wrap; gap:10px; }
@@ -199,11 +200,9 @@
 
     .lock-scroll{ overflow:hidden; }
 
-    /* --- Remove underline on product name links --- */
     .product-link{ text-decoration:none; color:inherit; }
     .product-link:hover,.product-link:focus{ text-decoration:none; outline:none; }
 
-    /* --- Yellow rating stars --- */
     .stars .fa-star,
     .stars .fa-star-half-stroke,
     .qv-rating .fa-star,
@@ -263,7 +262,12 @@
             <span class="cart-count">0</span>
           </a>
         </li>
-        <li><a href="wishlist.html"><i class="fa-regular fa-heart"></i></a></li>
+        <li style="position: relative;">
+          <a href="wishlist.html" aria-label="Favorites" id="wishlistLink">
+            <i class="fa-regular fa-heart"></i>
+            <span class="wishlist-count" id="wishlistCount">0</span>
+          </a>
+        </li>
         <li><a href="support.html"><i class="fa-solid fa-headset"></i></a></li>
       </ul>
     </nav>
@@ -418,7 +422,6 @@
       </ul>
     </div>
   </footer>
-
   <!-- LOGIC -->
   <script>
     /* ------------ Config ------------- */
@@ -1270,6 +1273,7 @@
         category: "crafts", rating: 4.9, reviews: 31,
         bullets: ["Made from genuine Mother of Pearl shell", "Jeepney cutwork design", "Dimensions: L10cm × W8cm × H4cm"]
         },
+        ]; 
 
 
 
@@ -1277,307 +1281,323 @@
 
       /* Add many more placeholders below as you collect assets... */
       // Example placeholder (change later)
-
-    ];
   /* ------------- Utilities ------------- */
   const grid = document.getElementById('grid');
-    const pager = document.getElementById('pager');
-    const fSearch = document.getElementById('fSearch');
-    const fCategory = document.getElementById('fCategory');
-    const fSort = document.getElementById('fSort');
-    const fReset = document.getElementById('fReset');
+  const pager = document.getElementById('pager');
+  const fSearch = document.getElementById('fSearch');
+  const fCategory = document.getElementById('fCategory');
+  const fSort = document.getElementById('fSort');
+  const fReset = document.getElementById('fReset');
 
-    const PER_PAGE = 12;
-    let currentPage = 1;
+  const PER_PAGE = 12;
+  let currentPage = 1;
 
-    const pesoToNumber = (p) => Number(String(p).replace(/[^\d.]/g,'')||0);
-    // const numberToPeso = (n) => '₱' + Number(n).toLocaleString('en-PH', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const pesoToNumber = (p) => Number(String(p).replace(/[^\d.]/g,'')||0);
 
-    function isClothing(item){
-      return (item.category||'').toLowerCase() === 'clothing' ||
-             (item.img||'').toLowerCase().includes('/clothing/') ||
-             /(barong|bolero|shirt|dress|top|blouse|pants|trousers|skirt|coat|jacket)/i.test(item.name||'');
+  function isClothing(item){
+    return (item.category||'').toLowerCase() === 'clothing' ||
+           (item.img||'').toLowerCase().includes('/clothing/') ||
+           /(barong|bolero|shirt|dress|top|blouse|pants|trousers|skirt|coat|jacket)/i.test(item.name||'');
+  }
+
+  function starsHTML(r){
+    const full = Math.floor(r||0);
+    const half = (r - full >= 0.25 && r - full < 0.75) ? 1 : 0;
+    const roundedFull = half ? full : Math.round(r||0);
+    let html = '';
+    for (let i = 0; i < roundedFull; i++) html += '<i class="fa-solid fa-star"></i>';
+    if (half) html += '<i class="fa-solid fa-star-half-stroke"></i>';
+    while ((html.match(/fa-star/g) || []).length < 5) html += '<i class="fa-regular fa-star"></i>';
+    return html;
+  }
+
+  function slugify(s){
+    return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+  }
+
+  function toAbs(p){ try { return new URL(p, window.location.href).href; } catch { return p; } }
+
+  function goToProductDetail(data){
+    const payload = {
+      ...data,
+      img: toAbs(data.img),
+      images: (Array.isArray(data.images) ? data.images : [data.img]).map(toAbs)
+    };
+    localStorage.setItem('productDetail', JSON.stringify(payload));
+    window.location.href = PRODUCT_PAGE;
+  }
+
+  function addToCart(product){
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const idx = cart.findIndex(i => i.baseName === product.baseName && i.size === product.size);
+    if(idx > -1){ cart[idx].quantity += product.quantity; }
+    else { cart.push(product); }
+    localStorage.setItem('cart', JSON.stringify(cart));
+    if (typeof window.openCartDrawer === 'function') window.openCartDrawer();
+  }
+
+  /* ------------- Filtering / Sorting ------------- */
+  function getFiltered(){
+    const term = (fSearch.value||'').toLowerCase().trim();
+    const cat = (fCategory.value||'').toLowerCase();
+
+    let list = PRODUCTS.slice();
+
+    if (cat) list = list.filter(p => (p.category||'').toLowerCase() === cat);
+    if (term) list = list.filter(p =>
+      (p.name||'').toLowerCase().includes(term) ||
+      (p.desc||'').toLowerCase().includes(term)
+    );
+
+    switch (fSort.value){
+      case 'price-asc':
+        list.sort((a,b)=> pesoToNumber(a.price) - pesoToNumber(b.price)); break;
+      case 'price-desc':
+        list.sort((a,b)=> pesoToNumber(b.price) - pesoToNumber(a.price)); break;
+      case 'name-asc':
+        list.sort((a,b)=> (a.name||'').localeCompare(b.name||'')); break;
+      case 'name-desc':
+        list.sort((a,b)=> (b.name||'').localeCompare(a.name||'')); break;
+      default: /* featured */ break;
+    }
+    return list;
+  }
+
+  function renderPager(total){
+    pager.innerHTML = '';
+    const pages = Math.max(1, Math.ceil(total / PER_PAGE));
+
+    const btnPrev = document.createElement('button');
+    btnPrev.textContent = '‹';
+    btnPrev.disabled = currentPage <= 1;
+    btnPrev.addEventListener('click', ()=> { currentPage = Math.max(1, currentPage-1); paint(); });
+    pager.appendChild(btnPrev);
+
+    for (let p=1; p<=pages; p++){
+      const b = document.createElement('button');
+      b.textContent = p;
+      if (p === currentPage) b.classList.add('active');
+      b.addEventListener('click', ()=> { currentPage = p; paint(); });
+      pager.appendChild(b);
     }
 
-    function starsHTML(r){
-      const full = Math.floor(r||0);
-      const half = (r - full >= 0.25 && r - full < 0.75) ? 1 : 0;
-      const roundedFull = half ? full : Math.round(r||0);
-      let html = '';
-      for (let i = 0; i < roundedFull; i++) html += '<i class="fa-solid fa-star"></i>';
-      if (half) html += '<i class="fa-solid fa-star-half-stroke"></i>';
-      while ((html.match(/fa-star/g) || []).length < 5) html += '<i class="fa-regular fa-star"></i>';
-      return html;
-    }
+    const btnNext = document.createElement('button');
+    btnNext.textContent = '›';
+    btnNext.disabled = currentPage >= pages;
+    btnNext.addEventListener('click', ()=> { currentPage = Math.min(pages, currentPage+1); paint(); });
+    pager.appendChild(btnNext);
+  }
 
-    function goToProductDetail(data){
-      const toAbs = (p) => { try { return new URL(p, window.location.href).href; } catch { return p; } };
-      const payload = {
-        ...data,
-        img: toAbs(data.img),
-        images: (Array.isArray(data.images) ? data.images : [data.img]).map(toAbs)
-      };
-      localStorage.setItem('productDetail', JSON.stringify(payload));
-      window.location.href = PRODUCT_PAGE;
-    }
+  /* ---- RENDER GRID (now with heart button) ---- */
+  function paint(){
+    const list = getFiltered();
+    renderPager(list.length);
+    const start = (currentPage - 1) * PER_PAGE;
+    const items = list.slice(start, start + PER_PAGE);
 
-    function addToCart(product){
-      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-      const idx = cart.findIndex(i => i.baseName === product.baseName && i.size === product.size);
-      if(idx > -1){ cart[idx].quantity += product.quantity; }
-      else { cart.push(product); }
-      localStorage.setItem('cart', JSON.stringify(cart));
-      if (typeof window.openCartDrawer === 'function') window.openCartDrawer();
-    }
+    grid.innerHTML = '';
+    items.forEach((p, i)=>{
+      const idx = start + i; // index in filtered list
+      const wishData = `
+        data-id="${slugify(p.name)}"
+        data-name="${p.name}"
+        data-price="${p.price}"
+        data-img="${p.img}"
+        data-desc="${(p.desc||'').replace(/"/g,'&quot;')}"
+        data-url="${location.href}"
+      `;
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.innerHTML = `
+        <a class="img-wrap product-link" href="#" data-idx="${idx}">
+          <img src="${p.img}" alt="${p.name}">
+        </a>
 
-    /* ------------- Filtering / Sorting ------------- */
-    function getFiltered(){
-      const term = (fSearch.value||'').toLowerCase().trim();
-      const cat = (fCategory.value||'').toLowerCase();
+        <!-- ❤️ Favorites button (picked up by wishlist.js) -->
+        <button type="button" class="wishlist-btn" aria-label="Add to favorites" ${wishData}>
+          <i class="fa-regular fa-heart"></i>
+        </button>
 
-      let list = PRODUCTS.slice();
-
-      if (cat) list = list.filter(p => (p.category||'').toLowerCase() === cat);
-      if (term) list = list.filter(p =>
-        (p.name||'').toLowerCase().includes(term) ||
-        (p.desc||'').toLowerCase().includes(term)
-      );
-
-      switch (fSort.value){
-        case 'price-asc':
-          list.sort((a,b)=> pesoToNumber(a.price) - pesoToNumber(b.price)); break;
-        case 'price-desc':
-          list.sort((a,b)=> pesoToNumber(b.price) - pesoToNumber(a.price)); break;
-        case 'name-asc':
-          list.sort((a,b)=> (a.name||'').localeCompare(b.name||'')); break;
-        case 'name-desc':
-          list.sort((a,b)=> (b.name||'').localeCompare(a.name||'')); break;
-        default: /* featured */ break;
-      }
-      return list;
-    }
-
-    function renderPager(total){
-      pager.innerHTML = '';
-      const pages = Math.max(1, Math.ceil(total / PER_PAGE));
-
-      const btnPrev = document.createElement('button');
-      btnPrev.textContent = '‹';
-      btnPrev.disabled = currentPage <= 1;
-      btnPrev.addEventListener('click', ()=> { currentPage = Math.max(1, currentPage-1); paint(); });
-      pager.appendChild(btnPrev);
-
-      for (let p=1; p<=pages; p++){
-        const b = document.createElement('button');
-        b.textContent = p;
-        if (p === currentPage) b.classList.add('active');
-        b.addEventListener('click', ()=> { currentPage = p; paint(); });
-        pager.appendChild(b);
-      }
-
-      const btnNext = document.createElement('button');
-      btnNext.textContent = '›';
-      btnNext.disabled = currentPage >= pages;
-      btnNext.addEventListener('click', ()=> { currentPage = Math.min(pages, currentPage+1); paint(); });
-      pager.appendChild(btnNext);
-    }
-
-    function paint(){
-      const list = getFiltered();
-      renderPager(list.length);
-      const start = (currentPage - 1) * PER_PAGE;
-      const items = list.slice(start, start + PER_PAGE);
-
-      grid.innerHTML = '';
-      items.forEach((p, i)=>{
-        const idx = start + i; // index in filtered list
-        const card = document.createElement('article');
-        card.className = 'card';
-        card.innerHTML = `
-          <a class="img-wrap product-link" href="#" data-idx="${idx}">
-            <img src="${p.img}" alt="${p.name}">
+        <button type="button" class="quick-btn" data-qv="${idx}">Quick View</button>
+        <div class="body">
+          <a class="product-link" href="#" data-idx="${idx}">
+            <p class="name">${p.name}</p>
           </a>
-          <button type="button" class="quick-btn" data-qv="${idx}">Quick View</button>
-          <div class="body">
-            <a class="product-link" href="#" data-idx="${idx}">
-              <p class="name">${p.name}</p>
-            </a>
-            <p class="price">${p.price}</p>
-            <div class="meta">
-              <span>${(p.category||'').charAt(0).toUpperCase() + (p.category||'').slice(1)}</span>
-              <span class="stars" title="${p.rating||0}">${starsHTML(p.rating||0)}</span>
-            </div>
+          <p class="price">${p.price}</p>
+          <div class="meta">
+            <span>${(p.category||'').charAt(0).toUpperCase() + (p.category||'').slice(1)}</span>
+            <span class="stars" title="${p.rating||0}">${starsHTML(p.rating||0)}</span>
           </div>
-        `;
-        grid.appendChild(card);
-      });
-    }
-    // expose for the ?cat= pre-filter script
-    window.paint = paint;
-    window.currentPage = currentPage;
-
-    /* Map from filtered index back to product object */
-    function productByFilteredIndex(filteredIndex){
-      const list = getFiltered();
-      return list[filteredIndex];
-    }
-
-    /* ------------- Quick View ------------- */
-    const qvOverlay = document.getElementById('qvOverlay');
-    const qvModal   = document.getElementById('qvModal');
-    const qvImg     = document.getElementById('qvImg');
-    const qvName    = document.getElementById('qvName');
-    const qvPrice   = document.getElementById('qvPrice');
-    const qvDesc    = document.getElementById('qvDesc');
-    const qvClose   = document.getElementById('qvClose');
-    const qvAdd     = document.getElementById('qvAdd');
-    const qvView    = document.getElementById('qvView');
-    const qvQty     = document.getElementById('qvQty');
-    const qvDec     = document.getElementById('qvDec');
-    const qvInc     = document.getElementById('qvInc');
-    const qvStock   = document.getElementById('qvStock');
-    const qvRating  = document.getElementById('qvRating');
-    const qvSizeWrap= document.getElementById('qvSizeWrap');
-
-    let currentFilteredIndex = null;
-
-    function openQVByIndex(filteredIdx){
-      currentFilteredIndex = filteredIdx;
-      const p = productByFilteredIndex(filteredIdx);
-      if (!p) return;
-
-      qvImg.src   = p.img;
-      qvImg.alt   = p.name;
-      qvName.textContent  = p.name;
-      qvPrice.textContent = p.price;
-      qvDesc.textContent  = p.desc || '';
-      qvQty.value = 1;
-      qvRating.innerHTML = starsHTML(p.rating || 0);
-      qvStock.hidden = true;
-
-      // Size for clothing only
-      qvSizeWrap.hidden = !isClothing(p);
-      document.querySelectorAll('input[name="qvSize"]').forEach(r => r.checked = false);
-
-      qvOverlay.classList.add('active');
-      qvModal.classList.add('active');
-      document.body.classList.add('lock-scroll');
-      qvClose.focus();
-    }
-
-    function closeQV(){
-      qvOverlay.classList.remove('active');
-      qvModal.classList.remove('active');
-      document.body.classList.remove('lock-scroll');
-      currentFilteredIndex = null;
-    }
-
-    function getChosenQVSize(){
-      const r = Array.from(document.querySelectorAll('input[name="qvSize"]')).find(x=>x.checked);
-      return r ? r.value : null;
-    }
-
-    // Open QV
-    document.addEventListener('click', (e)=>{
-      const btn = e.target.closest('button[data-qv]');
-      if (!btn) return;
-      e.preventDefault();
-      openQVByIndex(Number(btn.dataset.qv));
+        </div>
+      `;
+      grid.appendChild(card);
     });
+  }
+  // expose for the ?cat= pre-filter script
+  window.paint = paint;
+  window.currentPage = currentPage;
 
-    // Qty controls
-    qvDec.addEventListener('click', ()=>{ qvQty.value = Math.max(1, (parseInt(qvQty.value)||1)-1); });
-    qvInc.addEventListener('click', ()=>{ qvQty.value = (parseInt(qvQty.value)||1)+1; });
+  function productByFilteredIndex(filteredIndex){
+    const list = getFiltered();
+    return list[filteredIndex];
+  }
 
-    // Add to cart from QV
-    qvAdd.addEventListener('click', ()=>{
-      if (currentFilteredIndex == null) return;
-      const p = productByFilteredIndex(currentFilteredIndex);
-      const clothing = isClothing(p);
-      let chosenSize = null;
-      if (clothing) {
-        chosenSize = getChosenQVSize();
-        if (!chosenSize) { alert('Please choose a size.'); return; }
-      }
+  /* ------------- Quick View ------------- */
+  const qvOverlay = document.getElementById('qvOverlay');
+  const qvModal   = document.getElementById('qvModal');
+  const qvImg     = document.getElementById('qvImg');
+  const qvName    = document.getElementById('qvName');
+  const qvPrice   = document.getElementById('qvPrice');
+  const qvDesc    = document.getElementById('qvDesc');
+  const qvClose   = document.getElementById('qvClose');
+  const qvAdd     = document.getElementById('qvAdd');
+  const qvView    = document.getElementById('qvView');
+  const qvQty     = document.getElementById('qvQty');
+  const qvDec     = document.getElementById('qvDec');
+  const qvInc     = document.getElementById('qvInc');
+  const qvStock   = document.getElementById('qvStock');
+  const qvRating  = document.getElementById('qvRating');
+  const qvSizeWrap= document.getElementById('qvSizeWrap');
 
-      addToCart({
-        baseName: p.name,
-        name: clothing && chosenSize ? `${p.name} (Size: ${chosenSize})` : p.name,
-        img: p.img,
-        price: p.price,
-        desc: p.desc || '',
-        size: chosenSize || null,
-        quantity: Math.max(1, parseInt(qvQty.value)||1)
-      });
-      closeQV();
+  let currentFilteredIndex = null;
+
+  function openQVByIndex(filteredIdx){
+    currentFilteredIndex = filteredIdx;
+    const p = productByFilteredIndex(filteredIdx);
+    if (!p) return;
+
+    qvImg.src   = p.img;
+    qvImg.alt   = p.name;
+    qvName.textContent  = p.name;
+    qvPrice.textContent = p.price;
+    qvDesc.textContent  = p.desc || '';
+    qvQty.value = 1;
+    qvRating.innerHTML = starsHTML(p.rating || 0);
+    qvStock.hidden = true;
+
+    // Size for clothing only
+    qvSizeWrap.hidden = !isClothing(p);
+    document.querySelectorAll('input[name="qvSize"]').forEach(r => r.checked = false);
+
+    qvOverlay.classList.add('active');
+    qvModal.classList.add('active');
+    document.body.classList.add('lock-scroll');
+    qvClose.focus();
+  }
+
+  function closeQV(){
+    qvOverlay.classList.remove('active');
+    qvModal.classList.remove('active');
+    document.body.classList.remove('lock-scroll');
+    currentFilteredIndex = null;
+  }
+
+  function getChosenQVSize(){
+    const r = Array.from(document.querySelectorAll('input[name="qvSize"]')).find(x=>x.checked);
+    return r ? r.value : null;
+  }
+
+  // Open QV
+  document.addEventListener('click', (e)=>{
+    const btn = e.target.closest('button[data-qv]');
+    if (!btn) return;
+    e.preventDefault();
+    openQVByIndex(Number(btn.dataset.qv));
+  });
+
+  // Qty controls
+  qvDec.addEventListener('click', ()=>{ qvQty.value = Math.max(1, (parseInt(qvQty.value)||1)-1); });
+  qvInc.addEventListener('click', ()=>{ qvQty.value = (parseInt(qvQty.value)||1)+1; });
+
+  // Add to cart from QV
+  qvAdd.addEventListener('click', ()=>{
+    if (currentFilteredIndex == null) return;
+    const p = productByFilteredIndex(currentFilteredIndex);
+    const clothing = isClothing(p);
+    let chosenSize = null;
+    if (clothing) {
+      chosenSize = getChosenQVSize();
+      if (!chosenSize) { alert('Please choose a size.'); return; }
+    }
+
+    addToCart({
+      baseName: p.name,
+      name: clothing && chosenSize ? `${p.name} (Size: ${chosenSize})` : p.name,
+      img: p.img,
+      price: p.price,
+      desc: p.desc || '',
+      size: chosenSize || null,
+      quantity: Math.max(1, parseInt(qvQty.value)||1)
     });
+    closeQV();
+  });
 
-    // View details from QV
-    qvView.addEventListener('click', ()=>{
-      if (currentFilteredIndex == null) return;
-      const p = productByFilteredIndex(currentFilteredIndex);
-      const clothing = isClothing(p);
-      const chosenSize = clothing ? getChosenQVSize() : null;
+  // View details from QV
+  qvView.addEventListener('click', ()=>{
+    if (currentFilteredIndex == null) return;
+    const p = productByFilteredIndex(currentFilteredIndex);
+    const clothing = isClothing(p);
+    const chosenSize = clothing ? getChosenQVSize() : null;
 
-      goToProductDetail({
-        img: p.img,
-        images: Array.isArray(p.images) && p.images.length ? p.images : [p.img],
-        name: p.name,
-        price: p.price,
-        desc: p.desc || '',
-        rating: p.rating || 0,
-        reviewsCount: p.reviews || 0,
-        bullets: p.bullets || [],
-        preselectedSize: chosenSize,
-        category: p.category || ''
-      });
+    goToProductDetail({
+      img: p.img,
+      images: Array.isArray(p.images) && p.images.length ? p.images : [p.img],
+      name: p.name,
+      price: p.price,
+      desc: p.desc || '',
+      rating: p.rating || 0,
+      reviewsCount: p.reviews || 0,
+      bullets: p.bullets || [],
+      preselectedSize: chosenSize,
+      category: p.category || ''
     });
+  });
 
-    // Close QV
-    qvClose.addEventListener('click', closeQV);
-    qvOverlay.addEventListener('click', closeQV);
-    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && qvModal.classList.contains('active')) closeQV(); });
+  // Close QV
+  qvClose.addEventListener('click', closeQV);
+  qvOverlay.addEventListener('click', closeQV);
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && qvModal.classList.contains('active')) closeQV(); });
 
-    /* ------------- Card click -> product ------------- */
-    document.addEventListener('click', (e)=>{
-      const link = e.target.closest('.product-link');
-      if (!link) return;
-      e.preventDefault();
-      const filteredIdx = Number(link.dataset.idx);
-      const p = productByFilteredIndex(filteredIdx);
-      if (!p) return;
+  /* ------------- Card click -> product page ------------- */
+  document.addEventListener('click', (e)=>{
+    const link = e.target.closest('.product-link');
+    if (!link) return;
+    e.preventDefault();
+    const filteredIdx = Number(link.dataset.idx);
+    const p = productByFilteredIndex(filteredIdx);
+    if (!p) return;
 
-      goToProductDetail({
-        img: p.img,
-        images: Array.isArray(p.images) && p.images.length ? p.images : [p.img],
-        name: p.name,
-        price: p.price,
-        desc: p.desc || '',
-        rating: p.rating || 0,
-        reviewsCount: p.reviews || 0,
-        bullets: p.bullets || [],
-        preselectedSize: null,
-        category: p.category || ''
-      });
+    goToProductDetail({
+      img: p.img,
+      images: Array.isArray(p.images) && p.images.length ? p.images : [p.img],
+      name: p.name,
+      price: p.price,
+      desc: p.desc || '',
+      rating: p.rating || 0,
+      reviewsCount: p.reviews || 0,
+      bullets: p.bullets || [],
+      preselectedSize: null,
+      category: p.category || ''
     });
+  });
 
-    /* ------------- Filters / Reset ------------- */
-    fSearch.addEventListener('input', ()=>{ currentPage = 1; paint(); });
-    fCategory.addEventListener('change', ()=>{ currentPage = 1; paint(); });
-    fSort.addEventListener('change', ()=>{ currentPage = 1; paint(); });
-    fReset.addEventListener('click', ()=>{
-      fSearch.value = '';
-      fCategory.value = '';
-      fSort.value = 'featured';
-      currentPage = 1;
-      paint();
-    });
-
-    /* ------------- Init ------------- */
+  /* ------------- Filters / Reset ------------- */
+  fSearch.addEventListener('input', ()=>{ currentPage = 1; paint(); });
+  fCategory.addEventListener('change', ()=>{ currentPage = 1; paint(); });
+  fSort.addEventListener('change', ()=>{ currentPage = 1; paint(); });
+  fReset.addEventListener('click', ()=>{
+    fSearch.value = '';
+    fCategory.value = '';
+    fSort.value = 'featured';
+    currentPage = 1;
     paint();
+  });
+
+  /* ------------- Init ------------- */
+  paint();
   </script>
 
-  <!-- Cart drawer logic (keep if you already have cart.js) -->
+  <!-- Cart drawer logic -->
   <script src="cart.js"></script>
   <script>
     // Lock page scroll when cart drawer toggles
@@ -1591,25 +1611,24 @@
 
     /* Read ?cat=... and pre-filter the grid */
     (function () {
-  try {
-    const p = new URLSearchParams(location.search);
-    const cat = (p.get('cat') || '').toLowerCase();
-    if (!cat) return;
+      try {
+        const p = new URLSearchParams(location.search);
+        const cat = (p.get('cat') || '').toLowerCase();
+        if (!cat) return;
+        const sel = document.getElementById('fCategory');
+        if (sel) {
+          const map = {
+            'flavors':'flavors','accessories':'accessories','bags':'bags',
+            'clothing':'clothing','home':'home','crafts':'crafts','christmas':'christmas'
+          };
+          sel.value = map[cat] || cat;
+          sel.dispatchEvent(new Event('change'));
+        }
+        history.replaceState({}, '', location.pathname);
+      } catch (e) {}
+    })();
 
-    const sel = document.getElementById('fCategory');
-    if (sel) {
-      const map = {
-        'flavors':'flavors','accessories':'accessories','bags':'bags',
-        'clothing':'clothing','home':'home','crafts':'crafts','christmas':'christmas'
-      };
-      sel.value = map[cat] || cat;
-
-      // Trigger your existing handler (which sets currentPage=1 and repaint)
-      sel.dispatchEvent(new Event('change'));
-    }
-    history.replaceState({}, '', location.pathname);
-  } catch (e) {}
-})();
+    
   </script>
 </body>
 </html>

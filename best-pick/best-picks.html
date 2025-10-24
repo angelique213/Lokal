@@ -8,9 +8,11 @@
   <!-- Icons (FA6 stable) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
 
-  <!-- Site / Cart styles -->
+  <!-- Site / Cart / Wishlist styles (paths are relative to /best-pick/) -->
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../cart.css">
+  <link rel="stylesheet" href="../wishlist.css">
+  <script src="../wishlist.js" defer></script>
 
   <!-- Page-only styles (Best Picks grid + Quick View) -->
   <style>
@@ -45,6 +47,11 @@
       padding:10px 14px; border-radius:8px; font-weight:700; cursor:pointer; transition:opacity .25s;
     }
     .best-product:hover .quick-view{ opacity:.96; pointer-events:auto; }
+
+    /* Place the heart on each card (wishlist.css covers base look) */
+    .best-product .wishlist-btn{
+      position:absolute; right:10px; top:10px; z-index:2;
+    }
 
     @media (max-width: 992px){ .products-list{ grid-template-columns: repeat(3,1fr); } }
     @media (max-width: 768px){ .products-list{ grid-template-columns: repeat(2,1fr); } }
@@ -98,7 +105,7 @@
   <header class="header">
     <div class="logo">
       <a href="../index.html" aria-label="Home">
-        <img src="../images/projectlogo.png" alt="logo">
+        <img src="../images/projectlogo.png" alt="logo" loading="lazy">
       </a>
     </div>
 
@@ -143,7 +150,12 @@
             <span class="cart-count">0</span>
           </a>
         </li>
-        <li><a href="../wishlist.html" aria-label="Wishlist"><i class="fa-regular fa-heart"></i></a></li>
+        <li style="position: relative;">
+          <a href="../wishlist.html" aria-label="Favorites" id="wishlistLink">
+            <i class="fa-regular fa-heart"></i>
+            <span class="wishlist-count" id="wishlistCount">0</span>
+          </a>
+        </li>
         <li><a href="../support.html" aria-label="Support"><i class="fa-solid fa-headset"></i></a></li>
       </ul>
     </nav>
@@ -174,10 +186,12 @@
   </aside>
 
   <!-- PRODUCTS -->
-  <section class="products">
-    <h1 class="section-title">Best Picks</h1>
-    <div class="products-list"></div>
-  </section>
+  <main id="pageMain">
+    <section class="products">
+      <h1 class="section-title">Best Picks</h1>
+      <div class="products-list"></div>
+    </section>
+  </main>
 
   <!-- QUICK VIEW MODAL -->
   <div class="qv-overlay" id="qvOverlay" aria-hidden="true"></div>
@@ -186,7 +200,7 @@
       <button class="qv-close" id="qvClose" aria-label="Close">×</button>
 
       <div class="qv-media">
-        <img id="qvImg" alt="">
+        <img id="qvImg" alt="" loading="lazy">
       </div>
 
       <div class="qv-info">
@@ -262,7 +276,7 @@
   <!-- PAGE SCRIPTS -->
   <script>
     /* ================= Helpers ================= */
-    // Always convert relative -> absolute; this is the key to fixing cart images from subfolders
+    // Always convert relative -> absolute; this keeps cart images correct from subfolders
     const toAbs = (p) => { try { return new URL(p, location.href).href; } catch { return p; } };
 
     const PRODUCT_PAGE = 'product.html';
@@ -291,13 +305,9 @@
     function addToCart(product){
       let cart = JSON.parse(localStorage.getItem('cart') || '[]');
       const idx = cart.findIndex(i => i.baseName === product.baseName && i.size === product.size);
-
-      // ensure absolute image is saved
-      const item = { ...product, img: toAbs(product.img) };
-
+      const item = { ...product, img: toAbs(product.img) }; // ensure absolute image is saved
       if (idx > -1){ cart[idx].quantity += item.quantity; }
       else { cart.push(item); }
-
       localStorage.setItem('cart', JSON.stringify(cart));
       if (typeof window.openCartDrawer === 'function') window.openCartDrawer();
     }
@@ -312,7 +322,7 @@
     const productNames = [
       "Shamrock Otap","Shamrock Rosquillos","Mango Flavorful Candy","7D Dried Mangoes Dark Chocolate","Model Jeepney",
       "Bolero","Bayong Bag","Habing Maragondon Face Mask","Bucket Hat with PH Embroidery","Men's Cocoon Fully Callado Barong",
-      "Firebend 02","Sunglasses Cork Case","Davana Cassava Chips Barbeque","Auro Plant-based Chocolates","Pure Benguet Honey",
+      "Firebend 02 Bamboo Shades","Sunglasses Cork Case","Davana Cassava Chips Barbeque","Auro Plant-based Chocolates","Pure Benguet Honey",
       "Chocolea Choco Drink","Handwoven Bath Towels","Napkin Ring Floral","Mother of Pearl Utility Dish","Atin Reed Diffuser"
     ];
     const productPrices = [
@@ -352,13 +362,15 @@
       ["../images/home/home3.png","../images/home/home3a.png"],
       ["../images/home/home4.png","../images/home/home4a.png","../images/home/home4b.png"]
     ];
+
+    /* ✅ Bullets/features (ADDED) */
     const productBullets = [
       ["Delicately layered pastry","Made with fresh eggs","Cebu’s favorite snack"],
       ["Crisp buttery rings","Iconic Cebu pasalubong","Perfect with coffee"],
       ["Tropical mango flavor","Chewy texture","Great for kids"],
       ["Premium mangoes","Dark chocolate coated","Sweet and tart balance"],
       ["Handcrafted metal","Made in the Philippines","Perfect souvenir"],
-      ["Elegant handmade bolero","Comfortable cotton fabric","Locally crafted"],
+      ["Elegant handmade bolero","Comfortable fabric","Locally crafted"],
       ["Sustainable materials","Spacious and durable","Modern Filipino design"],
       ["Locally woven","Breathable and reusable","Stylish protection"],
       ["Wide brim","Adjustable fit","PH embroidery detail"],
@@ -377,6 +389,7 @@
 
     /* ================= Render cards ================= */
     const productsContainer = document.querySelector('.products-list');
+    const pageMain = document.getElementById('pageMain');
 
     function isClothingIndex(i){
       const name = (productNames[i]||"").toLowerCase();
@@ -384,13 +397,27 @@
       return /(barong|bolero|shirt|dress|top|blouse|pants|trousers|skirt|coat|jacket)/i.test(name) || img.includes("/clothing/");
     }
 
+    function slugify(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+
     for (let i=0;i<productNames.length;i++){
       const card = document.createElement('article');
       card.className = 'best-product';
       card.innerHTML = `
         <a class="product-link img-wrap" href="${PRODUCT_PAGE}" data-i="${i}">
-          <img src="${productImages[i]}" alt="${productNames[i]}">
+          <img src="${productImages[i]}" alt="${productNames[i]}" loading="lazy">
         </a>
+
+        <!-- ❤️ Favorites button (picked up by wishlist.js) -->
+        <button type="button" class="wishlist-btn" aria-label="Add to favorites"
+          data-id="${slugify(productNames[i])}"
+          data-name="${productNames[i]}"
+          data-price="${productPrices[i]}"
+          data-img="${productImages[i]}"
+          data-desc="${(productDescriptions[i]||'').replace(/"/g,'&quot;')}"
+          data-url="${location.href}">
+          <i class="fa-regular fa-heart"></i>
+        </button>
+
         <button class="quick-view" type="button" data-qv="${i}" aria-haspopup="dialog">Quick View</button>
         <div class="details">
           <a class="product-link" href="${PRODUCT_PAGE}" data-i="${i}"><p class="name">${productNames[i]}</p></a>
@@ -419,6 +446,12 @@
 
     let currentIndex = null;
 
+    function lockMainForModal(lock){
+      if (!pageMain) return;
+      pageMain.setAttribute('aria-hidden', lock ? 'true' : 'false');
+      document.body.classList.toggle('lock-scroll', !!lock);
+    }
+
     function openQV(i){
       currentIndex = i;
       qvImg.src   = productImages[i];
@@ -431,10 +464,22 @@
       qvStock.hidden = true;
       qvSizeWrap.hidden = !isClothingIndex(i);
       document.querySelectorAll('input[name="qvSize"]').forEach(r=> r.checked = false);
-      qvOverlay.classList.add('active'); qvModal.classList.add('active'); document.body.classList.add('lock-scroll'); qvClose.focus();
+      qvOverlay.classList.add('active'); qvModal.classList.add('active');
+      lockMainForModal(true);
+      qvClose.focus();
     }
-    function closeQV(){ qvOverlay.classList.remove('active'); qvModal.classList.remove('active'); document.body.classList.remove('lock-scroll'); currentIndex=null; }
-    document.addEventListener('click',(e)=>{ const b=e.target.closest('button[data-qv]'); if(!b) return; e.preventDefault(); openQV(+b.dataset.qv); });
+    function closeQV(){
+      qvOverlay.classList.remove('active'); qvModal.classList.remove('active');
+      lockMainForModal(false);
+      currentIndex=null;
+    }
+
+    document.addEventListener('click',(e)=>{
+      const b=e.target.closest('button[data-qv]');
+      if(!b) return;
+      e.preventDefault();
+      openQV(+b.dataset.qv);
+    });
     qvDec.addEventListener('click',()=>{ qvQty.value=Math.max(1,(parseInt(qvQty.value)||1)-1); });
     qvInc.addEventListener('click',()=>{ qvQty.value=(parseInt(qvQty.value)||1)+1; });
     qvClose.addEventListener('click',closeQV); qvOverlay.addEventListener('click',closeQV);
@@ -453,7 +498,7 @@
       addToCart({
         baseName,
         name: clothing && chosenSize ? `${baseName} (Size: ${chosenSize})` : baseName,
-        img: toAbs(productImages[currentIndex]),   // absolute!
+        img: toAbs(productImages[currentIndex]),
         price: productPrices[currentIndex],
         desc: productDescriptions[currentIndex],
         size: chosenSize || null,
@@ -475,7 +520,7 @@
         desc: productDescriptions[currentIndex],
         rating: productRatings[currentIndex] || 0,
         reviewsCount: productReviews[currentIndex] || 0,
-        bullets: productBullets[currentIndex] || [],
+        bullets: productBullets[currentIndex] || [],   // ✅ now sending bullets
         preselectedSize: chosenSize,
         category: clothing ? "Clothing" : ""
       });
@@ -495,7 +540,7 @@
         desc: productDescriptions[i],
         rating: productRatings[i] || 0,
         reviewsCount: productReviews[i] || 0,
-        bullets: productBullets[i] || [],
+        bullets: productBullets[i] || [],              // ✅ now sending bullets
         preselectedSize: null,
         category: isClothingIndex(i) ? "Clothing" : ""
       });
@@ -505,6 +550,7 @@
   <!-- Cart drawer logic -->
   <script src="../cart.js"></script>
   <script>
+    // Lock body scroll when cart drawer toggles
     document.addEventListener('DOMContentLoaded', function () {
       const drawer = document.getElementById('cdDrawer');
       const toggleLock = () => {
@@ -512,6 +558,9 @@
       };
       new MutationObserver(toggleLock).observe(drawer, { attributes: true, attributeFilter: ['class'] });
     });
+
+
+    
   </script>
 </body>
 </html>

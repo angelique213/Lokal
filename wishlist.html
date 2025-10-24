@@ -1,220 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Wishlist | Lokal</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Favorites | Lokal</title>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" crossorigin="anonymous"/>
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="cart.css">
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
 
-<style>
-  :root{
-    --ink:#2b1f1a; --muted:#7a6f68; --tone:#6d6a33; --chip:#f8f6f2; --line:#e8e3da;
-  }
-  .wrap{max-width:1200px;margin:24px auto 70px;padding:0 20px;}
-  .page-title{font-size:2.2rem;margin:6px 0 12px;color:var(--ink);letter-spacing:.01em}
-  .sub{color:var(--muted);margin-bottom:18px}
-
-  .wl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
-  @media (max-width: 980px){.wl-grid{grid-template-columns:repeat(2,1fr)}}
-  @media (max-width: 560px){.wl-grid{grid-template-columns:1fr}}
-
-  .wl-card{
-    background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;display:grid;grid-template-rows:auto 1fr;
-    transition:transform .22s, box-shadow .22s, border-color .22s;
-  }
-  .wl-card:hover{transform:translateY(-3px);box-shadow:0 14px 24px rgba(0,0,0,.06);border-color:#dfd9cf}
-  .wl-img{aspect-ratio:1/1;background:#f3f1ea;display:grid;place-items:center;overflow:hidden}
-  .wl-img img{width:100%;height:100%;object-fit:cover}
-  .wl-body{padding:14px 14px 16px}
-  .wl-name{margin:0 0 6px;font-weight:800;color:var(--ink)}
-  .wl-price{margin:0;font-weight:800;color:var(--ink)}
-  .wl-meta{display:flex;justify-content:space-between;align-items:center;margin-top:8px;color:var(--muted);font-size:.92rem}
-  .wl-actions{display:flex;gap:10px;margin-top:12px}
-  .btn{
-    height:42px;padding:0 14px;border-radius:10px;border:1px solid #cfc7c1;background:#fff;cursor:pointer;
-    font-weight:800;color:var(--ink);letter-spacing:.01em;display:inline-flex;align-items:center;gap:10px;
-    transition:background .15s, transform .02s, border-color .15s;
-  }
-  .btn:hover{background:#fbfaf8;border-color:#beb7af}
-  .btn:active{transform:translateY(1px)}
-  .btn-primary{background:var(--tone);color:#fff;border-color:var(--tone)}
-  .btn-primary:hover{filter:brightness(.96)}
-  .btn-danger{border-color:#e3c9c9;color:#8b2d2d}
-  .empty{
-    margin-top:12px;border:1px dashed var(--line);border-radius:14px;padding:22px;background:#fbfaf7;color:var(--ink);
-    display:grid;place-items:center;text-align:center;
-  }
-  .empty a{font-weight:800;color:var(--tone);text-decoration:none;border-bottom:2px solid var(--tone);padding-bottom:1px}
-</style>
+  <!-- Site CSS -->
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="cart.css">
+  <link rel="stylesheet" href="wishlist.css">
 </head>
+
 <body>
 
-<header class="header">
-  <div class="logo"><a href="index.html" aria-label="Home"><img src="images/projectlogo.png" alt="Lokal logo"></a></div>
-  <div class="nav-center">
-    <form class="site-search" action="search.html" method="GET">
-      <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="search" name="q" placeholder="Search products, categories..." autocomplete="off"/>
-      <button type="submit">Search</button>
-    </form>
-    <nav class="main-links">
-      <ul>
-        <li><a href="best-pick/best-picks.html">Best Picks</a></li>
-        <li><a href="shop-all.html">Shop All</a></li>
-        <li><a class="active" href="wishlist.html">Wishlist <span class="wishlist-count" style="margin-left:.35rem;">0</span></a></li>
+  <!-- ===== HEADER (SAME STRUCTURE AS SHOP ALL) ===== -->
+  <header class="header">
+    <div class="logo">
+      <a href="index.html" aria-label="Home">
+        <img src="images/projectlogo.png" alt="logo">
+      </a>
+    </div>
+
+    <div class="nav-center">
+      <form class="site-search" action="search.html" method="GET">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <input type="search" name="q" placeholder="Search products, categories..." autocomplete="off">
+        <button type="submit">Search</button>
+      </form>
+
+      <nav class="main-links">
+        <ul>
+          <li><a href="best-pick/best-picks.html">Best Picks</a></li>
+          <li><a href="shop-all.html">Shop All</a></li>
+          <li class="has-megamenu">
+            <a href="#" class="catmenu-toggle" aria-expanded="false">
+              Shop by Category <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+            </a>
+            <!-- Optional mega; keep empty if you don’t need it -->
+            <div class="mega" id="catMega" role="menu" aria-label="Shop by Category"></div>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <nav class="utils">
+      <ul class="nav-links">
+        <li><a href="login.html"><i class="fa-solid fa-user"></i></a></li>
+
+        <!-- Cart (same ID + href as Shop All so cart.js binds) -->
+        <li class="cart-icon">
+          <a href="#" id="openCart" aria-label="Open cart">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span class="cart-count">0</span>
+          </a>
+        </li>
+
+        <!-- Wishlist -->
+        <li style="position: relative;">
+          <a href="wishlist.html" aria-label="Favorites" id="wishlistLink">
+            <i class="fa-regular fa-heart"></i>
+            <span class="wishlist-count" id="wishlistCount">0</span>
+          </a>
+        </li>
+
+        <!-- Support -->
+        <li><a href="support.html" aria-label="Support"><i class="fa-solid fa-headset"></i></a></li>
       </ul>
     </nav>
-  </div>
-  <nav class="utils">
-    <ul class="nav-links">
-      <li><a href="login.html"><i class="fa-solid fa-user"></i></a></li>
-      <li><a href="#" id="openCart"><i class="fa-solid fa-cart-shopping"></i><span class="cart-count">0</span></a></li>
-      <li><a href="support.html"><i class="fa-solid fa-headset"></i></a></li>
-    </ul>
-  </nav>
-</header>
+  </header>
 
-<!-- Cart drawer (your existing markup) -->
-<div class="cd-overlay" id="cdOverlay" aria-hidden="true"></div>
-<aside class="cd-drawer" id="cdDrawer" aria-hidden="true" role="dialog" aria-label="Cart drawer">
-  <div class="cd-header"><h2>Cart</h2><button id="cdClose" class="cd-close" aria-label="Close cart">×</button></div>
-  <div class="cd-body">
-    <div id="cdItems" class="cd-items"></div>
-    <div class="cd-summary">
-      <div class="cd-row"><span>Subtotal</span><strong id="cdSubtotal">₱0.00</strong></div>
-      <p class="cd-note">Shipping, taxes, and discount codes calculated at checkout.</p>
-      <label class="cd-terms"><input id="cdAgree" type="checkbox"> <span>I agree with the <a href="terms.html" target="_blank" rel="noopener">terms and conditions</a></span></label>
-      <button id="cdCheckout" class="cd-checkout" disabled>CHECK OUT</button>
+  <!-- ===== Cart Drawer (COPIED FROM SHOP ALL) ===== -->
+  <div class="cd-overlay" id="cdOverlay" aria-hidden="true"></div>
+  <aside class="cd-drawer" id="cdDrawer" aria-hidden="true" role="dialog" aria-label="Cart drawer">
+    <div class="cd-header">
+      <h2>Cart</h2>
+      <button id="cdClose" class="cd-close" aria-label="Close cart">×</button>
     </div>
-  </div>
-</aside>
-
-<main class="wrap">
-  <h1 class="page-title">Your Wishlist</h1>
-  <p class="sub">Items you’ve saved for later.</p>
-  <section id="wlGrid" class="wl-grid"></section>
-  <div id="wlEmpty" class="empty" hidden>
-    Your wishlist is empty. <a href="shop-all.html">Browse products</a>
-  </div>
-</main>
-
-<footer class="footer">
-  <div class="footer-section">
-    <h1>Contact Us</h1>
-    <ul class="footer-list">
-      <li>lokal@info.com</li><li>lokal@admin.com</li><li>Manila Philippines</li>
-      <li class="border-list"></li>
-      <li class="socials"><i class="fa-brands fa-square-instagram"></i><i class="fa-brands fa-square-facebook"></i><i class="fa-brands fa-tiktok"></i></li>
-    </ul>
-  </div>
-  <div class="footer-section">
-    <h1>Quick Links</h1>
-    <ul class="footer-list">
-      <li><a href="index.html">Home</a></li><li><a href="shop-all.html">Shop All</a></li><li><a href="about.html">About Us</a></li><li><a href="terms.html">Terms & Conditions</a></li>
-    </ul>
-  </div>
-  <div class="footer-section">
-    <h1>Subscribe to Newsletter</h1>
-    <ul class="footer-list">
-      <li>A local marketplace is a community hub where people buy, sell, or trade goods and services within their area.</li>
-      <li class="sub"><input type="text" placeholder="Your email"><button class="button">Subscribe</button></li>
-    </ul>
-  </div>
-</footer>
-
-<script src="cart.js"></script>
-
-<!-- Wishlist page logic -->
-<script type="module">
-  import { getWishlist, removeFromWishlist, showToast, updateWishlistBadge } from './wishlist.js';
-
-  // fallback addToCart if cart.js doesn't expose it
-  function addToCartFallback(item){
-    try{
-      const priceNum = Number(String(item.price).replace(/[^\d.]/g,'')||0);
-      let cart = JSON.parse(localStorage.getItem('cart')||'[]');
-      const idx = cart.findIndex(i => i.baseName === item.name && !i.size);
-      if(idx>-1){ cart[idx].quantity += 1; }
-      else{
-        cart.push({
-          baseName: item.name,
-          name: item.name,
-          img: item.img,
-          price: item.price || ('₱'+priceNum.toFixed(2)),
-          desc: '',
-          size: null,
-          quantity: 1
-        });
-      }
-      localStorage.setItem('cart', JSON.stringify(cart));
-      if (typeof window.openCartDrawer === 'function') window.openCartDrawer();
-      showToast('Moved to cart');
-    }catch(e){ showToast('Could not add to cart'); }
-  }
-
-  const grid = document.getElementById('wlGrid');
-  const empty = document.getElementById('wlEmpty');
-
-  function paint(){
-    const list = getWishlist();
-    updateWishlistBadge?.();
-    grid.innerHTML = '';
-    empty.hidden = list.length > 0;
-
-    list.forEach(item=>{
-      const card = document.createElement('article');
-      card.className = 'wl-card';
-      card.innerHTML = `
-        <div class="wl-img"><img src="${item.img}" alt="${item.name}"></div>
-        <div class="wl-body">
-          <p class="wl-name">${item.name}</p>
-          <p class="wl-price">${item.price || ''}</p>
-          <div class="wl-meta">
-            <span>${(item.category||'').charAt(0).toUpperCase()+(item.category||'').slice(1)}</span>
-          </div>
-          <div class="wl-actions">
-            <button class="btn btn-primary" data-move="${item.id}"><i class="fa-solid fa-cart-plus"></i> Move to Cart</button>
-            <button class="btn btn-danger" data-remove="${item.id}"><i class="fa-regular fa-trash-can"></i> Remove</button>
-          </div>
+    <div class="cd-body">
+      <div id="cdItems" class="cd-items"></div>
+      <div class="cd-summary">
+        <div class="cd-row">
+          <span>Subtotal</span>
+          <strong id="cdSubtotal">₱0.00</strong>
         </div>
-      `;
-      grid.appendChild(card);
+        <p class="cd-note">Shipping, taxes, and discount codes calculated at checkout.</p>
+        <label class="cd-terms">
+          <input id="cdAgree" type="checkbox">
+          <span>I agree with the <a href="terms.html" target="_blank" rel="noopener">terms and conditions</a></span>
+        </label>
+        <button id="cdCheckout" class="cd-checkout" disabled>CHECK OUT</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== CONTENT ===== -->
+  <main class="fav-wrap">
+    <div class="fav-head">
+      <h1>Your Favorites</h1>
+      <div id="favCount" class="fav-count">0 ITEMS</div>
+    </div>
+
+    <!-- Grid that wishlist.js fills -->
+    <section id="favGrid" class="fav-grid"></section>
+
+    <!-- Empty state -->
+    <p id="wlEmpty" style="display:none; color:#7a6f68; margin-top:16px;">
+      You don’t have any favorites yet.
+    </p>
+  </main>
+
+  <!-- ===== SCRIPTS ===== -->
+  <!-- Make sure your wishlist.js is the version that stores absolute URLs -->
+  <script src="wishlist.js" defer></script>
+
+  <!-- Same cart logic used in Shop All -->
+  <script src="cart.js"></script>
+
+  <!-- Match Shop All: lock body scroll when drawer toggles -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const drawer = document.getElementById('cdDrawer');
+      const toggleLock = () => {
+        document.body.classList.toggle('lock-scroll', drawer.classList.contains('active'));
+      };
+      new MutationObserver(toggleLock).observe(drawer, { attributes: true, attributeFilter: ['class'] });
     });
-  }
+  </script>
 
-  document.addEventListener('click', (e)=>{
-    const rm = e.target.closest('button[data-remove]');
-    if (rm){
-      removeFromWishlist(rm.dataset.remove);
-      paint();
-      return;
-    }
-    const mv = e.target.closest('button[data-move]');
-    if (mv){
-      const list = getWishlist();
-      const item = list.find(x => x.id === mv.dataset.move);
-      if (item){
-        addToCartFallback(item);
-        removeFromWishlist(item.id);
-        paint();
-      }
-    }
-  });
-
-  paint();
-
-  // lock scroll when cart drawer state changes (like your other pages)
-  document.addEventListener('DOMContentLoaded', function () {
-    const drawer = document.getElementById('cdDrawer');
-    const toggleLock = () => {
-      document.body.classList.toggle('lock-scroll', drawer.classList.contains('active'));
-    };
-    new MutationObserver(toggleLock).observe(drawer, { attributes: true, attributeFilter: ['class'] });
-  });
-</script>
-
+  <!-- (Optional) If hidden overlays ever block clicks, uncomment this quick fix
+  <style>
+    .header .utils { position: relative; z-index: 3000; }
+    .has-megamenu .mega { pointer-events: none; opacity:0; visibility:hidden; }
+    .has-megamenu.open .mega,
+    .catmenu-toggle[aria-expanded="true"] + .mega { pointer-events:auto; opacity:1; visibility:visible; }
+  </style>
+  -->
 </body>
 </html>

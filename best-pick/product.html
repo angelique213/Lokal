@@ -11,6 +11,10 @@
   <!-- Site / Cart styles -->
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../cart.css">
+  <!-- Favorites styles (same file you use sitewide) -->
+  <link rel="stylesheet" href="../wishlist.css">
+  <!-- Favorites logic -->
+  <script src="../wishlist.js" defer></script>
 
   <!-- Page-only styles -->
   <style>
@@ -41,8 +45,12 @@
       border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
       width: 100%; aspect-ratio: 1/1; background:var(--chip);
       display:flex; align-items:center; justify-content:center;
+      position: relative; /* so the heart can be placed on top-right */
     }
     .hero img{ width:100%; height:100%; object-fit: contain; }
+
+    /* Put the heart on the hero top-right (uses .wishlist-btn base styles from wishlist.css) */
+    .hero .wishlist-btn{ position:absolute; right:12px; top:12px; z-index:5; }
 
     /* Right: details */
     .p-brand{ color:#a1948b; margin:0 0 6px; font-size:.9rem; text-transform:uppercase; letter-spacing:.25em; }
@@ -90,7 +98,7 @@
     .p-qty input::-webkit-outer-spin-button,
     .p-qty input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
 
-    .p-actions{ display:grid; gap: 10px; grid-template-columns: 1fr 1fr; max-width: 480px; margin: 8px 0 6px; }
+    .p-actions{ display:grid; gap: 10px; grid-template-columns: 1fr 1fr; max-width: 520px; margin: 8px 0 6px; }
     .btn{
       height:48px; border-radius: 10px; font-weight:700; cursor:pointer;
       display:inline-flex; align-items:center; justify-content:center; gap:10px;
@@ -166,7 +174,9 @@
         <ul>
           <li><a href="../best-pick/best-picks.html">Best Picks</a></li>
           <li><a href="../shop-all.html">Shop All</a></li>
-          <li><a href="../categories.html">Shop by Category</a></li>
+          <li class="has-megamenu">
+            <a href="../shop-all.html">Shop by Category</a>
+          </li>
         </ul>
       </nav>
     </div>
@@ -184,7 +194,13 @@
           </a>
         </li>
 
-        <li><a href="../wishlist.html"><i class="fa-regular fa-heart"></i></a></li>
+        <!-- Favorites link + counter (same as index) -->
+        <li style="position: relative;">
+          <a href="../wishlist.html" aria-label="Favorites" id="wishlistLink">
+            <i class="fa-regular fa-heart"></i>
+            <span class="wishlist-count" id="wishlistCount">0</span>
+          </a>
+        </li>
         <li><a href="../support.html"><i class="fa-solid fa-headset"></i></a></li>
       </ul>
     </nav>
@@ -219,7 +235,13 @@
     <!-- Left: gallery -->
     <section class="gallery">
       <div class="thumbs" id="thumbs"></div>
-      <div class="hero"><img id="heroImg" alt=""></div>
+      <div class="hero">
+        <img id="heroImg" alt="">
+        <!-- ❤️ Hero overlay heart (data-* set by JS below) -->
+        <button class="wishlist-btn" id="heroHeart" type="button" aria-label="Add to favorites" title="Add to favorites">
+          <i class="fa-regular fa-heart"></i>
+        </button>
+      </div>
     </section>
 
     <!-- Right: details -->
@@ -257,16 +279,15 @@
 
       <div class="p-actions">
         <button class="btn btn-primary" id="addToCartBtn"><i class="fa-solid fa-cart-plus"></i>&nbsp; ADD TO CART</button>
-        <button class="btn btn-secondary" id="wishlistBtn"><i class="fa-regular fa-heart"></i>&nbsp; ADD TO WISHLIST</button>
       </div>
 
-      <!-- Description FIRST (plain text) -->
+      <!-- Description -->
       <article class="p-desc" id="pDesc"></article>
 
-      <!-- Optional bullets/features (kept as a light card) -->
+      <!-- Optional bullets/features -->
       <article class="p-bullets" id="pBullets" hidden></article>
 
-      <!-- Share row AFTER description -->
+      <!-- Share row -->
       <div class="p-share">
         <span>Share:</span>
         <a aria-label="Share on Facebook" href="#"><i class="fa-brands fa-facebook-f"></i></a>
@@ -337,30 +358,27 @@
 
   <!-- Logic -->
   <script>
-    // -------- Get product from Best Picks / Shop All --------
+    // -------- Get product payload from localStorage --------
     const raw = localStorage.getItem('productDetail');
     let product = null;
     try { product = raw ? JSON.parse(raw) : null; } catch(e){ product = null; }
     if(!product || !product.name){ window.location.href = 'best-picks.html'; }
 
-// Prefer gallery passed in; else repeat main img for thumbnails
-// Make every image path absolute so it works from /best-pick/product.html
-const makeAbs = (p) => {
-  try { return new URL(p, window.location.href).href; } catch { return p; }
-};
-const galleryImgs = (product && Array.isArray(product.images) && product.images.length
-  ? product.images
-  : [product.img, product.img, product.img]
-).map(makeAbs);
+    // Turn relative -> absolute so images work from /best-pick/
+    const makeAbs = (p) => { try { return new URL(p, window.location.href).href; } catch { return p; } };
+    const galleryImgs = (product && Array.isArray(product.images) && product.images.length
+      ? product.images
+      : [product.img, product.img, product.img]
+    ).map(makeAbs);
 
-    // Clothing detector (name keywords, image path, or explicit category)
     function isClothing(p){
       const name = (p.name||"").toLowerCase();
       const img  = (p.img||"").toLowerCase();
       const byName = /(barong|bolero|shirt|dress|top|blouse|pants|trousers|skirt|coat|jacket)/i.test(name);
       const byImg  = img.includes("/clothing/");
-      return byName || byImg || p.category === "Clothing";
+      return byName || byImg || (p.category||"").toLowerCase()==="clothing";
     }
+    const clothing = isClothing(product);
 
     // Populate UI
     const root   = document.getElementById('productRoot');
@@ -370,7 +388,6 @@ const galleryImgs = (product && Array.isArray(product.images) && product.images.
     const pPrice = document.getElementById('pPrice');
     const pDesc  = document.getElementById('pDesc');
     const pBul   = document.getElementById('pBullets');
-
     const pRatingWrap = document.getElementById('pRating');
     const pStars    = document.getElementById('pStars');
     const pReviewCt = document.getElementById('pReviewCount');
@@ -378,7 +395,7 @@ const galleryImgs = (product && Array.isArray(product.images) && product.images.
     pName.textContent  = product.name || '';
     pPrice.textContent = product.price || '';
     pDesc.textContent  = product.desc || '';
-    hero.src = galleryImgs[0];
+    hero.src = makeAbs(product.img);
     hero.alt = product.name || 'Product image';
 
     galleryImgs.forEach((src, i)=>{
@@ -393,15 +410,16 @@ const galleryImgs = (product && Array.isArray(product.images) && product.images.
       thumbs.appendChild(b);
     });
 
-    // Ratings (if provided)
+    // Ratings
     function starsHTML(r){
-      const full = Math.floor(r);
-      const half = r - full >= 0.25 && r - full < 0.75;
-      let s = '';
-      for(let i=0;i<full;i++) s += '<i class="fa-solid fa-star"></i>';
-      if(half) s += '<i class="fa-solid fa-star-half-stroke"></i>';
-      while((s.match(/fa-star/g)||[]).length < 5) s += '<i class="fa-regular fa-star"></i>';
-      return s;
+      const full = Math.floor(r||0);
+      const half = (r - full >= 0.25 && r - full < 0.75) ? 1 : 0;
+      const roundedFull = half ? full : Math.round(r||0);
+      let html = '';
+      for (let i = 0; i < roundedFull; i++) html += '<i class="fa-solid fa-star"></i>';
+      if (half) html += '<i class="fa-solid fa-star-half-stroke"></i>';
+      while ((html.match(/fa-star/g) || []).length < 5) html += '<i class="fa-regular fa-star"></i>';
+      return html;
     }
     if (typeof product.rating === 'number') {
       pRatingWrap.hidden = false;
@@ -409,13 +427,10 @@ const galleryImgs = (product && Array.isArray(product.images) && product.images.
       pReviewCt.textContent = `${product.reviewsCount || 0} reviews`;
     }
 
-    // ----- Size UI -----
+    // Size
     const pSizeWrap = document.getElementById('pSizeWrap');
     const sizeRadios = Array.from(document.querySelectorAll('input[name="pSize"]'));
-    const clothing = isClothing(product);
     pSizeWrap.hidden = !clothing;
-
-    // Preselect size from Quick View if available
     if (clothing && product.preselectedSize){
       const r = sizeRadios.find(x=>x.value===product.preselectedSize);
       if(r) r.checked = true;
@@ -449,20 +464,49 @@ const galleryImgs = (product && Array.isArray(product.images) && product.images.
 
       addToCart({
         baseName,
-        name: displayName,      // shown in some carts; we also keep baseName separately
-        img: hero.src,          // current hero image
+        name: displayName,
+        img: hero.src,
         price: product.price,
-        desc: product.desc,
-        size: chosenSize,       // null for non-clothing
+        desc: product.desc || '',
+        size: chosenSize,
         quantity: Math.max(1, parseInt(qInput.value)||1)
       });
     });
 
-    document.getElementById('wishlistBtn').addEventListener('click', ()=>{
-      alert('Added to wishlist (demo)');
-    });
+    // ---------- Favorites wiring (hero heart only) ----------
+    function slugify(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
 
-    // Optional bullets/features
+    const heartData = {
+      id: slugify(product.name),
+      name: product.name,
+      price: product.price,
+      img: makeAbs(product.img),
+      desc: product.desc || '',
+      url: window.location.href
+    };
+
+    const heroHeart = document.getElementById('heroHeart');
+    function applyHeartData(el){
+      if(!el) return;
+      el.dataset.id    = heartData.id;
+      el.dataset.name  = heartData.name;
+      el.dataset.price = heartData.price;
+      el.dataset.img   = heartData.img;
+      el.dataset.desc  = heartData.desc;
+      el.dataset.url   = heartData.url;
+    }
+    applyHeartData(heroHeart);
+
+    // Header counter sync (in case wishlist.js didn't run yet)
+    (function updateWishlistCount(){
+      try{
+        const arr = JSON.parse(localStorage.getItem('wishlist')||'[]');
+        const c = document.getElementById('wishlistCount');
+        if(c) c.textContent = String(arr.length);
+      }catch{}
+    })();
+
+    // Bullets/features — show when present
     if (Array.isArray(product.bullets) && product.bullets.length) {
       pBul.hidden = false;
       pBul.innerHTML = `<ul>${product.bullets.map(li => `<li>${li}</li>`).join('')}</ul>`;
@@ -490,7 +534,7 @@ const galleryImgs = (product && Array.isArray(product.images) && product.images.
 
   <!-- Cart drawer logic -->
   <script src="../cart.js"></script>
-  <script src="../wishlist.js"></script>
+  <!-- (wishlist.js already included in <head> with defer) -->
   <script>
     // Lock/unlock page scroll when cart drawer opens/closes
     document.addEventListener('DOMContentLoaded', function () {

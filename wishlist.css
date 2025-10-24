@@ -1,0 +1,218 @@
+/* ===== Wishlist & Favorites Styling for Lokal ===== */
+
+/* --- Header Heart Icon --- */
+.utils a#wishlistLink i {
+  color: #fff !important;
+}
+
+.wishlist-count {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: #e11d48;
+  color: #fff;
+  font: 700 11px/18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  text-align: center;
+  display: none;
+}
+
+/* --- Favorites Page Layout --- */
+.fav-wrap {
+  max-width: 1200px;
+  margin: 24px auto 72px;
+  padding: 0 20px;
+}
+.fav-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 8px 0 18px;
+}
+.fav-head h1 {
+  font-size: 2.4rem;
+  color: #2b1f1a;
+  margin: 0;
+}
+.fav-count {
+  color: #7a6f68;
+  font-weight: 700;
+}
+
+.fav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 24px;
+}
+
+.wish-card {
+  border: 1px solid #eee;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+  transition: 0.3s ease all;
+}
+.wish-card:hover {
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+.wish-card .img-wrap {
+  position: relative;
+  aspect-ratio: 1/1;
+  display: grid;
+  place-items: center;
+  background: #f3f3f3;
+}
+.wish-card .img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Heart inside wishlist card */
+.wish-card .like-btn {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.15s ease, color 0.2s ease;
+}
+.wish-card .like-btn:hover {
+  transform: scale(1.15);
+  color: #ff9db0;
+}
+.wish-card .like-btn.active,
+.wish-card .like-btn:active {
+  color: #e11d48;
+}
+
+/* Info section */
+.wish-card .info {
+  padding: 16px;
+  text-align: left;
+}
+.wish-card .name {
+  font-weight: 700;
+  color: #2b1f1a;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 6px;
+}
+.wish-card .name:hover {
+  text-decoration: underline;
+}
+.wish-card .price {
+  font-weight: 700;
+  color: #2b1f1a;
+  margin-bottom: 12px;
+}
+.wish-card .cta {
+  width: 100%;
+  border: 1px solid #dcd7ce;
+  background: #fff;
+  color: #2b1f1a;
+  font-weight: 700;
+  border-radius: 10px;
+  height: 44px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.wish-card .cta:hover {
+  background: #f8f6f2;
+}
+
+/* --- Product Card Hearts (Best Picks / Shop All) --- */
+.wishlist-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none !important;
+  border: none !important;
+  cursor: pointer;
+  z-index: 5;
+  transition: transform 0.2s ease;
+  padding: 0;
+}
+
+/* Default: pure white heart */
+.wishlist-btn i {
+  font-size: 28px;
+  color: #ffffff; /* fully white */
+  text-shadow: 0 0 1px rgba(0,0,0,0.15); /* soft visibility */
+  transition: color 0.25s ease, transform 0.25s ease;
+}
+
+/* Hover tint */
+.wishlist-btn:hover i {
+  color: #ff9db0; /* light pink on hover */
+}
+
+/* When active/favorited → solid red */
+.wishlist-btn.active i,
+.wishlist-btn.is-active i,
+.wishlist-btn.wl-active i,
+.wishlist-btn i.fa-solid {
+  color: #e11d48; /* solid red */
+  text-shadow: none;
+}
+
+/* Pulse animation */
+.wishlist-btn.pulse {
+  animation: wlPulse 0.25s ease;
+}
+@keyframes wlPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+/* Remove hover background or outline */
+.wishlist-btn:focus,
+.wishlist-btn:active,
+.wishlist-btn:hover {
+  background: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+/* ===== WISHLIST PAGE HEART FIX ===== */
+
+/* Heart inside each wishlist product card */
+.wish-card .like-btn {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  background: none !important;
+  border: none !important;
+  font-size: 1.9rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, color 0.25s ease;
+}
+
+/* Default (already favorited → solid red) */
+.wish-card .like-btn i {
+  color: #e11d48; /* solid red */
+}
+
+/* Hover tint effect */
+.wish-card .like-btn:hover i {
+  transform: scale(1.15);
+  color: #ff5e7c; /* lighter red on hover */
+}
+
+/* Optional pulse on click */
+.wish-card .like-btn.pulse {
+  animation: wlPulse 0.25s ease;
+}
+@keyframes wlPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
