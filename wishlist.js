@@ -1,4 +1,5 @@
 /* ===== Wishlist — Final Full Version for Lokal =====
+   ✅ Saves ABSOLUTE image URLs (fixes broken images from grid)
    ✅ Full product data from PRODUCTS_CACHE
    ✅ Clickable hearts everywhere
    ✅ Solid red hearts (active)
@@ -19,9 +20,20 @@
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
 
+  // Convert any path (relative/absolute) to an absolute URL
+  function absUrl(p) {
+    try {
+      if (!p) return p;
+      // Use window.location.origin so it works across pages/folders
+      return new URL(p, window.location.origin).href;
+    } catch {
+      return p;
+    }
+  }
+
   const PRODUCTS = JSON.parse(localStorage.getItem("PRODUCTS_CACHE") || "[]");
 
-  // Get complete product data (with fallback)
+  // Get complete product data (with fallback) — ensures absolute URLs
   function fullProduct(item) {
     const id = item.id || slugify(item.name);
     const found =
@@ -31,17 +43,23 @@
           (p.name && item.name && p.name.trim() === item.name.trim())
       ) || {};
 
+    const primaryImg = absUrl(found.img || item.img || "");
+    const imgs = (found.images || item.images || [found.img || item.img || ""])
+      .filter(Boolean)
+      .map(absUrl);
+
     return {
       id,
       name: found.name || item.name || "Unnamed Product",
       price: found.price || item.price || "₱0",
       desc: found.desc || item.desc || "",
-      img: found.img || item.img || "",
-      images: found.images || item.images || [item.img],
-      rating: found.rating || 4.6,
-      reviewsCount: found.reviewsCount || 3,
-      bullets: found.bullets || [],
-      category: found.category || "",
+      img: primaryImg,
+      images: imgs.length ? imgs : (primaryImg ? [primaryImg] : []),
+      rating: found.rating || item.rating || 4.6,
+      reviewsCount: found.reviews || item.reviewsCount || 3,
+      bullets: found.bullets || item.bullets || [],
+      category: found.category || item.category || "",
+      url: item.url || window.location.href
     };
   }
 
@@ -51,12 +69,21 @@
     return list.some((x) => slugify(x.name) === slugify(name));
   }
 
-  function toggleWishlist(item) {
+  function toggleWishlist(rawItem) {
     let list = read();
-    const id = slugify(item.name);
+    const normalized = {
+      id: rawItem.id || slugify(rawItem.name),
+      name: rawItem.name,
+      price: rawItem.price || "",
+      // 🔧 Always store absolute URL to prevent broken images on wishlist.html
+      img: absUrl(rawItem.img || ""),
+      desc: rawItem.desc || "",
+      url: rawItem.url || window.location.href
+    };
+    const id = slugify(normalized.name);
     const index = list.findIndex((x) => slugify(x.name) === id);
     if (index > -1) list.splice(index, 1);
-    else list.push(item);
+    else list.push(normalized);
     write(list);
     updateBadge();
   }
@@ -65,7 +92,7 @@
     const el = $("#wishlistCount");
     if (!el) return;
     const n = read().length;
-    el.textContent = n > 0 ? n : "";
+    el.textContent = n > 0 ? String(n) : "";
     el.style.display = n > 0 ? "inline-block" : "none";
   }
 
@@ -77,9 +104,7 @@
       btn.classList.toggle("active", active);
       const icon = btn.querySelector("i");
       if (icon) {
-        icon.className = active
-          ? "fa-solid fa-heart"
-          : "fa-regular fa-heart";
+        icon.className = active ? "fa-solid fa-heart" : "fa-regular fa-heart";
       }
     });
   }
@@ -134,7 +159,7 @@
   document.addEventListener("click", (e) => {
     const t = e.target;
 
-    // Wishlist heart click (Shop All / Best Picks)
+    // Wishlist heart click (Shop All / Best Picks / any grid)
     const heart = t.closest(".wishlist-btn");
     if (heart) {
       e.preventDefault();
@@ -142,8 +167,10 @@
         id: heart.dataset.id,
         name: heart.dataset.name,
         price: heart.dataset.price,
-        img: heart.dataset.img,
+        // 🔧 Convert dataset image to absolute right here
+        img: absUrl(heart.dataset.img),
         desc: heart.dataset.desc,
+        url: heart.dataset.url || window.location.href
       };
       toggleWishlist(item);
       heart.classList.add("pulse");
@@ -152,7 +179,7 @@
       return;
     }
 
-    // View product
+    // View product (from wishlist page)
     const detail = t.closest(".to-detail");
     if (detail) {
       e.preventDefault();
@@ -186,6 +213,7 @@
       if (exist > -1) cart[exist].quantity += 1;
       else cart.push({ ...p, quantity: 1 });
       localStorage.setItem("cart", JSON.stringify(cart));
+      // Optionally remove from wishlist after adding to cart:
       list.splice(idx, 1);
       write(list);
       renderWishlist();
@@ -194,6 +222,23 @@
       return;
     }
   });
+
+  // ---------- Optional: broken-image fallback ----------
+  // Add a small placeholder image at: images/placeholder.png (recommended ~300x300)
+  document.addEventListener(
+    "error",
+    (e) => {
+      const img = e.target;
+      if (img && img.tagName === "IMG") {
+        if (!img.dataset.fallback) {
+          img.dataset.fallback = "1";
+          img.src = "images/placeholder.png";
+          img.alt = "Image not available";
+        }
+      }
+    },
+    true
+  );
 
   // ---------- Init ----------
   document.addEventListener("DOMContentLoaded", () => {
