@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lokal • Support</title>
+
+  <!-- Your site styles & icons -->
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="wishlist.css">
+  <link rel="stylesheet" href="cart.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous"/>
+
+  <style>
+    :root{
+      --ink:#2b1f1a; --muted:#7a6f68; --line:#e8e3da; --brand:#6d6a33; --chip:#f8f6f2; --card:#ffffff;
+      --ok:#166534; --err:#b91c1c;
+    }
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif; color:var(--ink); background:#fff;}
+    a{color:var(--brand);}
+
+    /* Hero */
+    .hero{
+      background: linear-gradient(180deg,#bab86c 0%, #d4d29a 100%);
+      color:#fff; padding:48px 20px;
+    }
+    .hero .wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.4fr .9fr;gap:24px;align-items:center;}
+    .hero h1{font-size:2.4rem;margin:0 0 8px;}
+    .hero p{opacity:.95;margin:0 0 16px;}
+    .hero .stats{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;}
+    .chip{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);color:#fff;padding:8px 12px;border-radius:999px;font-weight:700;}
+    .hero-card{
+      background:#ffffffd9;border:1px solid rgba(0,0,0,.06);backdrop-filter: blur(6px);
+      border-radius:16px;padding:18px; color:#1f2937;
+    }
+    .hero-card h3{margin:0 0 8px;font-size:1.05rem}
+    .hero-card p{margin:0 0 8px;color:#475569}
+    .hero-card .row{display:flex;gap:10px;flex-wrap:wrap}
+    .hero-card .btn{height:42px;padding:0 14px;border-radius:10px;border:0;background:var(--brand);color:#fff;font-weight:800;cursor:pointer;}
+    .hero-card .btn:hover{filter:brightness(.95)}
+    .hero-card .ghost{background:#fff;border:1px solid #d9d2cb;color:#1f2937}
+
+    /* Container */
+    .wrap{max-width:1100px;margin:32px auto;padding:0 20px;}
+
+    /* Quick links */
+    .quick{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:-24px;}
+    @media (max-width:880px){.hero .wrap{grid-template-columns:1fr}.quick{grid-template-columns:1fr 1fr}}
+    @media (max-width:560px){.quick{grid-template-columns:1fr}}
+    .qcard{
+      background:#fff;border:1px solid var(--line);border-radius:16px; padding:16px; display:flex; gap:12px; align-items:flex-start;
+      transition: box-shadow .2s, transform .2s, border-color .2s;
+    }
+    .qcard:hover{transform:translateY(-2px); box-shadow:0 10px 20px rgba(0,0,0,.06); border-color:#e2ddd5;}
+    .qcard i{font-size:22px;color:var(--brand);min-width:26px; margin-top:2px;}
+    .qcard h3{margin:0 0 6px;font-size:1.05rem}
+    .qcard p{margin:0;color:var(--muted)}
+
+    /* FAQ + search */
+    .faq-head{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin:12px 0 10px;}
+    .faq-head h2{margin:0}
+    .faq-search{flex:1;min-width:260px;display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff;}
+    .faq-search input{border:0;outline:0;width:100%;font-size:1rem;}
+    .accordion{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+    .faq-item{border-top:1px solid var(--line)}
+    .faq-item:first-child{border-top:0}
+    .faq-btn{
+      width:100%; text-align:left; background:#fff; border:0; padding:16px 18px; cursor:pointer; display:flex; justify-content:space-between; gap:16px;
+      font-weight:800; color:#1f2937;
+    }
+    /* No hover background for FAQ */
+    .faq-btn:hover{ background: transparent; }
+    .faq-btn i{transition:transform .18s ease}
+    .faq-btn[aria-expanded="true"] i{transform:rotate(180deg)}
+    .faq-panel{display:none;padding:0 18px 18px;color:#475569;line-height:1.6}
+    .faq-item.open .faq-panel{display:block}
+
+    /* Policy tiles */
+    .policies{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px;}
+    @media (max-width:880px){.policies{grid-template-columns:1fr 1fr}}
+    @media (max-width:560px){.policies{grid-template-columns:1fr}}
+    .tile{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;}
+    .tile h3{margin:0 0 6px}
+    .tile p, .tile ul{margin:0;color:#475569}
+    .tile ul{padding-left:18px;margin-top:6px}
+
+    /* Contact form */
+    .contact{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;margin-top:26px;}
+    @media (max-width:920px){.contact{grid-template-columns:1fr}}
+    form{
+      padding:18px;border:1px solid var(--line);border-radius:14px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.03);
+    }
+    label{display:block;font-weight:800;margin:10px 0 6px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media (max-width:560px){.row{grid-template-columns:1fr}}
+    input,textarea,select{
+      width:100%;padding:12px 14px;border:1px solid #d9d2cb;border-radius:10px;background:#fff;color:#222;font-size:16px;outline:none;
+      transition:border-color .15s, box-shadow .15s;
+    }
+    textarea{min-height:140px;resize:vertical;}
+    input:focus,textarea:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(109,106,51,.12);}
+    .actions{display:flex;gap:10px;align-items:center;margin-top:14px}
+    .btn{
+      height:46px;padding:0 18px;border-radius:10px;border:0;background:var(--brand);color:#fff;font-weight:800;cursor:pointer;
+    }
+    .btn:hover{filter:brightness(.95)}
+    .note{color:var(--muted);font-size:.95rem}
+    .status{margin-top:10px;font-weight:800}
+    .status.ok{color:var(--ok)} .status.err{color:var(--err)}
+    .cardy{border:1px solid var(--line);border-radius:14px;background:#fff;padding:16px}
+    .cardy p{margin:4px 0}
+    .hp{position:absolute;left:-5000px;top:auto;width:1px;height:1px;overflow:hidden;}
+  </style>
+</head>
+<body>
+
+  <!-- ===== YOUR HEADER (copied from your site) ===== -->
+  <header class="header">
+    <div class="logo">
+      <a href="index.html" aria-label="Home">
+        <img src="images/projectlogo.png" alt="logo">
+      </a>
+    </div>
+
+    <div class="nav-center">
+      <form class="site-search" action="search.html" method="GET">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="search" name="q" placeholder="Search products, categories..." autocomplete="off" />
+        <button type="submit">Search</button>
+      </form>
+
+      <nav class="main-links">
+        <ul>
+          <li><a href="best-pick/best-picks.html">Best Picks</a></li>
+          <li><a href="shop-all.html">Shop All</a></li>
+          <li><a href="support.html" class="active">Support</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <nav class="utils">
+      <ul class="nav-links">
+        <li><a href="login.html" aria-label="Account"><i class="fa-solid fa-user"></i></a></li>
+        <li>
+          <a href="#" id="openCart" aria-label="Open cart">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span class="cart-count">0</span>
+          </a>
+        </li>
+        <li style="position: relative;">
+          <a href="wishlist.html" aria-label="Favorites" id="wishlistLink">
+            <i class="fa-regular fa-heart"></i>
+            <span class="wishlist-count" id="wishlistCount">0</span>
+          </a>
+        </li>
+        <li><a href="support.html" aria-label="Support"><i class="fa-solid fa-headset"></i></a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <h1>How can we help?</h1>
+        <p>Find quick answers below or send us a message — we usually reply within <strong>24 hours</strong>.</p>
+        <div class="stats">
+          <span class="chip"><i class="fa-solid fa-clock"></i>&nbsp; Mon–Fri, 9am–6pm PHT</span>
+          <span class="chip"><i class="fa-solid fa-envelope"></i>&nbsp; shoplokalphilippines@gmail.com</span>
+        </div>
+      </div>
+      <div class="hero-card">
+        <h3>Need help with an order?</h3>
+        <p>Have your order number ready and we’ll sort it out fast.</p>
+        <div class="row">
+          <button class="btn" onclick="document.getElementById('supportForm').scrollIntoView({behavior:'smooth'})">
+            Contact Support
+          </button>
+          <button class="btn ghost" onclick="document.getElementById('faq').scrollIntoView({behavior:'smooth'})">
+            Browse FAQs
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUICK LINKS -->
+  <section class="wrap quick" aria-label="Popular help topics">
+    <article class="qcard">
+      <i class="fa-solid fa-truck"></i>
+      <div>
+        <h3>Shipping & Delivery</h3>
+        <p>Where we ship, timelines, and tracking info.</p>
+      </div>
+    </article>
+    <article class="qcard">
+      <i class="fa-solid fa-rotate-left"></i>
+      <div>
+        <h3>Returns & Refunds</h3>
+        <p>Eligibility window and how refunds are processed.</p>
+      </div>
+    </article>
+    <article class="qcard">
+      <i class="fa-solid fa-shield-heart"></i>
+      <div>
+        <h3>Product Support</h3>
+        <p>Item quality issues or missing parts? We’ll fix it.</p>
+      </div>
+    </article>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="wrap" aria-label="Frequently Asked Questions">
+    <div class="faq-head">
+      <h2>Frequently Asked Questions</h2>
+      <label class="faq-search" aria-label="Search FAQs">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input id="faqSearch" type="search" placeholder="Search keywords: shipping, return, size…" />
+      </label>
+    </div>
+
+    <div id="faqList" class="accordion">
+      <div class="faq-item">
+        <button class="faq-btn" aria-expanded="false">
+          Where do you ship and how long does it take? <i class="fa-solid fa-chevron-down"></i>
+        </button>
+        <div class="faq-panel">
+          We currently ship within the Philippines. Most Metro Manila orders arrive in 2–4 business days; provincial 4–7 business days.
+          You’ll receive a tracking link once your order ships.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" aria-expanded="false">
+          How much is shipping? <i class="fa-solid fa-chevron-down"></i>
+        </button>
+        <div class="faq-panel">
+          Shipping is calculated at checkout based on your address and cart weight. We occasionally run free-shipping promos — watch our homepage banners.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" aria-expanded="false">
+          What’s your return & refund policy? <i class="fa-solid fa-chevron-down"></i>
+        </button>
+        <div class="faq-panel">
+          You can request a return within 7 days of delivery if the item is defective, damaged, or incorrect. We’ll arrange a replacement or issue a refund to your original payment method once the return is received/approved.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" aria-expanded="false">
+          I received the wrong/defective item. What should I do? <i class="fa-solid fa-chevron-down"></i>
+        </button>
+        <div class="faq-panel">
+          Sorry about that! Please contact us with your order number and photos of the issue. We’ll fix it ASAP with a replacement or refund.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" aria-expanded="false">
+          Can I change or cancel my order? <i class="fa-solid fa-chevron-down"></i>
+        </button>
+        <div class="faq-panel">
+          We can edit/cancel orders that haven’t shipped yet. Message us immediately with your order number and requested change.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" aria-expanded="false">
+          What payment methods do you accept? <i class="fa-solid fa-chevron-down"></i>
+        </button>
+        <div class="faq-panel">
+          We currently accept major credit/debit cards and local e-wallets (coming soon). Cash on Delivery may be offered on selected items/areas.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" aria-expanded="false">
+          Do you have size guides for clothing? <i class="fa-solid fa-chevron-down"></i>
+        </button>
+        <div class="faq-panel">
+          Yes — check the product page’s size chart or ask us your measurements and the item you’re eyeing, and we’ll recommend a size.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" aria-expanded="false">
+          Do you offer gifting or special packaging? <i class="fa-solid fa-chevron-down"></i>
+        </button>
+        <div class="faq-panel">
+          Gift notes and special wrapping are available for select items. Add a note at checkout or message support to confirm availability and fees.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" aria-expanded="false">
+          How do I contact you? <i class="fa-solid fa-chevron-down"></i>
+        </button>
+        <div class="faq-panel">
+          Email us at <a href="mailto:shoplokalphilippines@gmail.com">shoplokalphilippines@gmail.com</a> or use the form below. We typically reply within 24 hours (Mon–Fri).
+        </div>
+      </div>
+    </div>
+
+    <!-- Policy tiles -->
+    <div class="policies" aria-label="Key policies">
+      <article class="tile">
+        <h3>Returns</h3>
+        <ul>
+          <li>Request within 7 days of delivery</li>
+          <li>Item must be unused & with tags</li>
+          <li>Photos required for defects/damage</li>
+        </ul>
+      </article>
+      <article class="tile">
+        <h3>Shipping</h3>
+        <ul>
+          <li>PH nationwide shipping</li>
+          <li>Metro Manila: 2–4 days</li>
+          <li>Provincial: 4–7 days</li>
+        </ul>
+      </article>
+      <article class="tile">
+        <h3>Payments</h3>
+        <ul>
+          <li>Cards (Visa/Mastercard)</li>
+          <li>E-wallets (coming soon)</li>
+          <li>COD on select items/areas</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="wrap contact" aria-label="Contact Support">
+    <form id="supportForm" novalidate>
+      <h2 style="margin:0 0 8px">Contact Support</h2>
+      <p class="note" style="margin:0 0 12px">We’ll reply from <strong>shoplokalphilippines@gmail.com</strong>.</p>
+
+      <div class="row">
+        <div>
+          <label for="name">Full name</label>
+          <input id="name" name="name" type="text" placeholder="Juan Dela Cruz" required />
+        </div>
+        <div>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" placeholder="you@email.com" required />
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="topic">Topic</label>
+          <select id="topic" name="topic">
+            <option value="">Select…</option>
+            <option>Orders & Shipping</option>
+            <option>Returns & Refunds</option>
+            <option>Product Question</option>
+            <option>Website Issue</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div>
+          <label for="order">Order # (optional)</label>
+          <input id="order" name="order" type="text" placeholder="e.g., 12345" />
+        </div>
+      </div>
+
+      <label for="subject">Subject</label>
+      <input id="subject" name="subject" type="text" placeholder="Short summary of your request" />
+
+      <label for="message">Message</label>
+      <textarea id="message" name="message" placeholder="Tell us what’s up…" required></textarea>
+
+      <!-- Honeypot -->
+      <div class="hp" aria-hidden="true">
+        <label>Leave this field empty<input type="text" name="company"></label>
+      </div>
+
+      <div class="actions">
+        <button class="btn" type="submit" id="supportSendBtn">Send Message</button>
+        <span id="supportStatus" class="status" role="status" aria-live="polite"></span>
+      </div>
+    </form>
+
+    <aside class="cardy">
+      <h3 style="margin:0 0 8px">Other ways to reach us</h3>
+      <p><i class="fa-solid fa-envelope"></i> &nbsp; <a href="mailto:shoplokalphilippines@gmail.com">shoplokalphilippines@gmail.com</a></p>
+      <p><i class="fa-solid fa-clock"></i> &nbsp; Mon–Fri, 9am–6pm PHT</p>
+      <hr style="border:0;border-top:1px solid #eee;margin:12px 0">
+      <p style="color:var(--muted);">Response time: usually within 24 hours. Weekends/holidays may take a bit longer.</p>
+    </aside>
+  </section>
+
+  <!-- ===== YOUR FOOTER (copied from your site) ===== -->
+  <footer class="footer">
+    <div class="footer-section">
+      <h1>Contact Us</h1>
+      <ul class="footer-list">
+        <li>lokal@info.com</li>
+        <li>lokal@admin.com</li>
+        <li>Manila Philippines</li>
+        <li class="border-list"></li>
+        <li class="socials">
+          <i class="fa-brands fa-square-instagram"></i>
+          <i class="fa-brands fa-square-facebook"></i>
+          <i class="fa-brands fa-tiktok"></i>
+        </li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h1>Quick Links</h1>
+      <ul class="footer-list">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="shop-all.html">Shop All</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="terms.html">Terms & Conditions</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h1>Subscribe to Newsletter</h1>
+      <ul class="footer-list">
+        <li>A local marketplace is a community hub where people buy, sell, or trade goods and services within their area.</li>
+        <li class="sub">
+          <input type="text" placeholder="Your email">
+          <button class="button">Subscribe</button>
+        </li>
+      </ul>
+    </div>
+  </footer>
+
+  <!-- (Optional) cart & wishlist scripts if needed on this page -->
+  <script src="cart.js" defer></script>
+  <script src="wishlist.js" defer></script>
+
+  <script>
+    /* ===== Accordions ===== */
+    document.addEventListener('click', (e)=>{
+      const btn = e.target.closest('.faq-btn');
+      if(!btn) return;
+      const item = btn.parentElement;
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(x=>{
+        if(x!==item){ x.classList.remove('open'); x.querySelector('.faq-btn').setAttribute('aria-expanded','false'); }
+      });
+      item.classList.toggle('open', !isOpen);
+      btn.setAttribute('aria-expanded', String(!isOpen));
+    });
+  
+    /* ===== FAQ Search ===== */
+    const faqSearch = document.getElementById('faqSearch');
+    if (faqSearch) {
+      faqSearch.addEventListener('input', ()=>{
+        const q = faqSearch.value.toLowerCase().trim();
+        document.querySelectorAll('#faqList .faq-item').forEach(it=>{
+          const text = it.textContent.toLowerCase();
+          it.style.display = text.includes(q) ? '' : 'none';
+        });
+      });
+    }
+  
+    /* ===== CONTACT FORM → Apps Script ===== */
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxkZCFWx_nc1KVtUzfCplWVFi-S1d6B8PUn8Wt0YhF1kcdpZZ59QMLQOLENvE6gN5Pm/exec'; // keep yours
+  
+    const form     = document.getElementById('supportForm');
+    const statusEl = document.getElementById('supportStatus');
+    const sendBtn  = document.getElementById('supportSendBtn');
+  
+    function setStatus(msg, isErr){
+      statusEl.textContent = msg;
+      statusEl.className = 'status ' + (isErr ? 'err' : 'ok');
+      if (!isErr && msg) {
+        // fade out after 3s
+        setTimeout(()=>{ statusEl.style.opacity = '0'; }, 2200);
+        setTimeout(()=>{ statusEl.textContent=''; statusEl.style.opacity=''; }, 3200);
+      }
+    }
+  
+    form.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      setStatus('', false);
+      sendBtn.disabled = true; sendBtn.textContent = 'Sending…';
+  
+      const fd = new FormData(form);
+  
+      // Build a clean subject without duplicating tokens:
+      // strip any existing [Topic] or (Order #xyz) the user might have typed
+      const topic = (form.topic.value  || '').trim();
+      const order = (form.order.value  || '').trim();
+      let base    = (form.subject.value|| 'New support request').trim();
+      base = base
+        .replace(/^\s*\[[^\]]+\]\s*/g, '')          // remove leading [Something]
+        .replace(/\(Order\s*#\s*[^)]+\)\s*/ig, '')  // remove any (Order #123)
+        .trim();
+  
+      const parts = [];
+      if (topic) parts.push(`[${topic}]`);
+      parts.push(base || 'Message');
+      if (order) parts.push(`(Order #${order})`);
+      const subject = parts.join(' ');
+      fd.set('subject', subject);
+  
+      try{
+        const res = await fetch(WEB_APP_URL, {
+          method: 'POST',
+          body: new URLSearchParams(fd),
+          // if Apps Script ever returns opaque (no-cors) we’ll still treat as success below
+        });
+  
+        // Handle success across normal & opaque responses
+        const looksOpaque = res.type === 'opaque';
+        let ok = looksOpaque || res.ok;
+  
+        if (!looksOpaque) {
+          // Try to read JSON if available; if it says ok:false, mark as error
+          try {
+            const data = await res.json();
+            if (typeof data?.ok !== 'undefined') ok = !!data.ok;
+          } catch (_) { /* ignore parse errors */ }
+        }
+  
+        if (ok) {
+          form.reset();
+          setStatus('Thanks! Your message has been sent. We’ll respond within 24 hours.', false);
+          form.scrollIntoView({behavior:'smooth', block:'start'});
+        } else {
+          setStatus('There was an error sending your message. Please try again.', true);
+        }
+      } catch (err){
+        // Even if client sees a network error, GAS may have received it.
+        console.error(err);
+        setStatus('Network error. Please try again.', true);
+      } finally{
+        sendBtn.disabled = false; sendBtn.textContent = 'Send Message';
+      }
+    });
+  </script>
+  
+</body>
+</html>

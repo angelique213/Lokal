@@ -457,6 +457,16 @@
       category: "flavors", rating: 4.3, reviews: 18,
       bullets: ["Sweet & tangy","Pocket-size treat","Made with real mango"]
     },
+
+    {
+      name: "Dried Mangoes",
+      price: "₱100",
+      desc: "Cebu's Lucky Premium Dried Mangoes",
+      img: "images/flavors/flavors26.png",
+      images: ["images/flavors/flavors26.png","images/flavors/flavors26a.png","images/flavors/flavors26b.png"],
+      category: "flavors", rating: 4.3, reviews: 18,
+      bullets: ["Freshness Guaranteed","Pocket-size treat","Made with real mango"]
+    },
     {
       name: "7D Dried Mangoes Dark Chocolate",
       price: "₱170",
@@ -1289,7 +1299,7 @@
   const fSort = document.getElementById('fSort');
   const fReset = document.getElementById('fReset');
 
-  const PER_PAGE = 12;
+  const PER_PAGE = 48;
   let currentPage = 1;
 
   const pesoToNumber = (p) => Number(String(p).replace(/[^\d.]/g,'')||0);
