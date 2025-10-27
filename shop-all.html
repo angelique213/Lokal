@@ -1591,8 +1591,8 @@
     });
   });
 
-  /* ------------- Filters / Reset ------------- */
-  fSearch.addEventListener('input', ()=>{ currentPage = 1; paint(); });
+   /* ------------- Filters / Reset ------------- */
+   fSearch.addEventListener('input', ()=>{ currentPage = 1; paint(); });
   fCategory.addEventListener('change', ()=>{ currentPage = 1; paint(); });
   fSort.addEventListener('change', ()=>{ currentPage = 1; paint(); });
   fReset.addEventListener('click', ()=>{
@@ -1607,8 +1607,9 @@
   paint();
   </script>
 
-  <!-- Cart drawer logic -->
+  <!-- Load global cart API (window.addToCart, window.openCartDrawer) -->
   <script src="cart.js"></script>
+
   <script>
     // Lock page scroll when cart drawer toggles
     document.addEventListener('DOMContentLoaded', function () {
@@ -1637,8 +1638,6 @@
         history.replaceState({}, '', location.pathname);
       } catch (e) {}
     })();
-
-    
   </script>
 </body>
 </html>

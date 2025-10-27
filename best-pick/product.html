@@ -8,147 +8,86 @@
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" crossorigin="anonymous"/>
 
-  <!-- Site / Cart styles -->
+  <!-- Site base: root deploy. If you later host under /Lokal/, change to /Lokal/ -->
+  <meta name="site-base" content="/">
+
+  <!-- Styles and scripts from project root (note the ../) -->
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../cart.css">
-  <!-- Favorites styles (same file you use sitewide) -->
   <link rel="stylesheet" href="../wishlist.css">
-  <!-- Favorites logic -->
   <script src="../wishlist.js" defer></script>
 
   <!-- Page-only styles -->
   <style>
     :root{
-      --ink:#2b1f1a;
-      --muted:#7a6f68;
-      --line:#e9e5de;
-      --brand:#6d6a33;
-      --chip:#efe9d8; /* hero bg */
+      --ink:#2b1f1a; --muted:#7a6f68; --line:#e9e5de; --brand:#6d6a33; --chip:#efe9d8;
     }
-
-    .product-wrap{
-      max-width: 1200px; margin: 32px auto 60px; padding: 0 20px;
-      display: grid; grid-template-columns: 560px 1fr; gap: 48px;
-    }
-
-    /* Left: gallery */
-    .gallery{ display: grid; grid-template-columns: 90px 1fr; gap: 16px; align-items: start; }
-    .thumbs{ display: grid; gap: 10px; }
-    .thumbs button{
-      width: 90px; height: 90px; border: 1px solid var(--line);
-      border-radius: 10px; overflow: hidden; background:#fff; cursor: pointer; padding:0; display:block;
-    }
-    .thumbs img{ width:100%; height:100%; object-fit: cover; display:block; }
-    .thumbs button.active{ outline: 2px solid var(--brand); outline-offset: 2px; }
-
-    .hero{
-      border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
-      width: 100%; aspect-ratio: 1/1; background:var(--chip);
-      display:flex; align-items:center; justify-content:center;
-      position: relative; /* so the heart can be placed on top-right */
-    }
-    .hero img{ width:100%; height:100%; object-fit: contain; }
-
-    /* Put the heart on the hero top-right (uses .wishlist-btn base styles from wishlist.css) */
+    .product-wrap{ max-width:1200px; margin:32px auto 60px; padding:0 20px; display:grid; grid-template-columns:560px 1fr; gap:48px; }
+    .gallery{ display:grid; grid-template-columns:90px 1fr; gap:16px; align-items:start; }
+    .thumbs{ display:grid; gap:10px; }
+    .thumbs button{ width:90px; height:90px; border:1px solid var(--line); border-radius:10px; overflow:hidden; background:#fff; cursor:pointer; padding:0; display:block; }
+    .thumbs img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .thumbs button.active{ outline:2px solid var(--brand); outline-offset:2px; }
+    .hero{ border:1px solid var(--line); border-radius:14px; overflow:hidden; width:100%; aspect-ratio:1/1; background:var(--chip); display:flex; align-items:center; justify-content:center; position:relative; }
+    .hero img{ width:100%; height:100%; object-fit:contain; }
     .hero .wishlist-btn{ position:absolute; right:12px; top:12px; z-index:5; }
 
-    /* Right: details */
     .p-brand{ color:#a1948b; margin:0 0 6px; font-size:.9rem; text-transform:uppercase; letter-spacing:.25em; }
-    .p-title{ font-size: 2.2rem; line-height:1.2; margin: 8px 0 6px; color:var(--ink); }
-    .p-price{ font-weight: 800; font-size: 1.2rem; margin: 6px 0 16px; color:var(--ink); }
+    .p-title{ font-size:2.2rem; line-height:1.2; margin:8px 0 6px; color:var(--ink); }
+    .p-price{ font-weight:800; font-size:1.2rem; margin:6px 0 16px; color:var(--ink); }
 
-    /* Rating row */
-    .p-rating{ display:flex; align-items:center; gap:10px; margin: 4px 0 12px; }
+    .p-rating{ display:flex; align-items:center; gap:10px; margin:4px 0 12px; }
     .p-rating .stars{ color:#e0a106; }
-    .p-rating small{ color: var(--muted); }
+    .p-rating small{ color:var(--muted); }
 
-    /* Size pills (new) */
-    .p-size{ margin: 6px 0 10px; }
+    .p-size{ margin:6px 0 10px; }
     .p-size-label{ display:block; font-weight:700; color:var(--ink); margin-bottom:8px; }
     .size-pills{ display:flex; flex-wrap:wrap; gap:10px; }
     .size-pills input{ position:absolute; opacity:0; pointer-events:none; }
-    .size-pills label{
-      display:inline-flex; align-items:center; justify-content:center;
-      min-width:64px; height:40px; padding:0 14px;
-      border:1px solid #cfc7c1; border-radius:999px;
-      background:#fff; color:var(--ink); font-weight:700; letter-spacing:.02em;
-      cursor:pointer; transition: all .15s ease; user-select:none;
-    }
+    .size-pills label{ display:inline-flex; align-items:center; justify-content:center; min-width:64px; height:40px; padding:0 14px; border:1px solid #cfc7c1; border-radius:999px; background:#fff; color:var(--ink); font-weight:700; letter-spacing:.02em; cursor:pointer; transition:.15s; user-select:none; }
     .size-pills label:hover{ border-color:#6d6a33; box-shadow:0 0 0 3px rgba(109,106,51,.15); }
-    .size-pills input:checked + label{
-      background:#6d6a33; color:#fff; border-color:#6d6a33; box-shadow:0 6px 12px rgba(0,0,0,.08);
-    }
+    .size-pills input:checked + label{ background:#6d6a33; color:#fff; border-color:#6d6a33; box-shadow:0 6px 12px rgba(0,0,0,.08); }
 
-    /* Quantity + buttons */
-    .p-form-row{ display:flex; gap:16px; align-items:center; margin: 6px 0 12px; }
+    .p-form-row{ display:flex; gap:16px; align-items:center; margin:6px 0 12px; }
     .p-form-row label{ color:var(--muted); font-weight:600; }
+    .p-qty{ display:inline-grid; grid-template-columns:44px 70px 44px; height:44px; border:1px solid #cfc7c1; border-radius:8px; overflow:hidden; background:#fff; }
+    .p-qty button{ background:#fff; border:0; font-size:20px; cursor:pointer; color:var(--ink); display:flex; align-items:center; justify-content:center; }
+    .p-qty input{ border:0; width:70px; text-align:center; font-size:16px; outline:none; -webkit-appearance:none; appearance:textfield; color:var(--ink); }
+    .p-qty input::-webkit-outer-spin-button, .p-qty input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
 
-    .p-qty{
-      display:inline-grid; grid-template-columns: 44px 70px 44px; height: 44px;
-      border: 1px solid #cfc7c1; border-radius: 8px; overflow: hidden; background: #fff;
-    }
-    .p-qty button{
-      background:#fff; border:0; font-size: 20px; cursor:pointer; color:var(--ink);
-      display:flex; align-items:center; justify-content:center;
-    }
-    .p-qty input{
-      border:0; width:70px; text-align:center; font-size: 16px; outline:none;
-      -webkit-appearance:none; appearance:textfield; color:var(--ink);
-    }
-    .p-qty input::-webkit-outer-spin-button,
-    .p-qty input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
-
-    .p-actions{ display:grid; gap: 10px; grid-template-columns: 1fr 1fr; max-width: 520px; margin: 8px 0 6px; }
-    .btn{
-      height:48px; border-radius: 10px; font-weight:700; cursor:pointer;
-      display:inline-flex; align-items:center; justify-content:center; gap:10px;
-      transition: background .15s, color .15s, border-color .15s;
-    }
+    .p-actions{ display:grid; gap:10px; grid-template-columns:1fr 1fr; max-width:520px; margin:8px 0 6px; }
+    .btn{ height:48px; border-radius:10px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:10px; transition:background .15s, color .15s, border-color .15s; }
     .btn-primary{ background:#6d6a33; color:#fff; border:0; }
-    .btn-primary:hover{ filter: brightness(.95); }
+    .btn-primary:hover{ filter:brightness(.95); }
     .btn-secondary{ background:#fff; color:var(--ink); border:1px solid #cfc7c1; }
     .btn-secondary:hover{ background:#f5f1ea; }
 
-    /* Description plain */
-    .p-desc{ margin-top: 16px; color:#3d342f; line-height:1.7; padding:0; background:transparent; border:0; }
+    .p-desc{ margin-top:16px; color:#3d342f; line-height:1.7; padding:0; background:transparent; border:0; }
+    .p-bullets{ margin-top:14px; color:#3d342f; line-height:1.6; padding:12px 14px; background:#faf9f7; border:1px solid var(--line); border-radius:10px; }
+    .p-bullets ul{ margin:0; padding-left:18px; }
+    .p-bullets li{ margin:6px 0; }
 
-    /* Optional bullets/features card */
-    .p-bullets{ margin-top: 14px; color:#3d342f; line-height:1.6; padding: 12px 14px; background:#faf9f7; border:1px solid var(--line); border-radius: 10px; }
-    .p-bullets ul{ margin:0; padding-left: 18px; }
-    .p-bullets li{ margin: 6px 0; }
+    .p-share{ display:flex; align-items:center; gap:12px; margin-top:12px; color:var(--muted); }
+    .p-share a{ color:var(--muted); } .p-share a:hover{ color:var(--ink); }
 
-    /* Share */
-    .p-share{ display:flex; align-items:center; gap:12px; margin-top: 12px; color:var(--muted); }
-    .p-share a{ color:var(--muted); }
-    .p-share a:hover{ color:var(--ink); }
-
-    /* Reviews block */
-    .reviews{ max-width: 1200px; margin: 36px auto 80px; padding: 0 20px; }
-    .reviews h3{ margin: 0 0 14px; color:var(--ink); }
-    .rev-summary{ display:flex; gap:24px; align-items:center; margin-bottom: 14px; }
-    .rev-score{ font-size: 2rem; font-weight:800; color:var(--ink); }
+    .reviews{ max-width:1200px; margin:36px auto 80px; padding:0 20px; }
+    .reviews h3{ margin:0 0 14px; color:var(--ink); }
+    .rev-summary{ display:flex; gap:24px; align-items:center; margin-bottom:14px; }
+    .rev-score{ font-size:2rem; font-weight:800; color:var(--ink); }
     .rev-stars{ color:#e0a106; }
     .rev-meta{ color:var(--muted); }
-    .rev-bars{ display:grid; gap:6px; max-width: 360px; }
-    .bar{ display:grid; grid-template-columns: 48px 1fr; gap:10px; align-items:center; color:var(--muted); font-size:.95rem; }
+    .rev-bars{ display:grid; gap:6px; max-width:360px; }
+    .bar{ display:grid; grid-template-columns:48px 1fr; gap:10px; align-items:center; color:var(--muted); font-size:.95rem; }
     .bar .track{ background:#eee6d7; height:10px; border-radius:6px; overflow:hidden; }
     .bar .fill{ height:100%; background:#6d6a33; width:0%; }
 
-    .rev-actions{ margin-top: 14px; }
+    .rev-actions{ margin-top:14px; }
     .rev-actions .btn{ height:42px; padding:0 16px; }
     .btn-outline{ background:#fff; color:var(--ink); border:1px solid #cfc7c1; }
     .btn-outline:hover{ background:#f5f1ea; }
 
-    @media (max-width: 1024px){
-      .product-wrap{ grid-template-columns: 1fr; gap: 24px; }
-      .gallery{ grid-template-columns: 90px 1fr; }
-      .p-actions{ grid-template-columns: 1fr; max-width: 420px; }
-    }
-    @media (max-width: 560px){
-      .gallery{ grid-template-columns: 1fr; }
-      .thumbs{ order:2; grid-template-columns: repeat(4,1fr); }
-      .thumbs button{ width:100%; height:90px; }
-    }
+    @media (max-width:1024px){ .product-wrap{ grid-template-columns:1fr; gap:24px; } .gallery{ grid-template-columns:90px 1fr; } .p-actions{ grid-template-columns:1fr; max-width:420px; } }
+    @media (max-width:560px){ .gallery{ grid-template-columns:1fr; } .thumbs{ order:2; grid-template-columns:repeat(4,1fr); } .thumbs button{ width:100%; height:90px; } }
   </style>
 </head>
 <body>
@@ -156,57 +95,40 @@
   <!-- HEADER -->
   <header class="header">
     <div class="logo">
-      <a href="../index.html" aria-label="Home">
-        <img src="../images/projectlogo.png" alt="logo">
-      </a>
+      <a href="../index.html" aria-label="Home"><img src="../images/projectlogo.png" alt="logo"></a>
     </div>
 
     <div class="nav-center">
-      <!-- Search -->
       <form class="site-search" action="../search.html" method="GET">
         <i class="fa-solid fa-magnifying-glass"></i>
         <input type="search" name="q" placeholder="Search products, categories..." autocomplete="off"/>
         <button type="submit">Search</button>
       </form>
 
-      <!-- Main links -->
       <nav class="main-links">
         <ul>
           <li><a href="../best-pick/best-picks.html">Best Picks</a></li>
           <li><a href="../shop-all.html">Shop All</a></li>
-          <li class="has-megamenu">
-            <a href="../shop-all.html">Shop by Category</a>
-          </li>
+          <li class="has-megamenu"><a href="../shop-all.html">Shop by Category</a></li>
         </ul>
       </nav>
     </div>
 
-    <!-- RIGHT ICONS -->
     <nav class="utils">
       <ul class="nav-links">
         <li><a href="../login.html"><i class="fa-solid fa-user"></i></a></li>
-
-        <!-- Cart opens drawer -->
         <li class="cart-icon">
-          <a href="#" id="openCart" aria-label="Open cart">
-            <i class="fa-solid fa-cart-shopping"></i>
-            <span class="cart-count">0</span>
-          </a>
+          <a href="#" id="openCart" aria-label="Open cart"><i class="fa-solid fa-cart-shopping"></i><span class="cart-count">0</span></a>
         </li>
-
-        <!-- Favorites link + counter (same as index) -->
         <li style="position: relative;">
-          <a href="../wishlist.html" aria-label="Favorites" id="wishlistLink">
-            <i class="fa-regular fa-heart"></i>
-            <span class="wishlist-count" id="wishlistCount">0</span>
-          </a>
+          <a href="../wishlist.html" aria-label="Favorites" id="wishlistLink"><i class="fa-regular fa-heart"></i><span class="wishlist-count" id="wishlistCount">0</span></a>
         </li>
         <li><a href="../support.html"><i class="fa-solid fa-headset"></i></a></li>
       </ul>
     </nav>
   </header>
 
-  <!-- Cart Drawer (off-canvas) -->
+  <!-- Cart Drawer -->
   <div class="cd-overlay" id="cdOverlay" aria-hidden="true"></div>
   <aside class="cd-drawer" id="cdDrawer" aria-hidden="true" role="dialog" aria-label="Cart drawer">
     <div class="cd-header">
@@ -216,15 +138,9 @@
     <div class="cd-body">
       <div id="cdItems" class="cd-items"></div>
       <div class="cd-summary">
-        <div class="cd-row">
-          <span>Subtotal</span>
-          <strong id="cdSubtotal">₱0.00</strong>
-        </div>
+        <div class="cd-row"><span>Subtotal</span><strong id="cdSubtotal">₱0.00</strong></div>
         <p class="cd-note">Shipping, taxes, and discount codes calculated at checkout.</p>
-        <label class="cd-terms">
-          <input id="cdAgree" type="checkbox">
-          <span>I agree with the <a href="../terms.html" target="_blank" rel="noopener">terms and conditions</a></span>
-        </label>
+        <label class="cd-terms"><input id="cdAgree" type="checkbox"> <span>I agree with the <a href="../terms.html" target="_blank" rel="noopener">terms and conditions</a></span></label>
         <button id="cdCheckout" class="cd-checkout" disabled>CHECK OUT</button>
       </div>
     </div>
@@ -237,7 +153,6 @@
       <div class="thumbs" id="thumbs"></div>
       <div class="hero">
         <img id="heroImg" alt="">
-        <!-- ❤️ Hero overlay heart (data-* set by JS below) -->
         <button class="wishlist-btn" id="heroHeart" type="button" aria-label="Add to favorites" title="Add to favorites">
           <i class="fa-regular fa-heart"></i>
         </button>
@@ -249,7 +164,6 @@
       <p class="p-brand">Lokal</p>
       <h1 class="p-title" id="pName"></h1>
 
-      <!-- rating row -->
       <div class="p-rating" id="pRating" hidden>
         <span class="stars" id="pStars"></span>
         <small id="pReviewCount"></small>
@@ -257,7 +171,6 @@
 
       <p class="p-price" id="pPrice"></p>
 
-      <!-- SIZE (only when product is clothing) -->
       <div class="p-size" id="pSizeWrap" hidden>
         <span class="p-size-label">Size</span>
         <div class="size-pills" role="radiogroup" aria-label="Choose size">
@@ -281,13 +194,9 @@
         <button class="btn btn-primary" id="addToCartBtn"><i class="fa-solid fa-cart-plus"></i>&nbsp; ADD TO CART</button>
       </div>
 
-      <!-- Description -->
       <article class="p-desc" id="pDesc"></article>
-
-      <!-- Optional bullets/features -->
       <article class="p-bullets" id="pBullets" hidden></article>
 
-      <!-- Share row -->
       <div class="p-share">
         <span>Share:</span>
         <a aria-label="Share on Facebook" href="#"><i class="fa-brands fa-facebook-f"></i></a>
@@ -305,7 +214,6 @@
       <div class="rev-stars" id="avgStars"></div>
       <div class="rev-meta" id="reviewMeta">Based on 0 reviews</div>
     </div>
-
     <div class="rev-bars">
       <div class="bar"><span>5 ★</span><div class="track"><div class="fill" id="b5"></div></div></div>
       <div class="bar"><span>4 ★</span><div class="track"><div class="fill" id="b4"></div></div></div>
@@ -313,70 +221,25 @@
       <div class="bar"><span>2 ★</span><div class="track"><div class="fill" id="b2"></div></div></div>
       <div class="bar"><span>1 ★</span><div class="track"><div class="fill" id="b1"></div></div></div>
     </div>
-
-    <div class="rev-actions">
-      <button class="btn btn-outline" id="writeReviewBtn">Write a review</button>
-    </div>
+    <div class="rev-actions"><button class="btn btn-outline" id="writeReviewBtn">Write a review</button></div>
   </section>
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div class="footer-section">
-      <h1>Contact Us</h1>
-      <ul class="footer-list">
-        <li>lokal@info.com</li>
-        <li>lokal@admin.com</li>
-        <li>Manila Philippines</li>
-        <li class="border-list"></li>
-        <li class="socials">
-          <i class="fa-brands fa-square-instagram"></i>
-          <i class="fa-brands fa-square-facebook"></i>
-          <i class="fa-brands fa-tiktok"></i>
-        </li>
-      </ul>
-    </div>
-    <div class="footer-section">
-      <h1>Quick Links</h1>
-      <ul class="footer-list">
-        <li><a href="../index.html">Home</a></li>
-        <li><a href="../shop-all.html">Shop All</a></li>
-        <li><a href="../about.html">About Us</a></li>
-        <li><a href="../terms.html">Terms & Conditions</a></li>
-      </ul>
-    </div>
-    <div class="footer-section">
-      <h1>Subscribe to Newsletter</h1>
-      <ul class="footer-list">
-        <li>A local marketplace is a community hub where people buy, sell, or trade goods and services within their area.</li>
-        <li class="sub">
-          <input type="text" placeholder="Your email">
-          <button class="button">Subscribe</button>
-        </li>
-      </ul>
-    </div>
-  </footer>
-
-  <!-- Logic -->
+  <!-- PAGE LOGIC -->
   <script>
-    // -------- Get product payload from localStorage --------
+    // Get product payload from localStorage
     const raw = localStorage.getItem('productDetail');
     let product = null;
-    try { product = raw ? JSON.parse(raw) : null; } catch(e){ product = null; }
-    if(!product || !product.name){ window.location.href = 'best-picks.html'; }
+    try { product = raw ? JSON.parse(raw) : null; } catch { product = null; }
+    if (!product || !product.name) { window.location.href = 'best-picks.html'; }
 
-    // Turn relative -> absolute so images work from /best-pick/
+    // Relative -> absolute for images (since this page is in /best-pick/)
     const makeAbs = (p) => { try { return new URL(p, window.location.href).href; } catch { return p; } };
-    const galleryImgs = (product && Array.isArray(product.images) && product.images.length
-      ? product.images
-      : [product.img, product.img, product.img]
-    ).map(makeAbs);
+    const galleryImgs = (product && Array.isArray(product.images) && product.images.length ? product.images : [product.img, product.img, product.img]).map(makeAbs);
 
     function isClothing(p){
       const name = (p.name||"").toLowerCase();
       const img  = (p.img||"").toLowerCase();
-      const byName = /(barong|bolero|shirt|dress|top|blouse|pants|trousers|skirt|coat|jacket)/i.test(name);
-      const byImg  = img.includes("/clothing/");
-      return byName || byImg || (p.category||"").toLowerCase()==="clothing";
+      return /(barong|bolero|shirt|dress|top|blouse|pants|trousers|skirt|coat|jacket)/i.test(name) || img.includes("/clothing/") || (p.category||"").toLowerCase()==="clothing";
     }
     const clothing = isClothing(product);
 
@@ -416,9 +279,9 @@
       const half = (r - full >= 0.25 && r - full < 0.75) ? 1 : 0;
       const roundedFull = half ? full : Math.round(r||0);
       let html = '';
-      for (let i = 0; i < roundedFull; i++) html += '<i class="fa-solid fa-star"></i>';
+      for (let i=0;i<roundedFull;i++) html += '<i class="fa-solid fa-star"></i>';
       if (half) html += '<i class="fa-solid fa-star-half-stroke"></i>';
-      while ((html.match(/fa-star/g) || []).length < 5) html += '<i class="fa-regular fa-star"></i>';
+      while ((html.match(/fa-star/g)||[]).length < 5) html += '<i class="fa-regular fa-star"></i>';
       return html;
     }
     if (typeof product.rating === 'number') {
@@ -433,25 +296,15 @@
     pSizeWrap.hidden = !clothing;
     if (clothing && product.preselectedSize){
       const r = sizeRadios.find(x=>x.value===product.preselectedSize);
-      if(r) r.checked = true;
+      if (r) r.checked = true;
     }
 
     // Qty controls
     const qInput = document.getElementById('qInput');
-    document.getElementById('qDec').addEventListener('click', ()=> { qInput.value = Math.max(1, (parseInt(qInput.value)||1)-1); });
-    document.getElementById('qInc').addEventListener('click', ()=> { qInput.value = (parseInt(qInput.value)||1)+1; });
+    document.getElementById('qDec').addEventListener('click', ()=>{ qInput.value = Math.max(1, (parseInt(qInput.value)||1)-1); });
+    document.getElementById('qInc').addEventListener('click', ()=>{ qInput.value = (parseInt(qInput.value)||1)+1; });
 
-    // Add to cart (merge by baseName + size)
-    function addToCart(item){
-      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-      const idx = cart.findIndex(i => i.baseName === item.baseName && i.size === item.size);
-      if(idx > -1) cart[idx].quantity += item.quantity;
-      else cart.push(item);
-      localStorage.setItem('cart', JSON.stringify(cart));
-      if (typeof window.openCartDrawer === 'function') window.openCartDrawer();
-      else alert('Added to cart!');
-    }
-
+    // Add to cart using the global cart.js API (no local cart logic)
     document.getElementById('addToCartBtn').addEventListener('click', ()=>{
       let chosenSize = null;
       if (clothing){
@@ -462,57 +315,38 @@
       const baseName = product.name;
       const displayName = clothing && chosenSize ? `${baseName} (Size: ${chosenSize})` : baseName;
 
-      addToCart({
+      window.addToCart({
+        id: baseName.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''),
         baseName,
         name: displayName,
-        img: hero.src,
+        img: hero.src,            // can be relative or absolute; cart.js will normalize
         price: product.price,
         desc: product.desc || '',
         size: chosenSize,
         quantity: Math.max(1, parseInt(qInput.value)||1)
       });
+      window.openCartDrawer?.();
     });
 
-    // ---------- Favorites wiring (hero heart only) ----------
+    // Wishlist (hero heart)
     function slugify(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
-
-    const heartData = {
-      id: slugify(product.name),
-      name: product.name,
-      price: product.price,
-      img: makeAbs(product.img),
-      desc: product.desc || '',
-      url: window.location.href
-    };
-
     const heroHeart = document.getElementById('heroHeart');
-    function applyHeartData(el){
-      if(!el) return;
-      el.dataset.id    = heartData.id;
-      el.dataset.name  = heartData.name;
-      el.dataset.price = heartData.price;
-      el.dataset.img   = heartData.img;
-      el.dataset.desc  = heartData.desc;
-      el.dataset.url   = heartData.url;
+    if (heroHeart) {
+      heroHeart.dataset.id    = slugify(product.name);
+      heroHeart.dataset.name  = product.name;
+      heroHeart.dataset.price = product.price;
+      heroHeart.dataset.img   = makeAbs(product.img);
+      heroHeart.dataset.desc  = product.desc || '';
+      heroHeart.dataset.url   = window.location.href;
     }
-    applyHeartData(heroHeart);
 
-    // Header counter sync (in case wishlist.js didn't run yet)
-    (function updateWishlistCount(){
-      try{
-        const arr = JSON.parse(localStorage.getItem('wishlist')||'[]');
-        const c = document.getElementById('wishlistCount');
-        if(c) c.textContent = String(arr.length);
-      }catch{}
-    })();
-
-    // Bullets/features — show when present
+    // Bullets/features
     if (Array.isArray(product.bullets) && product.bullets.length) {
       pBul.hidden = false;
       pBul.innerHTML = `<ul>${product.bullets.map(li => `<li>${li}</li>`).join('')}</ul>`;
     }
 
-    // Reviews block demo
+    // Reviews (demo)
     const reviewsBlock = document.getElementById('reviewsBlock');
     const avgScore = document.getElementById('avgScore');
     const avgStars = document.getElementById('avgStars');
@@ -532,11 +366,9 @@
     document.getElementById('productRoot').hidden = false;
   </script>
 
-  <!-- Cart drawer logic -->
+  <!-- Lock/unlock body scroll when cart drawer toggles -->
   <script src="../cart.js"></script>
-  <!-- (wishlist.js already included in <head> with defer) -->
   <script>
-    // Lock/unlock page scroll when cart drawer opens/closes
     document.addEventListener('DOMContentLoaded', function () {
       const drawer = document.getElementById('cdDrawer');
       const toggleLock = () => {

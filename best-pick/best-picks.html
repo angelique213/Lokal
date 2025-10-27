@@ -9,10 +9,13 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
 
   <!-- Site / Cart / Wishlist styles (paths are relative to /best-pick/) -->
+  <meta name="site-base" content="/">
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../cart.css">
   <link rel="stylesheet" href="../wishlist.css">
   <script src="../wishlist.js" defer></script>
+
+  
 
   <!-- Page-only styles (Best Picks grid + Quick View) -->
   <style>
@@ -540,27 +543,52 @@
         desc: productDescriptions[i],
         rating: productRatings[i] || 0,
         reviewsCount: productReviews[i] || 0,
-        bullets: productBullets[i] || [],              // ✅ now sending bullets
+        bullets: productBullets[i] || [],
         preselectedSize: null,
         category: isClothingIndex(i) ? "Clothing" : ""
       });
     });
   </script>
 
-  <!-- Cart drawer logic -->
+  <!-- Global cart API -->
   <script src="../cart.js"></script>
+
   <script>
-    // Lock body scroll when cart drawer toggles
-    document.addEventListener('DOMContentLoaded', function () {
+    /* ---------- Safety shim: ensure the cart can open ---------- */
+    window.openCartDrawer = window.openCartDrawer || function(){
       const drawer = document.getElementById('cdDrawer');
-      const toggleLock = () => {
-        document.body.classList.toggle('lock-scroll', drawer.classList.contains('active'));
-      };
-      new MutationObserver(toggleLock).observe(drawer, { attributes: true, attributeFilter: ['class'] });
+      const overlay = document.getElementById('cdOverlay');
+      if (drawer) drawer.classList.add('active');
+      if (overlay) overlay.classList.add('active');
+      document.body.classList.add('lock-scroll');
+    };
+
+    // Header cart icon opens the drawer
+    document.addEventListener('click', function (e) {
+      const btn = e.target.closest('#openCart');
+      if (!btn) return;
+      e.preventDefault();
+      window.openCartDrawer();
     });
 
+    // Close handlers
+    const cdClose = document.getElementById('cdClose');
+    const cdOverlay = document.getElementById('cdOverlay');
+    function closeCart(){
+      document.getElementById('cdDrawer')?.classList.remove('active');
+      document.getElementById('cdOverlay')?.classList.remove('active');
+      document.body.classList.remove('lock-scroll');
+    }
+    cdClose?.addEventListener('click', closeCart);
+    cdOverlay?.addEventListener('click', closeCart);
 
-    
+    // Lock body scroll when cart drawer toggles
+    const drawer = document.getElementById('cdDrawer');
+    if (drawer){
+      new MutationObserver(() => {
+        document.body.classList.toggle('lock-scroll', drawer.classList.contains('active'));
+      }).observe(drawer, { attributes: true, attributeFilter: ['class'] });
+    }
   </script>
 </body>
 </html>
