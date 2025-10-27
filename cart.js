@@ -76,29 +76,34 @@
 
   // ---------- schema + add ----------
   function normalizeProduct(raw) {
-    const id = String(raw.id || slugify(raw.name));
-    const name = String(raw.name || "Unknown");
-    const baseName = raw.baseName ? String(raw.baseName) : name;
+    // robust clone (structuredClone fallback)
+    const src = (typeof structuredClone === "function")
+      ? structuredClone(raw || {})
+      : JSON.parse(JSON.stringify(raw || {}));
+
+    const id = String(src.id || slugify(src.name));
+    const name = String(src.name || "Unknown");
+    const baseName = src.baseName ? String(src.baseName) : name;
 
     // Store price as a user-friendly string; parsePeso() will read it numerically
     let priceString;
-    if (typeof raw.price === "number") priceString = fmtPeso(raw.price);
-    else priceString = String(raw.price || "₱0.00");
+    if (typeof src.price === "number") priceString = fmtPeso(src.price);
+    else priceString = String(src.price || "₱0.00");
 
     return {
       id,                    // required (unique per product style)
       name,                  // required (may include size)
       baseName,              // title without size
-      size: raw.size || "",  // optional variant
-      quantity: Number(raw.quantity) > 0 ? Number(raw.quantity) : 1,
+      size: src.size || "",  // optional variant
+      quantity: Number(src.quantity) > 0 ? Number(src.quantity) : 1,
       price: priceString,    // display string (e.g., "₱199.00")
-      img: raw.img || raw.image || "", // raw path; resolve on render/migrate
+      img: src.img || src.image || "", // raw path; resolve on render/migrate
     };
   }
 
   // opts: { open: true|false } (default true). You can also pass rawProduct.open or rawProduct.silent=true
   function addToCart(rawProduct, opts) {
-    const p = normalizeProduct(structuredClone(rawProduct || {}));
+    const p = normalizeProduct(rawProduct);
     const cart = getCart();
 
     const idx = cart.findIndex((i) => i.id === p.id && i.size === p.size);

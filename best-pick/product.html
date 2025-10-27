@@ -5,23 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Product | Lokal</title>
 
-  <!-- Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" crossorigin="anonymous"/>
+  <!-- Icons (stable FA 6.x to match index.html) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
 
-  <!-- Site base: root deploy. If you later host under /Lokal/, change to /Lokal/ -->
-  <meta name="site-base" content="/">
+  <!-- IMPORTANT: If hosted at https://username.github.io/Lokal/ keep /Lokal/ -->
+  <meta name="site-base" content="/Lokal/">
 
-  <!-- Styles and scripts from project root (note the ../) -->
+  <!-- Styles and scripts from project root -->
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../cart.css">
   <link rel="stylesheet" href="../wishlist.css">
   <script src="../wishlist.js" defer></script>
 
-  <!-- Page-only styles -->
   <style>
-    :root{
-      --ink:#2b1f1a; --muted:#7a6f68; --line:#e9e5de; --brand:#6d6a33; --chip:#efe9d8;
-    }
+    :root{ --ink:#2b1f1a; --muted:#7a6f68; --line:#e9e5de; --brand:#6d6a33; --chip:#efe9d8; }
     .product-wrap{ max-width:1200px; margin:32px auto 60px; padding:0 20px; display:grid; grid-template-columns:560px 1fr; gap:48px; }
     .gallery{ display:grid; grid-template-columns:90px 1fr; gap:16px; align-items:start; }
     .thumbs{ display:grid; gap:10px; }
@@ -226,13 +223,13 @@
 
   <!-- PAGE LOGIC -->
   <script>
-    // Get product payload from localStorage
+    // Load product payload
     const raw = localStorage.getItem('productDetail');
     let product = null;
     try { product = raw ? JSON.parse(raw) : null; } catch { product = null; }
     if (!product || !product.name) { window.location.href = 'best-picks.html'; }
 
-    // Relative -> absolute for images (since this page is in /best-pick/)
+    // Make relative image paths absolute (this page lives in /best-pick/)
     const makeAbs = (p) => { try { return new URL(p, window.location.href).href; } catch { return p; } };
     const galleryImgs = (product && Array.isArray(product.images) && product.images.length ? product.images : [product.img, product.img, product.img]).map(makeAbs);
 
@@ -304,7 +301,7 @@
     document.getElementById('qDec').addEventListener('click', ()=>{ qInput.value = Math.max(1, (parseInt(qInput.value)||1)-1); });
     document.getElementById('qInc').addEventListener('click', ()=>{ qInput.value = (parseInt(qInput.value)||1)+1; });
 
-    // Add to cart using the global cart.js API (no local cart logic)
+    // Add to cart (uses global cart.js API)
     document.getElementById('addToCartBtn').addEventListener('click', ()=>{
       let chosenSize = null;
       if (clothing){
@@ -319,7 +316,7 @@
         id: baseName.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''),
         baseName,
         name: displayName,
-        img: hero.src,            // can be relative or absolute; cart.js will normalize
+        img: hero.src,            // cart.js will normalize/resolve
         price: product.price,
         desc: product.desc || '',
         size: chosenSize,

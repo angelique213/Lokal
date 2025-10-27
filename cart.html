@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Your Cart | Lokal</title>
 
-  <!-- Fonts & Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" crossorigin="anonymous" />
+  <!-- Icons (same version as your other pages) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
 
   <!-- Site Styles -->
   <link rel="stylesheet" href="style.css">
@@ -17,13 +17,15 @@
   <!-- HEADER -->
   <header class="header">
     <div class="logo">
-      <a href="index.html"><img src="images/projectlogo.png" alt="Lokal Logo" /></a>
+      <a href="index.html" aria-label="Home">
+        <img src="images/projectlogo.png" alt="Lokal Logo" />
+      </a>
     </div>
 
     <div class="nav-center">
       <!-- Search Bar -->
       <form class="site-search" action="search.html" method="GET">
-        <i class="fa-solid fa-magnifying-glass"></i>
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
         <input type="search" name="q" placeholder="Search products, categories..." autocomplete="off" />
         <button type="submit">Search</button>
       </form>
@@ -33,7 +35,9 @@
         <ul>
           <li><a href="best-pick/best-picks.html">Best Picks</a></li>
           <li><a href="shop-all.html">Shop All</a></li>
-          <li><a href="categories.html">Shop by Category</a></li>
+          <li class="has-megamenu">
+            <a href="shop-all.html?cat=flavors" class="catmenu-toggle">Shop by Category</a>
+          </li>
         </ul>
       </nav>
     </div>
@@ -41,25 +45,43 @@
     <!-- Utilities -->
     <nav class="utils">
       <ul class="nav-links">
-        <li><a href="login.html"><i class="fa-solid fa-user"></i></a></li>
-        <li>
-          <a href="#" id="openCart"><i class="fa-solid fa-cart-shopping"></i><span class="cart-count">0</span></a>
+        <li><a href="login.html" aria-label="Account"><i class="fa-solid fa-user"></i></a></li>
+        <li class="cart-icon">
+          <a href="cart.html" aria-label="Cart">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span class="cart-count">0</span>
+          </a>
         </li>
-        <li><a href="wishlist.html"><i class="fa-regular fa-heart"></i></a></li>
-        <li><a href="support.html"><i class="fa-solid fa-headset"></i></a></li>
+        <li><a href="wishlist.html" aria-label="Favorites"><i class="fa-regular fa-heart"></i></a></li>
+        <li><a href="support.html" aria-label="Support"><i class="fa-solid fa-headset"></i></a></li>
       </ul>
     </nav>
   </header>
 
   <!-- CART PAGE -->
-  <main class="cart-page">
+  <main class="cart-page" aria-live="polite">
     <h1>Your Cart</h1>
 
-    <div class="cart-items" aria-live="polite"></div>
+    <!-- Empty state -->
+    <div id="cart-empty" style="display:none; color:#7a6f68; margin:16px 0;">
+      Your cart is empty. <a href="shop-all.html" class="button" style="margin-left:8px;">Go shopping</a>
+    </div>
 
-    <div class="cart-summary">
-      <p>Total: <strong>₱<span id="cart-total">0.00</span></strong></p>
-      <button class="checkout-btn" id="checkoutBtn">Proceed to Checkout</button>
+    <!-- Items -->
+    <div class="cart-items" id="cartItems"></div>
+
+    <!-- Summary -->
+    <div class="cart-summary" id="cartSummary" style="display:none;">
+      <div class="cart-row">
+        <span>Subtotal</span>
+        <strong>₱<span id="cart-subtotal">0.00</span></strong>
+      </div>
+      <p class="cd-note">Shipping, taxes, and discount codes calculated at checkout.</p>
+      <div class="cart-actions" style="display:flex; gap:8px; flex-wrap:wrap;">
+        <a href="shop-all.html" class="button" aria-label="Continue Shopping">Continue Shopping</a>
+        <button class="checkout-btn" id="checkoutBtn">Proceed to Checkout</button>
+        <button class="button" id="clearCart" type="button" style="background:#fff;border:1px solid #ddd;color:#2b1f1a;">Clear Cart</button>
+      </div>
     </div>
   </main>
 
@@ -103,7 +125,128 @@
   </footer>
 
   <!-- SCRIPTS -->
-  <script src="cart.js"></script>
-  <script src="wishlist.js"></script>
+  <script>
+    // ----- Helpers -----
+    const toAbs = (p) => { try { return p ? new URL(p, location.href).href : p; } catch { return p; } };
+    const pesoToNumber = (p) => Number(String(p).replace(/[^\d.]/g, "")) || 0;
+    const numberToPeso = (n) => n.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    function getCart(){ try { return JSON.parse(localStorage.getItem("cart") || "[]"); } catch { return []; } }
+    function setCart(c){ localStorage.setItem("cart", JSON.stringify(c || [])); }
+    function updateCartCount(){
+      const total = getCart().reduce((s,i)=> s + (Number(i.quantity)||0), 0);
+      document.querySelectorAll(".cart-count").forEach(el => el.textContent = total);
+    }
+
+    // ----- Render -----
+    const itemsWrap = document.getElementById("cartItems");
+    const emptyEl   = document.getElementById("cart-empty");
+    const sumWrap   = document.getElementById("cartSummary");
+    const subtotalEl= document.getElementById("cart-subtotal");
+
+    function paint(){
+      const cart = getCart();
+      itemsWrap.innerHTML = "";
+      const hasItems = cart.length > 0;
+      emptyEl.style.display = hasItems ? "none" : "block";
+      sumWrap.style.display = hasItems ? "block" : "none";
+
+      let subtotal = 0;
+
+      cart.forEach((p, idx) => {
+        const priceNum = pesoToNumber(p.price);
+        const lineTotal = priceNum * (Number(p.quantity)||1);
+        subtotal += lineTotal;
+
+        const art = document.createElement("article");
+        art.className = "cart-item";
+        art.innerHTML = `
+          <div class="ci-left">
+            <img src="${toAbs(p.img)}" alt="${p.name}" class="ci-img" onerror="this.onerror=null;this.src='images/placeholder.png';">
+          </div>
+          <div class="ci-main">
+            <p class="ci-name">${p.name || p.baseName || "Product"}</p>
+            ${p.size ? `<p class="ci-meta">Size: <strong>${p.size}</strong></p>` : ""}
+            <p class="ci-price">Price: <strong>${p.price}</strong></p>
+            <div class="ci-qty">
+              <button type="button" class="qty-dec" data-i="${idx}" aria-label="Decrease quantity">−</button>
+              <input type="number" min="1" value="${p.quantity || 1}" data-i="${idx}" aria-label="Quantity input">
+              <button type="button" class="qty-inc" data-i="${idx}" aria-label="Increase quantity">+</button>
+            </div>
+          </div>
+          <div class="ci-right">
+            <p class="ci-line">₱${numberToPeso(lineTotal)}</p>
+            <button type="button" class="ci-remove" data-i="${idx}" aria-label="Remove item">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        `;
+        itemsWrap.appendChild(art);
+      });
+
+      subtotalEl.textContent = numberToPeso(subtotal);
+      updateCartCount();
+    }
+
+    // ----- Events -----
+    document.addEventListener("click", (e)=>{
+      // Increase
+      const inc = e.target.closest(".qty-inc");
+      if (inc){
+        const i = +inc.dataset.i;
+        const cart = getCart();
+        cart[i].quantity = Math.max(1, (parseInt(cart[i].quantity)||1) + 1);
+        setCart(cart); paint(); return;
+      }
+
+      // Decrease
+      const dec = e.target.closest(".qty-dec");
+      if (dec){
+        const i = +dec.dataset.i;
+        const cart = getCart();
+        cart[i].quantity = Math.max(1, (parseInt(cart[i].quantity)||1) - 1);
+        setCart(cart); paint(); return;
+      }
+
+      // Remove
+      const rm = e.target.closest(".ci-remove");
+      if (rm){
+        const i = +rm.dataset.i;
+        const cart = getCart();
+        cart.splice(i,1);
+        setCart(cart); paint(); return;
+      }
+    });
+
+    // Direct qty typing
+    document.addEventListener("change", (e)=>{
+      const qtyInput = e.target.matches('.ci-qty input') ? e.target : null;
+      if (!qtyInput) return;
+      const i = +qtyInput.dataset.i;
+      const val = Math.max(1, parseInt(qtyInput.value)||1);
+      const cart = getCart();
+      cart[i].quantity = val;
+      setCart(cart); paint();
+    });
+
+    // Clear cart
+    document.getElementById("clearCart")?.addEventListener("click", ()=>{
+      if (!confirm("Clear all items from your cart?")) return;
+      setCart([]); paint();
+    });
+
+    // Checkout
+    document.getElementById("checkoutBtn")?.addEventListener("click", ()=>{
+      // Hook up to your real checkout flow here
+      alert("Checkout flow not connected yet. Add your payment/checkout integration.");
+    });
+
+    // Init
+    document.addEventListener("DOMContentLoaded", paint);
+  </script>
+
+  <!-- If you also load your shared scripts, keep them after the inline script: -->
+  <!-- <script src="cart.js"></script> -->
+  <!-- <script src="wishlist.js"></script> -->
 </body>
 </html>

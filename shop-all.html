@@ -422,1189 +422,427 @@
       </ul>
     </div>
   </footer>
+
   <!-- LOGIC -->
   <script>
     /* ------------ Config ------------- */
-    const PRODUCT_PAGE = 'best-pick/product.html'; 
-
+    const PRODUCT_PAGE = 'best-pick/product.html';
 
     const PRODUCTS = [
       /* FLAVORS */
-          {
-      name: "Shamrock Otap",
-      price: "₱120",
-      desc: "Delicate layered pastry from Cebu.",
-      img: "images/flavors/flavors1.png",
-      images: ["images/flavors/flavors1.png","images/flavors/flavors1a.png"],
-      category: "flavors", rating: 4.5, reviews: 12,
-      bullets: ["Cebu favorite","Crisp flakes","Perfect pasalubong"]
-    },
-    {
-      name: "Shamrock Rosquillos",
-      price: "₱120",
-      desc: "Iconic buttery biscuits from Cebu with a crisp bite.",
-      img: "images/flavors/flavors2.png",
-      images: ["images/flavors/flavors2.png","images/flavors/flavors2a.png"],
-      category: "flavors", rating: 4.6, reviews: 10,
-      bullets: ["Classic Cebu treat","Light & crunchy","Ideal for tea time"]
-    },
-    {
-      name: "Mango Flavorful Candy",
-      price: "₱100",
-      desc: "Chewy candy bursting with the natural sweetness of mangoes.",
-      img: "images/flavors/flavors5.png",
-      images: ["images/flavors/flavors5.png","images/flavors/flavors5a.png"],
-      category: "flavors", rating: 4.3, reviews: 18,
-      bullets: ["Sweet & tangy","Pocket-size treat","Made with real mango"]
-    },
-
-    {
-      name: "Dried Mangoes",
-      price: "₱100",
-      desc: "Cebu's Lucky Premium Dried Mangoes",
-      img: "images/flavors/flavors26.png",
-      images: ["images/flavors/flavors26.png","images/flavors/flavors26a.png","images/flavors/flavors26b.png"],
-      category: "flavors", rating: 4.3, reviews: 18,
-      bullets: ["Freshness Guaranteed","Pocket-size treat","Made with real mango"]
-    },
-    {
-      name: "7D Dried Mangoes Dark Chocolate",
-      price: "₱170",
-      desc: "Premium dried mangoes dipped in rich dark chocolate.",
-      img: "images/flavors/flavors6.png",
-      images: ["images/flavors/flavors6.png","images/flavors/flavors6a.png","images/flavors/flavors6b.png"],
-      category: "flavors", rating: 4.7, reviews: 22,
-      bullets: ["Sweet-tart balance","Gift-ready","Made in PH"]
-    },
-    {
-      name: "Davana Cassava Chips Barbeque",
-      price: "₱120",
-      desc: "Crunchy cassava chips with smoky barbeque seasoning.",
-      img: "images/flavors/flavors7.png",
-      images: ["images/flavors/flavors7.png","images/flavors/flavors7a.png"],
-      category: "flavors", rating: 4.5, reviews: 16,
-      bullets: ["Gluten-free","Locally sourced","Barbeque goodness"]
-    },
-    {
-      name: "Auro Plant-based Chocolates",
-      price: "₱110",
-      desc: "Ethically crafted fiesta-inspired plant-based chocolate bars.",
-      img: "images/flavors/flavors8.png",
-      images: ["images/flavors/flavors8.png","images/flavors/flavors8a.png"],
-      category: "flavors", rating: 4.8, reviews: 20,
-      bullets: ["Vegan friendly","Award-winning PH brand","Sustainably sourced"]
-    },
-    {
-      name: "Pure Benguet Honey",
-      price: "₱400",
-      desc: "Locally harvested pure wildflower honey from Benguet.",
-      img: "images/flavors/flavors9.png",
-      images: ["images/flavors/flavors9.png","images/flavors/flavors9a.png"],
-      category: "flavors", rating: 4.9, reviews: 25,
-      bullets: ["100% natural","Supports local beekeepers","No preservatives"]
-    },
-    {
-      name: "Chocolea Choco Drink",
-      price: "₱350",
-      desc: "Single-origin cacao drink mix sweetened with coconut sugar.",
-      img: "images/flavors/flavors10.png",
-      images: ["images/flavors/flavors10.png","images/flavors/flavors10a.png"],
-      category: "flavors", rating: 4.6, reviews: 14,
-      bullets: ["Hot or cold","Rich cocoa taste","Homegrown Filipino brand"]
-    },
-    {
-      name: "7D Dried Mangorind",
-      price: "₱69",
-      desc: "7D Dried Mangorind offers a chewy, flavorful treat with the perfect balance of tart tamarind and sweet mango in every bite.",
-      img: "images/flavors/flavors11.png",
-      images: ["images/flavors/flavors11.png","images/flavors/flavors11a.png"],
-      category: "flavors", rating: 4.6, reviews: 15,
-      bullets: ["90g pack of premium dried mangoes and tamarind","Ideal for pasalubong or standalone snacking","Made with high-quality mangoes and tamarind","Perfect balance of tart and sweetness"]
-    },
-    {
-      name: "Guisantes Espesyal",
-      price: "₱229",
-      desc: "Guisantes Espesyal Green Peas with Mango Bits Pack of 12.",
-      img: "images/flavors/flavors13.png",
-      images: ["images/flavors/flavors13.png","images/flavors/flavors13a.png"],
-      category: "flavors", rating: 4.6, reviews: 17,
-      bullets: ["20g x 12 packs","Locally made",]
-    },
-
-    {
-      name: "KangKong King",
-      price: "₱149",
-      desc: "KangKong King Water Spinach Chips Original 60g",
-      img: "images/flavors/flavors12.png",
-      images: ["images/flavors/flavors12.png","images/flavors/flavors12a.png","images/flavors/flavors12b.png"],
-      category: "flavors", rating: 4.6, reviews: 14,
-      bullets: ["100% from Real KangKong Leaf","Made with Coconut Oil","Gluten-Free"]
-    },
-
-    {
-      name: "Sabanana",
-      price: "₱59.75",
-      desc: "Made from farm fresh Green Saba Bananas",
-      img: "images/flavors/flavors14.png",
-      images: ["images/flavors/flavors14.png","images/flavors/flavors14a.png"],
-      category: "flavors", rating: 4.6, reviews: 18,
-      bullets: ["Sweet Original Flavor","Thin and crispy banana chips","100g"]
-    },
-
-    {
-      name: "Garlic Mushroom Chicharon",
-      price: "₱199",
-      desc: "Chicharon Mushroom chips",
-      img: "images/flavors/flavors15.png",
-      images: ["images/flavors/flavors15.png","images/flavors/flavors15a.png"],
-      category: "flavors", rating: 4.6, reviews: 17,
-      bullets: ["75g with garlic flavor","Made with healthy ingredients"]
-    },
-
-    {
-      name: "Dried Mango Strips",
-      price: "₱149",
-      desc: "Delicious and nutritious Guadalupe Dried Mangoes proudly made in Cebu, Philippines",
-      img: "images/flavors/flavors16.png",
-      images: ["images/flavors/flavors16.png","images/flavors/flavors16a.png"],
-      category: "flavors", rating: 4.6, reviews: 20,
-      bullets: ["All natural, no artificial flavoring","100g"]
-    },
-
-    {
-      name: "65% Dark Chocolate Bar",
-      price: "₱279",
-      desc: "Award winning chocolate from Davao, Philippines. Savor Malagos 65%Dark Chocolate with hints of cherry and licorice, a sensory experience in each bite.",
-      img: "images/flavors/flavors17.png",
-      images: ["images/flavors/flavors17.png","images/flavors/flavors17a.png"],
-      category: "flavors", rating: 4.6, reviews: 25,
-      bullets: ["Single-origin from Davao","Rich aroma with fruity notes","Crafted by local chocolatiers"]
-    },
-
-    {
-      name: "Manila Chocolate Bar Collection",
-      price: "₱559",
-      desc: "This is chocolate in its purest form, Savor it with this Manila Chocolatier Manila Bar Collection.",
-      img: "images/flavors/flavors18.png",
-      images: ["images/flavors/flavors18.png","images/flavors/flavors18a.png","images/flavors/flavors18b.png"],
-      category: "flavors", rating: 4.8, reviews: 17,
-      bullets: ["Premium artisan assortment","Made with locally sourced cacao","Perfect gift for chocolate lovers"]
-    },
-
-    {
-      name: "Camote Chips",
-      price: "₱99",
-      desc: "Camote Chips Sweet and Salty flavor.",
-      img: "images/flavors/flavors19.png",
-      images: ["images/flavors/flavors19.png","images/flavors/flavors19a.png"],
-      category: "flavors", rating: 4.7, reviews: 14,
-      bullets: ["Naturally sweet and highly nutritious","Ingredients: Farm fresh camote tubers, sugar, coconut oil and iodized salt","Proudly made in the Philippines"]
-    },
-    {
-      name: "Ube Coco White Chocolate ",
-      price: "₱250",
-      desc: "Auro Chocolate 32% Ube Coco White Chocolate and Puffed Rice",
-      img: "images/flavors/flavors20.png",
-      images: ["images/flavors/flavors20.png","images/flavors/flavors20a.png"],
-      category: "flavors", rating: 4.9, reviews: 15,
-      bullets: ["60g","A combination of ube-infused single origin 32% white chocolate mixed with desiccated coconut and crispy puffed rice","A tree-to-bar chocolate with unique burst of flavor in every bite"]
-    },
-    {
-      name: "Special Spicy Butcheron",
-      price: "₱149",
-      desc: "Mouth-watering taste of  Special Spicy Butcheron -  is a delicious snack that brings the authentic taste of the Philippines to your home",
-      img: "images/flavors/flavors21.png",
-      images: ["images/flavors/flavors21.png"],
-      category: "flavors", rating: 4.8, reviews: 15,
-      bullets: ["Spicy Butcheron","Halal Certified","50g"]
-    },
-    {
-      name: "Sweet & Spicy Dilis",
-      price: "₱100",
-      desc: "Enjoy a tantalizing snack with Sweet & Spicy Dilis!",
-      img: "images/flavors/flavors22.png",
-      images: ["images/flavors/flavors22.png"],
-      category: "flavors", rating: 4.7, reviews: 14,
-      bullets: ["Made of crispy, bite-sized anchovies","Experience the perfect balance of sweetness and spiciness!","Halal Certified"]
-    },
-    {
-      name: "Sweet & Spicy Pusit",
-      price: "₱119",
-      desc: "Filled with tender and flavorful dried squid, coated in a delightful blend of sweet and spicy seasonings",
-      img: "images/flavors/flavors23.png",
-      images: ["images/flavors/flavors23.png"],
-      category: "flavors", rating: 4.6, reviews: 14,
-      bullets: ["Made from high-quality dried squid","Halal Certified","Experience the perfect balance of sweetness and spiciness!"]
-    },
-    {
-      name: "Shortbread Cookies ",
-      price: "₱339",
-      desc: "Premium shortbread cookies with Classic Butter.",
-      img: "images/flavors/flavors24.png",
-      images: ["images/flavors/flavors24.png","images/flavors/flavors24a.png"],
-      category: "flavors", rating: 4.9, reviews: 20,
-      bullets: ["Perfectly for your cravings."]
-    },
-    {
-      name: "Shortbread Cookies ",
-      price: "₱359",
-      desc: "Premium shortbread cookies with Queso de Bola Cheese",
-      img: "images/flavors/flavors25.png",
-      images: ["images/flavors/flavors25.png","images/flavors/flavors25a.png"],
-      category: "flavors", rating: 5, reviews: 21,
-      bullets: ["Perfectly for your cravings."]
-    },
-
+      { name:"Shamrock Otap", price:"₱120", desc:"Delicate layered pastry from Cebu.", img:"images/flavors/flavors1.png", images:["images/flavors/flavors1.png","images/flavors/flavors1a.png"], category:"flavors", rating:4.5, reviews:12, bullets:["Cebu favorite","Crisp flakes","Perfect pasalubong"] },
+      { name:"Shamrock Rosquillos", price:"₱120", desc:"Iconic buttery biscuits from Cebu with a crisp bite.", img:"images/flavors/flavors2.png", images:["images/flavors/flavors2.png","images/flavors/flavors2a.png"], category:"flavors", rating:4.6, reviews:10, bullets:["Classic Cebu treat","Light & crunchy","Ideal for tea time"] },
+      { name:"Mango Flavorful Candy", price:"₱100", desc:"Chewy candy bursting with the natural sweetness of mangoes.", img:"images/flavors/flavors5.png", images:["images/flavors/flavors5.png","images/flavors/flavors5a.png"], category:"flavors", rating:4.3, reviews:18, bullets:["Sweet & tangy","Pocket-size treat","Made with real mango"] },
+      { name:"Dried Mangoes", price:"₱100", desc:"Cebu's Lucky Premium Dried Mangoes", img:"images/flavors/flavors26.png", images:["images/flavors/flavors26.png","images/flavors/flavors26a.png","images/flavors/flavors26b.png"], category:"flavors", rating:4.3, reviews:18, bullets:["Freshness Guaranteed","Pocket-size treat","Made with real mango"] },
+      { name:"7D Dried Mangoes Dark Chocolate", price:"₱170", desc:"Premium dried mangoes dipped in rich dark chocolate.", img:"images/flavors/flavors6.png", images:["images/flavors/flavors6.png","images/flavors/flavors6a.png","images/flavors/flavors6b.png"], category:"flavors", rating:4.7, reviews:22, bullets:["Sweet-tart balance","Gift-ready","Made in PH"] },
+      { name:"Davana Cassava Chips Barbeque", price:"₱120", desc:"Crunchy cassava chips with smoky barbeque seasoning.", img:"images/flavors/flavors7.png", images:["images/flavors/flavors7.png","images/flavors/flavors7a.png"], category:"flavors", rating:4.5, reviews:16, bullets:["Gluten-free","Locally sourced","Barbeque goodness"] },
+      { name:"Auro Plant-based Chocolates", price:"₱110", desc:"Ethically crafted fiesta-inspired plant-based chocolate bars.", img:"images/flavors/flavors8.png", images:["images/flavors/flavors8.png","images/flavors/flavors8a.png"], category:"flavors", rating:4.8, reviews:20, bullets:["Vegan friendly","Award-winning PH brand","Sustainably sourced"] },
+      { name:"Pure Benguet Honey", price:"₱400", desc:"Locally harvested pure wildflower honey from Benguet.", img:"images/flavors/flavors9.png", images:["images/flavors/flavors9.png","images/flavors/flavors9a.png"], category:"flavors", rating:4.9, reviews:25, bullets:["100% natural","Supports local beekeepers","No preservatives"] },
+      { name:"Chocolea Choco Drink", price:"₱350", desc:"Single-origin cacao drink mix sweetened with coconut sugar.", img:"images/flavors/flavors10.png", images:["images/flavors/flavors10.png","images/flavors/flavors10a.png"], category:"flavors", rating:4.6, reviews:14, bullets:["Hot or cold","Rich cocoa taste","Homegrown Filipino brand"] },
+      { name:"7D Dried Mangorind", price:"₱69", desc:"Chewy mix of tart tamarind and sweet mango.", img:"images/flavors/flavors11.png", images:["images/flavors/flavors11.png","images/flavors/flavors11a.png"], category:"flavors", rating:4.6, reviews:15, bullets:["90g pack","Great pasalubong","Sweet-tart balance"] },
+      { name:"Guisantes Espesyal", price:"₱229", desc:"Green Peas with Mango Bits Pack of 12.", img:"images/flavors/flavors13.png", images:["images/flavors/flavors13.png","images/flavors/flavors13a.png"], category:"flavors", rating:4.6, reviews:17, bullets:["20g × 12 packs","Locally made"] },
+      { name:"KangKong King", price:"₱149", desc:"Water Spinach Chips Original 60g", img:"images/flavors/flavors12.png", images:["images/flavors/flavors12.png","images/flavors/flavors12a.png","images/flavors/flavors12b.png"], category:"flavors", rating:4.6, reviews:14, bullets:["Real kangkong leaf","Coconut oil","Gluten-free"] },
+      { name:"Sabanana", price:"₱59.75", desc:"Thin and crispy banana chips.", img:"images/flavors/flavors14.png", images:["images/flavors/flavors14.png","images/flavors/flavors14a.png"], category:"flavors", rating:4.6, reviews:18, bullets:["Sweet original","100g"] },
+      { name:"Garlic Mushroom Chicharon", price:"₱199", desc:"Crispy mushroom chips with garlic.", img:"images/flavors/flavors15.png", images:["images/flavors/flavors15.png","images/flavors/flavors15a.png"], category:"flavors", rating:4.6, reviews:17, bullets:["75g","Healthier snack"] },
+      { name:"Dried Mango Strips", price:"₱149", desc:"Guadalupe Dried Mangoes, Cebu.", img:"images/flavors/flavors16.png", images:["images/flavors/flavors16.png","images/flavors/flavors16a.png"], category:"flavors", rating:4.6, reviews:20, bullets:["All natural","100g"] },
+      { name:"65% Dark Chocolate Bar", price:"₱279", desc:"Malagos 65% dark chocolate.", img:"images/flavors/flavors17.png", images:["images/flavors/flavors17.png","images/flavors/flavors17a.png"], category:"flavors", rating:4.6, reviews:25, bullets:["Single-origin Davao","Fruity notes"] },
+      { name:"Manila Chocolate Bar Collection", price:"₱559", desc:"Artisan assortment from Manila Chocolatier.", img:"images/flavors/flavors18.png", images:["images/flavors/flavors18.png","images/flavors/flavors18a.png","images/flavors/flavors18b.png"], category:"flavors", rating:4.8, reviews:17, bullets:["Local cacao","Gift-ready"] },
+      { name:"Camote Chips", price:"₱99", desc:"Sweet & salty camote chips.", img:"images/flavors/flavors19.png", images:["images/flavors/flavors19.png","images/flavors/flavors19a.png"], category:"flavors", rating:4.7, reviews:14, bullets:["Natural","Proudly PH"] },
+      { name:"Ube Coco White Chocolate", price:"₱250", desc:"32% Ube Coco white chocolate w/ puffed rice.", img:"images/flavors/flavors20.png", images:["images/flavors/flavors20.png","images/flavors/flavors20a.png"], category:"flavors", rating:4.9, reviews:15, bullets:["60g","Tree-to-bar"] },
+      { name:"Special Spicy Butcheron", price:"₱149", desc:"Crunchy, spicy butcheron snack.", img:"images/flavors/flavors21.png", images:["images/flavors/flavors21.png"], category:"flavors", rating:4.8, reviews:15, bullets:["50g","Halal"] },
+      { name:"Sweet & Spicy Dilis", price:"₱100", desc:"Crispy anchovies, sweet-spicy.", img:"images/flavors/flavors22.png", images:["images/flavors/flavors22.png"], category:"flavors", rating:4.7, reviews:14, bullets:["Halal","Perfect snack"] },
+      { name:"Sweet & Spicy Pusit", price:"₱119", desc:"Tender dried squid, sweet-spicy.", img:"images/flavors/flavors23.png", images:["images/flavors/flavors23.png"], category:"flavors", rating:4.6, reviews:14, bullets:["Halal","Great balance"] },
+      { name:"Shortbread Cookies (Butter)", price:"₱339", desc:"Classic butter shortbread.", img:"images/flavors/flavors24.png", images:["images/flavors/flavors24.png","images/flavors/flavors24a.png"], category:"flavors", rating:4.9, reviews:20, bullets:["Perfect for cravings"] },
+      { name:"Shortbread Cookies (Queso de Bola)", price:"₱359", desc:"Queso de Bola shortbread.", img:"images/flavors/flavors25.png", images:["images/flavors/flavors25.png","images/flavors/flavors25a.png"], category:"flavors", rating:5, reviews:21, bullets:["Perfect for cravings"] },
 
       /* ACCESSORIES */
-            {
-        name: "Sunglasses Cork Case",
-        price: "₱600",
-        desc: "Slim, fold-flat cork case that protects your eyewear without the bulk—lightweight, durable, and naturally stylish.",
-        img: "images/accessories/accessories4.png",
-        images: ["images/accessories/accessories4.png","images/accessories/accessories4a.png"],
-        category: "accessories", rating: 4.5, reviews: 18,
-        bullets: ["Fold-flat design saves space","Eco-friendly cork exterior","Soft, scratch-safe lining"]
-        },
-        {
-        name: "Firebend 02 Bamboo Shades",
-        price: "₱4,000",
-        desc: "Handcrafted bamboo sunglasses with polarized lenses for crisp, glare-free vision—elevated everyday wear.",
-        img: "images/accessories/accessories3.png",
-        images: ["images/accessories/accessories3.png","images/accessories/accessories3a.png"],
-        category: "accessories", rating: 4.6, reviews: 31,
-        bullets: ["Polarized, UV-blocking lenses","Lightweight bamboo frame","Handmade Filipino craftsmanship"]
-        },
-        {
-        name: "Alfombra Slippers with Beads",
-        price: "₱350",
-        desc: "Comfy alfombra slippers dressed with bead accents—soft on the feet and cute for lounging or quick errands.",
-        img: "images/accessories/accessories5.png",
-        images: ["images/accessories/accessories5.png","images/accessories/accessories5a.png"],
-        category: "accessories", rating: 4.3, reviews: 12,
-        bullets: ["Cushioned alfombra footbed","Hand-beaded strap detail","Slip-on, everyday comfort"]
-        },
-        {
-        name: "Higawa Beaded Earrings",
-        price: "₱2,000",
-        desc: "Delicately beaded statement earrings handcrafted by Filipino mothers—every pair helps support local livelihoods.",
-        img: "images/accessories/accessories6.png",
-        images: ["images/accessories/accessories6.png","images/accessories/accessories6a.png"],
-        category: "accessories", rating: 4.7, reviews: 22,
-        bullets: ["Intricate bead artistry","Lightweight for all-day wear","Empowers artisan communities"]
-        },
-        {
-        name: "Elara Beaded Earrings",
-        price: "₱2,000",
-        desc: "Celestial-inspired beadwork with graceful movement—handmade pieces that add shimmer to day or night looks.",
-        img: "images/accessories/accessories7.png",
-        images: ["images/accessories/accessories7.png","images/accessories/accessories7a.png","images/accessories/accessories7b.png"],
-        category: "accessories", rating: 4.6, reviews: 19,
-        bullets: ["Sparkling, elegant silhouette","Handcrafted bead detail","Nickel-safe findings"]
-        },
-        {
-        name: "Punuan Beaded Earrings",
-        price: "₱2,000",
-        desc: "Organic shapes and earth-tone beads come together in artisanal earrings that celebrate slow, thoughtful making.",
-        img: "images/accessories/accessories8.png",
-        images: ["images/accessories/accessories8.png","images/accessories/accessories8a.png"],
-        category: "accessories", rating: 4.5, reviews: 17,
-        bullets: ["Warm, nature-inspired palette","Handmade by local artisans","Light and comfortable fit"]
-        },
-        {
-        name: "Straw Headband Sunvisor",
-        price: "₱250",
-        desc: "Breathable straw sunvisor that packs flat—keeps you shaded on beach days, markets, and sunny strolls.",
-        img: "images/accessories/accessories9.png",
-        images: ["images/accessories/accessories9.png","images/accessories/accessories9a.png","images/accessories/accessories9b.png"],
-        category: "accessories", rating: 4.4, reviews: 26,
-        bullets: ["Wide brim shade","Adjustable, comfy band","Folds flat for travel"]
-        },
-        {
-        name: "Flat Head Hat",
-        price: "₱300",
-        desc: "A foldable, wide-brim sun hat for effortless shade—easy to toss in your tote and go.",
-        img: "images/accessories/accessories10.png",
-        images: ["images/accessories/accessories10.png","images/accessories/accessories10a.png","images/accessories/accessories10b.png"],
-        category: "accessories", rating: 4.3, reviews: 21,
-        bullets: ["Packable, travel-friendly","Breathable woven texture","Everyday sun protection"]
-        },
-        {
-        name: "Slides with Lace Strap",
-        price: "₱250",
-        desc: "Cozy house slides with a lace-look strap made from native materials—simple, airy, and easy to love.",
-        img: "images/accessories/accessories11.png",
-        images: ["images/accessories/accessories11.png"],
-        category: "accessories", rating: 4.2, reviews: 14,
-        bullets: ["Lightweight slip-on","Locally sourced materials","Soft footbed feel"]
-        },
-        {
-        name: "Native Abaca Headband",
-        price: "₱200",
-        desc: "Textured abaca headband that adds a natural touch to any outfit—secure, comfy, and uniquely Filipino.",
-        img: "images/accessories/accessories12.png",
-        images: ["images/accessories/accessories12.png","images/accessories/accessories12a.png","images/accessories/accessories12b.png"],
-        category: "accessories", rating: 4.4, reviews: 28,
-        bullets: ["Handwoven abaca fiber","Flexible, snug fit","Everyday neutral style"]
-        },
-        /* BAGS */
-        {
-        name: "Bayong Bag",
-        price: "₱1,600",
-        desc: "A sustainable woven bag that blends traditional Filipino craftsmanship with a modern design — stylish, sturdy, and eco-friendly.",
-        img: "images/bags/bag1.png",
-        images: ["images/bags/bag1.png", "images/bags/bag1a.png", "images/bags/bag1b.png"],
-        category: "bags", rating: 4.6, reviews: 18,
-        bullets: ["Eco-friendly and reusable", "Durable weave for daily use", "Locally handcrafted with care"]
-        },
-        {
-        name: "Buntal Shoulder Bag",
-        price: "₱2,000",
-        desc: "Elegant and lightweight, this Buntal shoulder bag is made from Buri palm fibers, handcrafted by local artisans for a timeless look.",
-        img: "images/bags/bag2.png",
-        images: ["images/bags/bag2.png", "images/bags/bag2a.png", "images/bags/bag2b.png"],
-        category: "bags", rating: 4.4, reviews: 12,
-        bullets: ["Black and beige accent", "Handwoven from Buri palm fibers", "Comfortable shoulder strap"]
-        },
-        {
-        name: "Pandan Tote Bag",
-        price: "₱300",
-        desc: "Add a pop of tropical charm to your outfit with this pandan tote — a stylish piece that supports Filipino artisans and eco-friendly living.",
-        img: "images/bags/bag3.png",
-        images: ["images/bags/bag3.png", "images/bags/bag3a.png", "images/bags/bag3b.png"],
-        category: "bags", rating: 4.2, reviews: 10,
-        bullets: ["Made from natural pandan leaves", "Braided handle for durability", "Zip closure for convenience"]
-        },
-        {
-        name: "Flower Square Handbag",
-        price: "₱3,000",
-        desc: "A chic square handbag decorated with floral patterns — perfect for elegant occasions or adding a touch of nature-inspired beauty to your day.",
-        img: "images/bags/bag4.png",
-        images: ["images/bags/bag4.png", "images/bags/bag4a.png"],
-        category: "bags", rating: 4.7, reviews: 15,
-        bullets: ["Made from premium Tikog material", "Features delicate floral design", "Includes a secure zipper closure"]
-        },
-        {
-        name: "Buntal Long Clutch Bag",
-        price: "₱1,500",
-        desc: "A sleek and stylish clutch made from Buri palm fibers, showcasing natural textures and modern Filipino craftsmanship.",
-        img: "images/bags/bag5.png",
-        images: ["images/bags/bag5.png", "images/bags/bag5a.png"],
-        category: "bags", rating: 4.5, reviews: 14,
-        bullets: ["Flap-style clutch with magnetic closure", "Brown and beige accent", "Comes with a detachable silver chain sling"]
-        },
-        {
-        name: "Mother of Pearl Clutch Bag",
-        price: "₱6,000",
-        desc: "An elegant clutch that radiates sophistication — made from mother-of-pearl shells and perfect for formal events and special gatherings.",
-        img: "images/bags/bag7.png",
-        images: ["images/bags/bag7.png", "images/bags/bag7a.png"],
-        category: "bags", rating: 4.9, reviews: 22,
-        bullets: ["Crafted from genuine mother-of-pearl", "Features yellowlip shell accents", "Includes a luxurious gold chain sling"]
-        },
-        {
-        name: "Sinamay Gift Bag",
-        price: "₱100",
-        desc: "A handcrafted native gift bag made from Sinamay and Abaca — an eco-conscious way to present thoughtful gifts with Filipino flair.",
-        img: "images/bags/bag8.png",
-        images: ["images/bags/bag8.png", "images/bags/bag8a.png"],
-        category: "bags", rating: 4.3, reviews: 8,
-        bullets: ["Made of Sinamay and Abaca fibers", "Reusable and biodegradable", "Handcrafted by local Filipino artisans"]
-        },
-        {
-        name: "Banig Tote Bag",
-        price: "₱500",
-        desc: "This lightweight Banig tote bag adds a pop of color and texture to your everyday look. A perfect blend of practicality and native style.",
-        img: "images/bags/bag9.png",
-        images: ["images/bags/bag9.png", "images/bags/bag9a.png"],
-        category: "bags", rating: 4.4, reviews: 11,
-        bullets: ["Made from traditional banig material", "Magnetic closure and dual handle", "Colorful striped pattern"]
-        },
-        {
-        name: "Raffia Tote Bag",
-        price: "₱1,500",
-        desc: "Bright, natural, and full of character — this Raffia tote brings artisanal craftsmanship and modern style together in one durable piece.",
-        img: "images/bags/bag10.png",
-        images: ["images/bags/bag10.png", "images/bags/bag10a.png", "images/bags/bag10b.png"],
-        category: "bags", rating: 4.6, reviews: 17,
-        bullets: ["Crafted from natural raffia fibers", "Zipper closure and inner pocket", "Playful multicolor block design"]
-        },
-        {
-        name: "Tikog Handbag",
-        price: "₱3,000",
-        desc: "Handcrafted from natural Tikog, this handbag showcases three delicate flower accents and elegant Filipino artistry — both classic and modern.",
-        img: "images/bags/bag11.png",
-        images: ["images/bags/bag11.png", "images/bags/bag11a.png", "images/bags/bag11b.png"],
-        category: "bags", rating: 4.8, reviews: 21,
-        bullets: ["Made from woven Tikog", "Zipper closure and double handle", "Decorated with three floral designs"]
-        },
+      { name:"Sunglasses Cork Case", price:"₱600", desc:"Fold-flat cork eyewear case.", img:"images/accessories/accessories4.png", images:["images/accessories/accessories4.png","images/accessories/accessories4a.png"], category:"accessories", rating:4.5, reviews:18, bullets:["Eco-friendly","Scratch-safe lining"] },
+      { name:"Firebend 02 Bamboo Shades", price:"₱4,000", desc:"Polarized bamboo sunglasses.", img:"images/accessories/accessories3.png", images:["images/accessories/accessories3.png","images/accessories/accessories3a.png"], category:"accessories", rating:4.6, reviews:31, bullets:["UV-blocking","Handmade"] },
+      { name:"Alfombra Slippers with Beads", price:"₱350", desc:"Cozy beaded slippers.", img:"images/accessories/accessories5.png", images:["images/accessories/accessories5.png","images/accessories/accessories5a.png"], category:"accessories", rating:4.3, reviews:12, bullets:["Cushioned","Slip-on"] },
+      { name:"Higawa Beaded Earrings", price:"₱2,000", desc:"Delicate beaded earrings.", img:"images/accessories/accessories6.png", images:["images/accessories/accessories6.png","images/accessories/accessories6a.png"], category:"accessories", rating:4.7, reviews:22, bullets:["Lightweight","Empowers artisans"] },
+      { name:"Elara Beaded Earrings", price:"₱2,000", desc:"Celestial beadwork earrings.", img:"images/accessories/accessories7.png", images:["images/accessories/accessories7.png","images/accessories/accessories7a.png","images/accessories/accessories7b.png"], category:"accessories", rating:4.6, reviews:19, bullets:["Sparkling","Nickel-safe"] },
+      { name:"Punuan Beaded Earrings", price:"₱2,000", desc:"Earth-tone artisanal earrings.", img:"images/accessories/accessories8.png", images:["images/accessories/accessories8.png","images/accessories/accessories8a.png"], category:"accessories", rating:4.5, reviews:17, bullets:["Nature-inspired","Light fit"] },
+      { name:"Straw Headband Sunvisor", price:"₱250", desc:"Breathable foldable sunvisor.", img:"images/accessories/accessories9.png", images:["images/accessories/accessories9.png","images/accessories/accessories9a.png","images/accessories/accessories9b.png"], category:"accessories", rating:4.4, reviews:26, bullets:["Wide brim","Packs flat"] },
+      { name:"Flat Head Hat", price:"₱300", desc:"Foldable wide-brim hat.", img:"images/accessories/accessories10.png", images:["images/accessories/accessories10.png","images/accessories/accessories10a.png","images/accessories/accessories10b.png"], category:"accessories", rating:4.3, reviews:21, bullets:["Packable","Breathable"] },
+      { name:"Slides with Lace Strap", price:"₱250", desc:"House slides with lace-look strap.", img:"images/accessories/accessories11.png", images:["images/accessories/accessories11.png"], category:"accessories", rating:4.2, reviews:14, bullets:["Lightweight","Local materials"] },
+      { name:"Native Abaca Headband", price:"₱200", desc:"Textured abaca headband.", img:"images/accessories/accessories12.png", images:["images/accessories/accessories12.png","images/accessories/accessories12a.png","images/accessories/accessories12b.png"], category:"accessories", rating:4.4, reviews:28, bullets:["Handwoven","Everyday neutral"] },
 
+      /* BAGS */
+      { name:"Bayong Bag", price:"₱1,600", desc:"Sustainable woven bayong bag.", img:"images/bags/bag1.png", images:["images/bags/bag1.png","images/bags/bag1a.png","images/bags/bag1b.png"], category:"bags", rating:4.6, reviews:18, bullets:["Eco-friendly","Durable weave"] },
+      { name:"Buntal Shoulder Bag", price:"₱2,000", desc:"Lightweight Buri palm shoulder bag.", img:"images/bags/bag2.png", images:["images/bags/bag2.png","images/bags/bag2a.png","images/bags/bag2b.png"], category:"bags", rating:4.4, reviews:12, bullets:["Handwoven","Comfortable strap"] },
+      { name:"Pandan Tote Bag", price:"₱300", desc:"Tropical pandan tote.", img:"images/bags/bag3.png", images:["images/bags/bag3.png","images/bags/bag3a.png","images/bags/bag3b.png"], category:"bags", rating:4.2, reviews:10, bullets:["Natural pandan","Zippered"] },
+      { name:"Flower Square Handbag", price:"₱3,000", desc:"Chic floral square handbag.", img:"images/bags/bag4.png", images:["images/bags/bag4.png","images/bags/bag4a.png"], category:"bags", rating:4.7, reviews:15, bullets:["Premium Tikog","Zipper closure"] },
+      { name:"Buntal Long Clutch Bag", price:"₱1,500", desc:"Sleek Buri palm clutch.", img:"images/bags/bag5.png", images:["images/bags/bag5.png","images/bags/bag5a.png"], category:"bags", rating:4.5, reviews:14, bullets:["Magnetic flap","Detachable chain"] },
+      { name:"Mother of Pearl Clutch Bag", price:"₱6,000", desc:"Elegant mother-of-pearl clutch.", img:"images/bags/bag7.png", images:["images/bags/bag7.png","images/bags/bag7a.png"], category:"bags", rating:4.9, reviews:22, bullets:["Genuine shell","Gold chain sling"] },
+      { name:"Sinamay Gift Bag", price:"₱100", desc:"Native gift bag, Sinamay & Abaca.", img:"images/bags/bag8.png", images:["images/bags/bag8.png","images/bags/bag8a.png"], category:"bags", rating:4.3, reviews:8, bullets:["Reusable","Biodegradable"] },
+      { name:"Banig Tote Bag", price:"₱500", desc:"Colorful banig tote.", img:"images/bags/bag9.png", images:["images/bags/bag9.png","images/bags/bag9a.png"], category:"bags", rating:4.4, reviews:11, bullets:["Magnetic closure","Dual handle"] },
+      { name:"Raffia Tote Bag", price:"₱1,500", desc:"Playful multicolor raffia tote.", img:"images/bags/bag10.png", images:["images/bags/bag10.png","images/bags/bag10a.png","images/bags/bag10b.png"], category:"bags", rating:4.6, reviews:17, bullets:["Natural raffia","Inner pocket"] },
+      { name:"Tikog Handbag", price:"₱3,000", desc:"Tikog handbag with flowers.", img:"images/bags/bag11.png", images:["images/bags/bag11.png","images/bags/bag11a.png","images/bags/bag11b.png"], category:"bags", rating:4.8, reviews:21, bullets:["Woven Tikog","Double handle"] },
 
-/* CLOTHING (size will be shown in Quick View & cart) */
-        {
-        name: "Bolero",
-        price: "₱2,400",
-        desc: "Elegant handmade bolero from Cavite, crafted with care using traditional weaving techniques — perfect for formal and semi-formal wear.",
-        img: "images/clothing/clothing1.png",
-        images: ["images/clothing/clothing1.png"],
-        category: "clothing", rating: 4.8, reviews: 12,
-        bullets: ["Handmade in Cavite", "Light and breathable fabric", "Ideal for elegant occasions"]
-        },
-        {
-        name: "Men's Cocoon Fully Callado Barong",
-        price: "₱10,000",
-        desc: "A timeless cocoon barong with intricate callado embroidery, showcasing the artistry and prestige of traditional Filipino formal wear.",
-        img: "images/clothing/clothing2.png",
-        images: ["images/clothing/clothing2.png","images/clothing/clothing2a.png","images/clothing/clothing2b.png","images/clothing/clothing2c.png"],
-        category: "clothing", rating: 4.9, reviews: 20,
-        bullets: ["Made from cocoon silk", "Detailed callado embroidery", "Classic and timeless design"]
-        },
-        {
-        name: "Aisha Dress",
-        price: "₱1,500",
-        desc: "A soft and graceful dress made from Habing Maragondon and cotton linen — blending modern comfort with cultural texture.",
-        img: "images/clothing/clothing3.png",
-        images: ["images/clothing/clothing3.png","images/clothing/clothing3a.png"],
-        category: "clothing", rating: 4.7, reviews: 9,
-        bullets: ["Habing Maragondon fabric", "Soft cotton-linen blend", "Lightweight and breathable"]
-        },
-        {
-        name: "V-Neck Top",
-        price: "₱1,000",
-        desc: "A simple yet elegant V-neck top crafted from Habing Maragondon fabric — ideal for both casual and smart-casual looks.",
-        img: "images/clothing/clothing4.png",
-        images: ["images/clothing/clothing4.png"],
-        category: "clothing", rating: 4.5, reviews: 8,
-        bullets: ["Made from Habing Maragondon", "Comfortable and versatile", "Pairs well with skirts or pants"]
-        },
-        {
-        name: "Victoria Top",
-        price: "₱1,200",
-        desc: "A light and classy top made with Habing Maragondon and cotton linen — designed for elegance and everyday comfort.",
-        img: "images/clothing/clothing5.png",
-        images: ["images/clothing/clothing5.png","images/clothing/clothing5a.png"],
-        category: "clothing", rating: 4.6, reviews: 10,
-        bullets: ["Habing Maragondon and cotton linen", "Breathable and durable", "Modern Filipiniana design"]
-        },
-        {
-        name: "Erika Top",
-        price: "₱2,000",
-        desc: "A modern Filipiniana top blending Habing Maragondon with neoprene fabric — structured yet comfortable for a refined look.",
-        img: "images/clothing/clothing6.png",
-        images: ["images/clothing/clothing6.png","images/clothing/clothing6a.png"],
-        category: "clothing", rating: 4.8, reviews: 14,
-        bullets: ["Habing Maragondon and neoprene fabric", "Structured fit for elegance", "Modern Filipiniana silhouette"]
-        },
-        {
-        name: "Jacket",
-        price: "₱1,400",
-        desc: "A stylish jacket made from Habing Maragondon and 2-ply taffeta — lightweight yet warm, great for layering or cool evenings.",
-        img: "images/clothing/clothing7.png",
-        images: ["images/clothing/clothing7.png","images/clothing/clothing7a.png"],
-        category: "clothing", rating: 4.4, reviews: 7,
-        bullets: ["Made with Habing Maragondon", "2-ply taffeta inner lining", "Comfortable and versatile style"]
-        },
-        {
-        name: "Rhea Top",
-        price: "₱1,200",
-        desc: "A timeless and comfortable top made from Habing Maragondon and cotton linen — perfect for daily wear with a local touch.",
-        img: "images/clothing/clothing8.png",
-        images: ["images/clothing/clothing8.png","images/clothing/clothing8a.png"],
-        category: "clothing", rating: 4.5, reviews: 9,
-        bullets: ["Soft cotton-linen blend", "Lightweight Habing Maragondon fabric", "Casual yet refined look"]
-        },
-        {
-        name: "Malou Skirt",
-        price: "₱1,500",
-        desc: "A flowy skirt designed with Habing Maragondon and cotton linen — a versatile piece that adds elegance to any outfit.",
-        img: "images/clothing/clothing9.png",
-        images: ["images/clothing/clothing9.png","images/clothing/clothing9a.png"],
-        category: "clothing", rating: 4.6, reviews: 11,
-        bullets: ["Made with Habing Maragondon", "Soft brush cotton-linen texture", "Comfortable A-line design"]
-        },
-        {
-        name: "Fatima Top",
-        price: "₱1,500",
-        desc: "A light and graceful blouse made from Habing Maragondon and soft cotton linen — breathable, elegant, and easy to style.",
-        img: "images/clothing/clothing10.png",
-        images: ["images/clothing/clothing10.png","images/clothing/clothing10a.png","images/clothing/clothing10b.png"],
-        category: "clothing", rating: 4.7, reviews: 10,
-        bullets: ["Habing Maragondon material", "Cotton-linen blend for comfort", "Feminine and elegant fit"]
-        },
-        {
-        name: "Gabriela Bolero",
-        price: "₱3,000",
-        desc: "Inspired by classic Filipiniana, the Gabriela Bolero combines Habing Maragondon with soft cotton linen for a refined and cultural statement piece.",
-        img: "images/clothing/clothing11.png",
-        images: ["images/clothing/clothing11.png","images/clothing/clothing11a.png","images/clothing/clothing11b.png"],
-        category: "clothing", rating: 4.9, reviews: 19,
-        bullets: ["Habing Maragondon and soft linen blend", "Elegant cropped design", "Perfect for formal wear or modern Filipiniana looks"]
-        },
-        {
-        name: "Poncho",
-        price: "₱1,800",
-        desc: "A cozy, free-flowing poncho made from Habing Maragondon fabric — soft, warm, and perfect for layering in any season.",
-        img: "images/clothing/clothing12.png",
-        images: ["images/clothing/clothing12.png"],
-        category: "clothing", rating: 4.6, reviews: 8,
-        bullets: ["Made from Habing Maragondon fabric", "One-size fits most", "Lightweight yet warm"]
-        },
+      /* CLOTHING */
+      { name:"Bolero", price:"₱2,400", desc:"Elegant handmade bolero (Cavite).", img:"images/clothing/clothing1.png", images:["images/clothing/clothing1.png"], category:"clothing", rating:4.8, reviews:12, bullets:["Light fabric","Formal/semi-formal"] },
+      { name:"Men's Cocoon Fully Callado Barong", price:"₱10,000", desc:"Cocoon barong with callado.", img:"images/clothing/clothing2.png", images:["images/clothing/clothing2.png","images/clothing/clothing2a.png","images/clothing/clothing2b.png","images/clothing/clothing2c.png"], category:"clothing", rating:4.9, reviews:20, bullets:["Cocoon silk","Classic"] },
+      { name:"Aisha Dress", price:"₱1,500", desc:"Dress in Habing Maragondon + cotton linen.", img:"images/clothing/clothing3.png", images:["images/clothing/clothing3.png","images/clothing/clothing3a.png"], category:"clothing", rating:4.7, reviews:9, bullets:["Light & breathable"] },
+      { name:"V-Neck Top", price:"₱1,000", desc:"V-neck top (Habing Maragondon).", img:"images/clothing/clothing4.png", images:["images/clothing/clothing4.png"], category:"clothing", rating:4.5, reviews:8, bullets:["Versatile","Comfortable"] },
+      { name:"Victoria Top", price:"₱1,200", desc:"Top with Habing Maragondon.", img:"images/clothing/clothing5.png", images:["images/clothing/clothing5.png","images/clothing/clothing5a.png"], category:"clothing", rating:4.6, reviews:10, bullets:["Breathable","Modern Filipiniana"] },
+      { name:"Erika Top", price:"₱2,000", desc:"Modern Filipiniana top.", img:"images/clothing/clothing6.png", images:["images/clothing/clothing6.png","images/clothing/clothing6a.png"], category:"clothing", rating:4.8, reviews:14, bullets:["Structured fit"] },
+      { name:"Jacket", price:"₱1,400", desc:"Habing Maragondon + taffeta jacket.", img:"images/clothing/clothing7.png", images:["images/clothing/clothing7.png","images/clothing/clothing7a.png"], category:"clothing", rating:4.4, reviews:7, bullets:["Lightweight","Layering"] },
+      { name:"Rhea Top", price:"₱1,200", desc:"Habing Maragondon + cotton linen.", img:"images/clothing/clothing8.png", images:["images/clothing/clothing8.png","images/clothing/clothing8a.png"], category:"clothing", rating:4.5, reviews:9, bullets:["Daily wear"] },
+      { name:"Malou Skirt", price:"₱1,500", desc:"A-line skirt (Habing + cotton linen).", img:"images/clothing/clothing9.png", images:["images/clothing/clothing9.png","images/clothing/clothing9a.png"], category:"clothing", rating:4.6, reviews:11, bullets:["Flowy","Elegant"] },
+      { name:"Fatima Top", price:"₱1,500", desc:"Soft blouse (Habing + cotton linen).", img:"images/clothing/clothing10.png", images:["images/clothing/clothing10.png","images/clothing/clothing10a.png","images/clothing/clothing10b.png"], category:"clothing", rating:4.7, reviews:10, bullets:["Feminine fit"] },
+      { name:"Gabriela Bolero", price:"₱3,000", desc:"Filipiniana-inspired bolero.", img:"images/clothing/clothing11.png", images:["images/clothing/clothing11.png","images/clothing/clothing11a.png","images/clothing/clothing11b.png"], category:"clothing", rating:4.9, reviews:19, bullets:["Statement piece"] },
+      { name:"Poncho", price:"₱1,800", desc:"Cozy poncho (Habing Maragondon).", img:"images/clothing/clothing12.png", images:["images/clothing/clothing12.png"], category:"clothing", rating:4.6, reviews:8, bullets:["Warm & soft"] },
 
+      /* HOME */
+      { name:"Handwoven Bath Towels", price:"₱1,000", desc:"Soft, absorbent handwoven towels.", img:"images/home/home1.png", images:["images/home/home1.png","images/home/home1a.png","images/home/home1b.png"], category:"home", rating:4.6, reviews:12, bullets:["Eco yarns","Craftsmanship"] },
+      { name:"Napkin Ring Floral", price:"₱800", desc:"Decorative floral napkin ring.", img:"images/home/home2.png", images:["images/home/home2.png","images/home/home2a.png"], category:"home", rating:4.4, reviews:9, bullets:["Festive","Sustainable"] },
+      { name:"Mother of Pearl Utility Dish", price:"₱2,000", desc:"Shell-inlay utility dish.", img:"images/home/home3.png", images:["images/home/home3.png","images/home/home3a.png"], category:"home", rating:4.8, reviews:14, bullets:["Genuine shell","Elegant"] },
+      { name:"Atin Reed Diffuser", price:"₱900", desc:"Marine, jasmine & woody notes.", img:"images/home/home4.png", images:["images/home/home4.png","images/home/home4a.png"], category:"home", rating:4.5, reviews:10, bullets:["Calming","Natural oils"] },
+      { name:"Banana Bark Picture Frame", price:"₱1,500", desc:"Banana bark frame w/ gold detail.", img:"images/home/home5.png", images:["images/home/home5.png","images/home/home5a.png"], category:"home", rating:4.3, reviews:8, bullets:["Fits 5×7","Sustainable"] },
+      { name:"Bamboo Woven Storage", price:"₱3,000", desc:"Handcrafted bamboo organizer.", img:"images/home/home6.png", images:["images/home/home6.png","images/home/home6a.png"], category:"home", rating:4.7, reviews:11, bullets:["Lightweight","Durable"] },
+      { name:"Coco Planter", price:"₱2,000", desc:"Planter inspired by coconut tree.", img:"images/home/home7.png", images:["images/home/home7.png","images/home/home7a.png"], category:"home", rating:4.6, reviews:10, bullets:["Natural rattan","Indoor plants"] },
+      { name:"Plain Acacia Mug", price:"₱6,000", desc:"Rustic acacia wood mug.", img:"images/home/home8.png", images:["images/home/home8.png"], category:"home", rating:4.5, reviews:9, bullets:["Durable","Natural grain"] },
+      { name:"Manila Ceramic Mug", price:"₱200", desc:"Mug with wood handle & PH prints.", img:"images/home/home9.png", images:["images/home/home9.png"], category:"home", rating:4.4, reviews:12, bullets:["Vibrant design","Durable"] },
+      { name:"Acacia Wood Salad Tosser", price:"₱350", desc:"Solid acacia salad tossers.", img:"images/home/home10.png", images:["images/home/home10.png","images/home/home10a.png"], category:"home", rating:4.5, reviews:11, bullets:["Ergonomic","Sustainable"] },
+      { name:"Acacia Wood Rectangle Plate", price:"₱500", desc:"Rectangular acacia plate.", img:"images/home/home11.png", images:["images/home/home11.png","images/home/home11a.png","images/home/home11b.png"], category:"home", rating:4.6, reviews:10, bullets:["Handmade","Food-safe"] },
+      { name:"Round Acacia Coaster", price:"₱600", desc:"Set of six acacia coasters.", img:"images/home/home12.png", images:["images/home/home12.png","images/home/home12a.png","images/home/home12b.png"], category:"home", rating:4.7, reviews:13, bullets:["Eco-friendly","Durable"] },
+      { name:"Acacia Wood Round Plate", price:"₱300", desc:"8-inch acacia round plate.", img:"images/home/home13.png", images:["images/home/home13.png"], category:"home", rating:4.5, reviews:9, bullets:["Reusable","Polished"] },
+      { name:"Titanic Boat Shape Nito Tray", price:"₱700", desc:"Nito tray shaped like a boat.", img:"images/home/home14.png", images:["images/home/home14.png","images/home/home14a.png","images/home/home14b.png"], category:"home", rating:4.8, reviews:15, bullets:["Handcrafted","Tropical charm"] },
 
+      /* CHRISTMAS */
+      { name:"Santa Ornament", price:"₱479", desc:"Pinoy-themed Santa ornament.", img:"images/christmas/christmas1.png", images:["images/christmas/christmas1.png","images/christmas/christmas1a.png"], category:"christmas", rating:4.7, reviews:18, bullets:["Hand-painted","Lightweight"] },
+      { name:"Santa Stockings", price:"₱295", desc:"Habing Maragondon stockings.", img:"images/christmas/christmas2.png", images:["images/christmas/christmas2.png","images/christmas/christmas2a.png"], category:"christmas", rating:4.4, reviews:22, bullets:["Festive","Durable"] },
+      { name:"Christmas Parol", price:"₱900", desc:"Foldable parol by Kababaihan ng Maynila.", img:"images/christmas/christmas3.png", images:["images/christmas/christmas3.png","images/christmas/christmas3a.png"], category:"christmas", rating:4.8, reviews:41, bullets:["61 cm","Foldable"] },
+      { name:"Magnolia Queso De Bola", price:"₱300", desc:"Classic holiday queso de bola.", img:"images/christmas/christmas4.png", images:["images/christmas/christmas4.png","images/christmas/christmas4a.png"], category:"christmas", rating:4.6, reviews:35, bullets:["Rich & tangy"] },
+      { name:"Christmas Ornament (Kape at Pandesal)", price:"₱479", desc:"Mini Santa with kape & pandesal.", img:"images/christmas/christmas5.png", images:["images/christmas/christmas5.png","images/christmas/christmas5a.png","images/christmas/christmas5b.png"], category:"christmas", rating:4.5, reviews:19, bullets:["Thread hanger","Cute gift"] },
+      { name:"Santa Candy Tray", price:"₱500", desc:"Mini Santa holding a tray.", img:"images/christmas/christmas6.png", images:["images/christmas/christmas6.png","images/christmas/christmas6a.png","images/christmas/christmas6b.png"], category:"christmas", rating:4.4, reviews:16, bullets:["Resin+abaca","H8.5×L27×W25cm"] },
+      { name:"Capiz Orn with Jeep", price:"₱300", desc:"Capiz Santa + Jeepney ornament.", img:"images/christmas/christmas7.png", images:["images/christmas/christmas7.png"], category:"christmas", rating:4.6, reviews:24, bullets:["3.75×3.375×0.125in"] },
+      { name:"Capiz Orn with Kalabaw", price:"₱300", desc:"Capiz Santa + kalabaw ornament.", img:"images/christmas/christmas8.png", images:["images/christmas/christmas8.png"], category:"christmas", rating:4.6, reviews:21, bullets:["Capiz material"] },
+      { name:"Natural Christmas Wreath", price:"₱900", desc:"Twig wreath with lights.", img:"images/christmas/christmas9.png", images:["images/christmas/christmas9.png"], category:"christmas", rating:4.7, reviews:28, bullets:["16 inches","Handcrafted"] },
+      { name:"Fruit Basket", price:"₱900", desc:"Mr. Santa with fruit basket.", img:"images/christmas/christmas10.png", images:["images/christmas/christmas10.png","images/christmas/christmas10a.png","images/christmas/christmas10b.png"], category:"christmas", rating:4.3, reviews:12, bullets:["40×28×30 cm"] },
+      { name:"Mini Parol Ornament (Set of 2)", price:"₱350", desc:"Set of 2 capiz mini parols.", img:"images/christmas/christmas11.png", images:["images/christmas/christmas11.png","images/christmas/christmas11a.png"], category:"christmas", rating:4.6, reviews:26, bullets:["Lightweight","Glossy"] },
+      { name:"Welcome Hanging Board", price:"₱650", desc:"Santa with ‘Merry Christmas’ board.", img:"images/christmas/christmas12.png", images:["images/christmas/christmas12.png","images/christmas/christmas12a.png"], category:"christmas", rating:4.5, reviews:17, bullets:["Native accents","Wood lettering"] },
+      { name:"Capiz Star Ornaments", price:"₱350", desc:"Capiz stars in Natural or Red.", img:"images/christmas/christmas13.png", images:["images/christmas/christmas13.png","images/christmas/christmas13a.png","images/christmas/christmas13b.png"], category:"christmas", rating:4.7, reviews:33, bullets:["Lightweight","Classic"] },
+      { name:"Cebu Best Mango Chocolate", price:"₱699", desc:"Dried mango dipped in dark chocolate.", img:"images/christmas/christmas14.png", images:["images/christmas/christmas14.png","images/christmas/christmas14a.png","images/christmas/christmas14b.png","images/christmas/christmas14c.png"], category:"christmas", rating:4.7, reviews:33, bullets:["12 count","14×14×3cm"] },
+      { name:"Cebu Best Dried Mangoes", price:"₱339", desc:"Premium dried mangoes from Cebu.", img:"images/christmas/christmas15.png", images:["images/christmas/christmas15.png","images/christmas/christmas15a.png"], category:"christmas", rating:4.7, reviews:33, bullets:["180g"] },
+      { name:"Audrey's Coconut Otap", price:"₱259", desc:"Crispy, flaky otap with coconut.", img:"images/christmas/christmas16.png", images:["images/christmas/christmas16.png","images/christmas/christmas16a.png","images/christmas/christmas16b.png"], category:"christmas", rating:4.7, reviews:33, bullets:["Authentic Cebu taste"] },
 
-        /* HOME */
-        {
-        name: "Handwoven Bath Towels",
-        price: "₱1,000",
-        desc: "Soft, absorbent towels handwoven by local artisans using eco-friendly yarns. Perfect for adding a touch of craftsmanship to your home.",
-        img: "images/home/home1.png",
-        images: ["images/home/home1.png", "images/home/home1a.png", "images/home/home1b.png"],
-        category: "home", rating: 4.6, reviews: 12,
-        bullets: ["Highly absorbent fabric", "Soft and gentle on skin", "Proudly handwoven in the Philippines"]
-        },
-        {
-        name: "Napkin Ring Floral",
-        price: "₱800",
-        desc: "A decorative floral napkin ring that adds a festive and elegant touch to your dining table setup. Ideal for celebrations and special gatherings.",
-        img: "images/home/home2.png",
-        images: ["images/home/home2.png", "images/home/home2a.png"],
-        category: "home", rating: 4.4, reviews: 9,
-        bullets: ["Handcrafted floral accent", "Perfect for table settings", "Made with sustainable materials"]
-        },
-        {
-        name: "Mother of Pearl Utility Dish",
-        price: "₱2,000",
-        desc: "Elegant shell-inlay dish ideal for jewelry, soap, or decorative displays — beautifully handcrafted from genuine mother of pearl.",
-        img: "images/home/home3.png",
-        images: ["images/home/home3.png", "images/home/home3a.png"],
-        category: "home", rating: 4.8, reviews: 14,
-        bullets: ["Made with genuine mother of pearl", "Handcrafted and polished", "Elegant and versatile use"]
-        },
-        {
-        name: "Atin Reed Diffuser",
-        price: "₱900",
-        desc: "A soothing reed diffuser featuring marine, jasmine, and woody notes — perfect for creating a calming tropical home ambiance.",
-        img: "images/home/home4.png",
-        images: ["images/home/home4.png", "images/home/home4a.png"],
-        category: "home", rating: 4.5, reviews: 10,
-        bullets: ["Refreshing tropical scent", "Long-lasting fragrance", "Handmade with natural oils"]
-        },
-        {
-        name: "Banana Bark Picture Frame",
-        price: "₱1,500",
-        desc: "A unique picture frame crafted from banana bark, highlighting sustainable Filipino craftsmanship with a touch of gold detail.",
-        img: "images/home/home5.png",
-        images: ["images/home/home5.png", "images/home/home5a.png"],
-        category: "home", rating: 4.3, reviews: 8,
-        bullets: ["Capiz gold accent", "Fits 5x7 photos", "Made from banana bark, an indigenous tropical resource"]
-        },
-        {
-        name: "Bamboo Woven Storage",
-        price: "₱3,000",
-        desc: "A durable and stylish basket organizer handcrafted from natural bamboo — perfect for keeping your space clean and eco-chic.",
-        img: "images/home/home6.png",
-        images: ["images/home/home6.png", "images/home/home6a.png"],
-        category: "home", rating: 4.7, reviews: 11,
-        bullets: ["Eco-friendly bamboo material", "Lightweight and durable", "Handwoven by Filipino artisans"]
-        },
-        {
-        name: "Coco Planter",
-        price: "₱2,000",
-        desc: "Designed with the silhouette of a coconut palm tree, this handcrafted COCO planter brings a natural tropical vibe to any space.",
-        img: "images/home/home7.png",
-        images: ["images/home/home7.png", "images/home/home7a.png"],
-        category: "home", rating: 4.6, reviews: 10,
-        bullets: ["Inspired by coconut trees", "Made with natural rattan and bark", "Perfect for indoor plants"]
-        },
-        {
-        name: "Plain Acacia Mug",
-        price: "₱6,000",
-        desc: "A rustic yet refined mug carved from acacia wood, offering a warm and natural touch to your morning coffee or tea.",
-        img: "images/home/home8.png",
-        images: ["images/home/home8.png"],
-        category: "home", rating: 4.5, reviews: 9,
-        bullets: ["Made from durable acacia wood", "Avoid soaking to prevent cracking", "Natural grain pattern on each piece"]
-        },
-        {
-        name: "Manila Ceramic Mug",
-        price: "₱200",
-        desc: "Manila ceramic mug with a wooden handle, showcasing vibrant prints of iconic Philippine landmarks — functional and collectible.",
-        img: "images/home/home9.png",
-        images: ["images/home/home9.png"],
-        category: "home", rating: 4.4, reviews: 12,
-        bullets: ["Vibrant Philippine design", "Wood handle for insulation", "Durable ceramic material"]
-        },
-        {
-        name: "Acacia Wood Salad Tosser",
-        price: "₱350",
-        desc: "Handcrafted salad tossers made from solid acacia wood — strong, lightweight, and perfect for serving meals naturally.",
-        img: "images/home/home10.png",
-        images: ["images/home/home10.png", "images/home/home10a.png"],
-        category: "home", rating: 4.5, reviews: 11,
-        bullets: ["Made from acacia wood", "Ergonomic and easy to use", "Sustainably sourced material"]
-        },
-        {
-        name: "Acacia Wood Rectangle Plate",
-        price: "₱500",
-        desc: "A rectangular serving plate made from acacia wood, polished smooth to highlight its natural grain — ideal for dining or display.",
-        img: "images/home/home11.png",
-        images: ["images/home/home11.png", "images/home/home11a.png", "images/home/home11b.png"],
-        category: "home", rating: 4.6, reviews: 10,
-        bullets: ["Crafted from acacia wood", "Handmade by Filipino artisans", "Food-safe and durable finish"]
-        },
-        {
-        name: "Round Acacia Coaster",
-        price: "₱600",
-        desc: "A set of handcrafted acacia coasters that combine durability, sustainability, and natural beauty — perfect for any table setting.",
-        img: "images/home/home12.png",
-        images: ["images/home/home12.png", "images/home/home12a.png", "images/home/home12b.png"],
-        category: "home", rating: 4.7, reviews: 13,
-        bullets: ["Set of six coasters", "Made from durable acacia wood", "Eco-friendly and sustainable"]
-        },
-        {
-        name: "Acacia Wood Round Plate",
-        price: "₱300",
-        desc: "Round wooden plate handcrafted from acacia, known for its fine grain, rich tone, and sustainable quality — ideal for serving or décor.",
-        img: "images/home/home13.png",
-        images: ["images/home/home13.png"],
-        category: "home", rating: 4.5, reviews: 9,
-        bullets: ["8-inch diameter", "Eco-friendly and reusable", "Smooth hand-polished surface"]
-        },
-        {
-        name: "Titanic Boat Shape Nito Tray",
-        price: "₱700",
-        desc: "A naturally woven Nito tray shaped like a boat — stylish and tropical, perfect for serving snacks or as a home centerpiece.",
-        img: "images/home/home14.png",
-        images: ["images/home/home14.png", "images/home/home14a.png", "images/home/home14b.png"],
-        category: "home", rating: 4.8, reviews: 15,
-        bullets: ["Naturally woven Nito material", "Handcrafted by Filipino artisans", "Infuses tropical charm into any home"]
-        },
+      /* CRAFTS */
+      { name:"Model Jeepney", price:"₱200", desc:"Handcrafted miniature Jeepney.", img:"images/crafts/crafts1.png", images:["images/crafts/crafts1.png","images/crafts/crafts1a.png","images/crafts/crafts1b.png"], category:"crafts", rating:4.8, reviews:26, bullets:["Native+recycled","Souvenir"] },
+      { name:"Buri Round Fan", price:"₱100", desc:"Traditional buri fan.", img:"images/crafts/crafts2.png", images:["images/crafts/crafts2.png","images/crafts/crafts2a.png"], category:"crafts", rating:4.6, reviews:19, bullets:["Eco-friendly","Durable"] },
+      { name:"Jusi Fabric Fan", price:"₱600", desc:"Jusi fabric hand fan, embroidered.", img:"images/crafts/crafts3.png", images:["images/crafts/crafts3.png","images/crafts/crafts3a.png","images/crafts/crafts3b.png"], category:"crafts", rating:4.7, reviews:22, bullets:["Elegant","Lightweight"] },
+      { name:"Sigay Sungka", price:"₱500", desc:"Traditional sungka board game.", img:"images/crafts/crafts4.png", images:["images/crafts/crafts4.png","images/crafts/crafts4a.png"], category:"crafts", rating:4.8, reviews:28, bullets:["Solid wood","Sigay shells"] },
+      { name:"Wooden Base Carabao", price:"₱400", desc:"Carabao + farmer figurine.", img:"images/crafts/crafts5.png", images:["images/crafts/crafts5.png","images/crafts/crafts5a.png","images/crafts/crafts5b.png"], category:"crafts", rating:4.5, reviews:14, bullets:["Gold tin + wood","15×5.5×4 cm"] },
+      { name:"Mother of Pearl Cutwork", price:"₱2,000", desc:"Round MOP cutwork decor (Jeepney).", img:"images/crafts/crafts6.png", images:["images/crafts/crafts6.png","images/crafts/crafts6a.png","images/crafts/crafts6b.png"], category:"crafts", rating:4.9, reviews:31, bullets:["Genuine MOP","Polished"] },
+    ];
 
+    /* ------------- Utilities ------------- */
+    const grid = document.getElementById('grid');
+    const pager = document.getElementById('pager');
+    const fSearch = document.getElementById('fSearch');
+    const fCategory = document.getElementById('fCategory');
+    const fSort = document.getElementById('fSort');
+    const fReset = document.getElementById('fReset');
 
-        /* CHRISTMAS */
-        {
-        name: "Santa Ornament",
-        price: "₱479",
-        desc: "A Filipino-themed Santa wearing a Barong Tagalog and salakot while carrying a mini Jeepney—perfect for a uniquely Pinoy holiday tree.",
-        img: "images/christmas/christmas1.png",
-        images: ["images/christmas/christmas1.png","images/christmas/christmas1a.png"],
-        category: "christmas", rating: 4.7, reviews: 18,
-        bullets: ["Hand-painted details", "Lightweight for tree branches", "Great as OFW/abroad gifts"]
-        },
-        {
-        name: "Santa Stockings",
-        price: "₱295",
-        desc: "Habing Maragondon Christmas stockings with a soft, handcrafted texture—ready to fill with treats and notes.",
-        img: "images/christmas/christmas2.png",
-        images: ["images/christmas/christmas2.png","images/christmas/christmas2a.png"],
-        category: "christmas", rating: 4.4, reviews: 22,
-        bullets: ["Habing Maragondon fabric", "Loop for easy hanging", "Festive and durable"]
-        },
-        {
-        name: "Christmas Parol",
-        price: "₱900",
-        desc: "Best-selling foldable parol made by Kababaihan ng Maynila—easy to ship/store while supporting women’s livelihoods.",
-        img: "images/christmas/christmas3.png",
-        images: ["images/christmas/christmas3.png","images/christmas/christmas3a.png"],
-        category: "christmas", rating: 4.8, reviews: 41,
-        bullets: ["Red shimmery polyester", "61 cm diameter", "Foldable for storage/parcel"]
-        },
-        {
-        name: "Magnolia Queso De Bola",
-        price: "₱300",
-        desc: "Classic holiday queso de bola—savory, nutty, and perfect for noche buena spreads or gifting.",
-        img: "images/christmas/christmas4.png",
-        images: ["images/christmas/christmas4.png","images/christmas/christmas4a.png"],
-        category: "christmas", rating: 4.6, reviews: 35,
-        bullets: ["Holiday staple", "Rich and tangy flavor", "Great for platters and pasta"]
-        },
-        {
-        name: "Christmas Ornament (Kape at Pandesal)",
-        price: "₱479",
-        desc: "A Pinoy breakfast–themed mini Santa ornament with kape and pandesal—cute, nostalgic, and conversation-starting.",
-        img: "images/christmas/christmas5.png",
-        images: ["images/christmas/christmas5.png","images/christmas/christmas5a.png","images/christmas/christmas5b.png"],
-        category: "christmas", rating: 4.5, reviews: 19,
-        bullets: ["Barong fabric detail", "Thread hanger included", "Kape + pandesal motif"]
-        },
-        {
-        name: "Santa Candy Tray",
-        price: "₱500",
-        desc: "A mini Santa holding a wooden tray—use as a candy dish, trinket holder, or centerpiece accent.",
-        img: "images/christmas/christmas6.png",
-        images: ["images/christmas/christmas6.png","images/christmas/christmas6a.png","images/christmas/christmas6b.png"],
-        category: "christmas", rating: 4.4, reviews: 16,
-        bullets: ["Resin head + abaca body", "Wooden tray", "H8.5cm × L27cm × W25cm"]
-        },
-        {
-        name: "Capiz Orn with Jeep",
-        price: "₱300",
-        desc: "Capiz shell ornament featuring a Santa + Jeepney design—light-catching and proudly Filipino.",
-        img: "images/christmas/christmas7.png",
-        images: ["images/christmas/christmas7.png"],
-        category: "christmas", rating: 4.6, reviews: 24,
-        bullets: ["Material: Capiz", "Jeepney motif", "3.75 × 3.375 × 0.125 in"]
-        },
-        {
-        name: "Capiz Orn with Kalabaw",
-        price: "₱300",
-        desc: "Capiz shell ornament with a Santa + kalabaw (carabao) design—rustic charm for your tree.",
-        img: "images/christmas/christmas8.png",
-        images: ["images/christmas/christmas8.png"],
-        category: "christmas", rating: 4.6, reviews: 21,
-        bullets: ["Material: Capiz", "Kalabaw motif", "3.75 × 3.375 × 0.125 in"]
-        },
-        {
-        name: "Natural Christmas Wreath",
-        price: "₱900",
-        desc: "Twig-based wreath with dried pine cones, abaca balls, ribbon, and fairy lights—warm and welcoming.",
-        img: "images/christmas/christmas9.png",
-        images: ["images/christmas/christmas9.png"],
-        category: "christmas", rating: 4.7, reviews: 28,
-        bullets: ["16 inches diameter", "Natural wood + abaca", "Handcrafted with lights"]
-        },
-        {
-        name: "Fruit Basket",
-        price: "₱900",
-        desc: "Mr. Santa seated with a fruit basket—native accents meet festive flair for tabletops or foyers.",
-        img: "images/christmas/christmas10.png",
-        images: ["images/christmas/christmas10.png","images/christmas/christmas10a.png","images/christmas/christmas10b.png"],
-        category: "christmas", rating: 4.3, reviews: 12,
-        bullets: ["Wood basket w/ braided raffia", "Resin + abaca head", "40 × 28 × 30 cm"]
-        },
-        {
-        name: "Mini Parol Ornament (Set of 2)",
-        price: "₱350",
-        desc: "Set of 2 mini parol ornaments made of capiz—thin, glossy, and bright under lights.",
-        img: "images/christmas/christmas11.png",
-        images: ["images/christmas/christmas11.png","images/christmas/christmas11a.png"],
-        category: "christmas", rating: 4.6, reviews: 26,
-        bullets: ["Material: Capiz", "Set of 2", "5.25 × 5 × 0.125 in"]
-        },
-        {
-        name: "Welcome Hanging Board",
-        price: "₱650",
-        desc: "Mr. Santa with a ‘Merry Christmas’ hanging board—perfect for doors, halls, or shelves.",
-        img: "images/christmas/christmas12.png",
-        images: ["images/christmas/christmas12.png","images/christmas/christmas12a.png"],
-        category: "christmas", rating: 4.5, reviews: 17,
-        bullets: ["Buri rope + native accents", "Wooden board lettering", "53 × 14 × 76 cm"]
-        },
-        {
-        name: "Capiz Star Ornaments",
-        price: "₱350",
-        desc: "Capiz star ornaments available in Natural or Red—lightweight, shiny, and classic.",
-        img: "images/christmas/christmas13.png",
-        images: ["images/christmas/christmas13.png","images/christmas/christmas13a.png","images/christmas/christmas13b.png"],
-        category: "christmas", rating: 4.7, reviews: 33,
-        bullets: ["2 colors: Natural/Red", "Material: Capiz", "5.25 × 5 × 0.125 in"]
-        },
-        {
-        name: "Cebu Best Mango Chocolate",
-        price: "₱699",
-        desc: "Created to elevate the Dried Mango,  this classic pasalubong is dipped in rich, top-notch dark belgian chocolate that goes perfectly as a healthy treat.",
-        img: "images/christmas/christmas14.png",
-        images: ["images/christmas/christmas14.png","images/christmas/christmas14a.png","images/christmas/christmas14b.png","images/christmas/christmas14c.png"],
-        category: "christmas", rating: 4.7, reviews: 33,
-        bullets: ["Dimensions: 14 x 14 x 3cm", "12 count"]
-        },
-        {
-        name: "Cebu Best Dried Mangoes",
-        price: "₱339",
-        desc: "Premium dried mangoes sourced directly from Cebu – a cult-favorite snack. Eat them on their own, serve on a charcuterie board, or pack them as souvenirs for loved ones missing the taste of home.",
-        img: "images/christmas/christmas15.png",
-        images: ["images/christmas/christmas15.png","images/christmas/christmas15a.png"],
-        category: "christmas", rating: 4.7, reviews: 33,
-        bullets: ["180 Grams"]
-        },
-        {
-        name: "Audrey's Coconut Otap",
-        price: "₱259",
-        desc: "Experience the crispy, flaky delight of traditional Cebuano Otap with Coconut!",
-        img: "images/christmas/christmas16.png",
-        images: ["images/christmas/christmas16.png","images/christmas/christmas16a.png","images/christmas/christmas16b.png"],
-        category: "christmas", rating: 4.7, reviews: 33,
-        bullets: ["Perfect as a Pasalubong or a treat to enjoy at home, our Otap captures the authentic taste of Cebu’s beloved pastry tradition.", "Texture: Light, flaky, and crisp. It shatters when you bite into it!", "Taste: Sweet with a slightly buttery note."]
-        },
-        
+    const PER_PAGE = 48;
+    let currentPage = 1;
 
-        /* CRAFTS */
-        {
-        name: "Model Jeepney",
-        price: "₱200",
-        desc: "The iconic ‘King of the Road’ for your collection! This handcrafted miniature Jeepney celebrates Filipino artistry and culture in every tiny detail.",
-        img: "images/crafts/crafts1.png",
-        images: ["images/crafts/crafts1.png","images/crafts/crafts1a.png","images/crafts/crafts1b.png"],
-        category: "crafts", rating: 4.8, reviews: 26,
-        bullets: ["Handcrafted miniature Jeepney", "Made from native and recycled materials", "Perfect as a collectible or souvenir gift"]
-        },
-        {
-        name: "Buri Round Fan",
-        price: "₱100",
-        desc: "A traditional Filipino buri fan made from dried buri palm leaves — lightweight, eco-friendly, and beautifully woven by local artisans.",
-        img: "images/crafts/crafts2.png",
-        images: ["images/crafts/crafts2.png","images/crafts/crafts2a.png"],
-        category: "crafts", rating: 4.6, reviews: 19,
-        bullets: ["Woven from buri palm leaves", "Reinforced with bamboo handle", "Durable, stylish, and eco-friendly"]
-        },
-        {
-        name: "Jusi Fabric Fan",
-        price: "₱600",
-        desc: "An elegant hand fan made from Jusi fabric, adorned with delicate embroidery — perfect for formal events, gifting, or tropical getaways.",
-        img: "images/crafts/crafts3.png",
-        images: ["images/crafts/crafts3.png","images/crafts/crafts3a.png","images/crafts/crafts3b.png"],
-        category: "crafts", rating: 4.7, reviews: 22,
-        bullets: ["Handcrafted pamaypay made of Jusi material", "Detailed embroidered design", "Lightweight and elegant accessory"]
-        },
-        {
-        name: "Sigay Sungka",
-        price: "₱500",
-        desc: "Relive your childhood with this traditional Filipino board game — perfect for family bonding, home décor, or as a cultural keepsake.",
-        img: "images/crafts/crafts4.png",
-        images: ["images/crafts/crafts4.png","images/crafts/crafts4a.png"],
-        category: "crafts", rating: 4.8, reviews: 28,
-        bullets: ["Made from solid wood with sigay shells", "Dimensions: L56cm × H2.5cm × W10cm", "Great for play or display"]
-        },
-        {
-        name: "Wooden Base Carabao",
-        price: "₱400",
-        desc: "A handcrafted figurine of a carabao and farmer — symbolizing Filipino hard work and rural heritage. A beautiful desk or shelf accent.",
-        img: "images/crafts/crafts5.png",
-        images: ["images/crafts/crafts5.png","images/crafts/crafts5a.png","images/crafts/crafts5b.png"],
-        category: "crafts", rating: 4.5, reviews: 14,
-        bullets: ["Gold tin with wooden base", "Carabao with farmer design", "Dimensions: 15 × 5.5 × 4 cm"]
-        },
-        {
-        name: "Mother of Pearl Cutwork",
-        price: "₱2,000",
-        desc: "A premium round Mother of Pearl cutwork décor featuring a Jeepney design — intricately detailed and polished to perfection.",
-        img: "images/crafts/crafts6.png",
-        images: ["images/crafts/crafts6.png","images/crafts/crafts6a.png","images/crafts/crafts6b.png"],
-        category: "crafts", rating: 4.9, reviews: 31,
-        bullets: ["Made from genuine Mother of Pearl shell", "Jeepney cutwork design", "Dimensions: L10cm × W8cm × H4cm"]
-        },
-        ]; 
+    const pesoToNumber = (p) => Number(String(p).replace(/[^\d.]/g,'')||0);
 
-
-
-
-
-      /* Add many more placeholders below as you collect assets... */
-      // Example placeholder (change later)
-  /* ------------- Utilities ------------- */
-  const grid = document.getElementById('grid');
-  const pager = document.getElementById('pager');
-  const fSearch = document.getElementById('fSearch');
-  const fCategory = document.getElementById('fCategory');
-  const fSort = document.getElementById('fSort');
-  const fReset = document.getElementById('fReset');
-
-  const PER_PAGE = 48;
-  let currentPage = 1;
-
-  const pesoToNumber = (p) => Number(String(p).replace(/[^\d.]/g,'')||0);
-
-  function isClothing(item){
-    return (item.category||'').toLowerCase() === 'clothing' ||
-           (item.img||'').toLowerCase().includes('/clothing/') ||
-           /(barong|bolero|shirt|dress|top|blouse|pants|trousers|skirt|coat|jacket)/i.test(item.name||'');
-  }
-
-  function starsHTML(r){
-    const full = Math.floor(r||0);
-    const half = (r - full >= 0.25 && r - full < 0.75) ? 1 : 0;
-    const roundedFull = half ? full : Math.round(r||0);
-    let html = '';
-    for (let i = 0; i < roundedFull; i++) html += '<i class="fa-solid fa-star"></i>';
-    if (half) html += '<i class="fa-solid fa-star-half-stroke"></i>';
-    while ((html.match(/fa-star/g) || []).length < 5) html += '<i class="fa-regular fa-star"></i>';
-    return html;
-  }
-
-  function slugify(s){
-    return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
-  }
-
-  function toAbs(p){ try { return new URL(p, window.location.href).href; } catch { return p; } }
-
-  function goToProductDetail(data){
-    const payload = {
-      ...data,
-      img: toAbs(data.img),
-      images: (Array.isArray(data.images) ? data.images : [data.img]).map(toAbs)
-    };
-    localStorage.setItem('productDetail', JSON.stringify(payload));
-    window.location.href = PRODUCT_PAGE;
-  }
-
-  function addToCart(product){
-    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const idx = cart.findIndex(i => i.baseName === product.baseName && i.size === product.size);
-    if(idx > -1){ cart[idx].quantity += product.quantity; }
-    else { cart.push(product); }
-    localStorage.setItem('cart', JSON.stringify(cart));
-    if (typeof window.openCartDrawer === 'function') window.openCartDrawer();
-  }
-
-  /* ------------- Filtering / Sorting ------------- */
-  function getFiltered(){
-    const term = (fSearch.value||'').toLowerCase().trim();
-    const cat = (fCategory.value||'').toLowerCase();
-
-    let list = PRODUCTS.slice();
-
-    if (cat) list = list.filter(p => (p.category||'').toLowerCase() === cat);
-    if (term) list = list.filter(p =>
-      (p.name||'').toLowerCase().includes(term) ||
-      (p.desc||'').toLowerCase().includes(term)
-    );
-
-    switch (fSort.value){
-      case 'price-asc':
-        list.sort((a,b)=> pesoToNumber(a.price) - pesoToNumber(b.price)); break;
-      case 'price-desc':
-        list.sort((a,b)=> pesoToNumber(b.price) - pesoToNumber(a.price)); break;
-      case 'name-asc':
-        list.sort((a,b)=> (a.name||'').localeCompare(b.name||'')); break;
-      case 'name-desc':
-        list.sort((a,b)=> (b.name||'').localeCompare(a.name||'')); break;
-      default: /* featured */ break;
-    }
-    return list;
-  }
-
-  function renderPager(total){
-    pager.innerHTML = '';
-    const pages = Math.max(1, Math.ceil(total / PER_PAGE));
-
-    const btnPrev = document.createElement('button');
-    btnPrev.textContent = '‹';
-    btnPrev.disabled = currentPage <= 1;
-    btnPrev.addEventListener('click', ()=> { currentPage = Math.max(1, currentPage-1); paint(); });
-    pager.appendChild(btnPrev);
-
-    for (let p=1; p<=pages; p++){
-      const b = document.createElement('button');
-      b.textContent = p;
-      if (p === currentPage) b.classList.add('active');
-      b.addEventListener('click', ()=> { currentPage = p; paint(); });
-      pager.appendChild(b);
+    function isClothing(item){
+      return (item.category||'').toLowerCase() === 'clothing' ||
+             (item.img||'').toLowerCase().includes('/clothing/') ||
+             /(barong|bolero|shirt|dress|top|blouse|pants|trousers|skirt|coat|jacket)/i.test(item.name||'');
     }
 
-    const btnNext = document.createElement('button');
-    btnNext.textContent = '›';
-    btnNext.disabled = currentPage >= pages;
-    btnNext.addEventListener('click', ()=> { currentPage = Math.min(pages, currentPage+1); paint(); });
-    pager.appendChild(btnNext);
-  }
+    function starsHTML(r){
+      const full = Math.floor(r||0);
+      const half = (r - full >= 0.25 && r - full < 0.75) ? 1 : 0;
+      const roundedFull = half ? full : Math.round(r||0);
+      let html = '';
+      for (let i = 0; i < roundedFull; i++) html += '<i class="fa-solid fa-star"></i>';
+      if (half) html += '<i class="fa-solid fa-star-half-stroke"></i>';
+      while ((html.match(/fa-star/g) || []).length < 5) html += '<i class="fa-regular fa-star"></i>';
+      return html;
+    }
 
-  /* ---- RENDER GRID (now with heart button) ---- */
-  function paint(){
-    const list = getFiltered();
-    renderPager(list.length);
-    const start = (currentPage - 1) * PER_PAGE;
-    const items = list.slice(start, start + PER_PAGE);
+    function slugify(s){
+      return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+    }
 
-    grid.innerHTML = '';
-    items.forEach((p, i)=>{
-      const idx = start + i; // index in filtered list
-      const wishData = `
-        data-id="${slugify(p.name)}"
-        data-name="${p.name}"
-        data-price="${p.price}"
-        data-img="${p.img}"
-        data-desc="${(p.desc||'').replace(/"/g,'&quot;')}"
-        data-url="${location.href}"
-      `;
-      const card = document.createElement('article');
-      card.className = 'card';
-      card.innerHTML = `
-        <a class="img-wrap product-link" href="#" data-idx="${idx}">
-          <img src="${p.img}" alt="${p.name}">
-        </a>
+    function toAbs(p){ try { return new URL(p, window.location.href).href; } catch { return p; } }
 
-        <!-- ❤️ Favorites button (picked up by wishlist.js) -->
-        <button type="button" class="wishlist-btn" aria-label="Add to favorites" ${wishData}>
-          <i class="fa-regular fa-heart"></i>
-        </button>
+    function goToProductDetail(data){
+      const payload = {
+        ...data,
+        img: toAbs(data.img),
+        images: (Array.isArray(data.images) ? data.images : [data.img]).map(toAbs)
+      };
+      localStorage.setItem('productDetail', JSON.stringify(payload));
+      window.location.href = PRODUCT_PAGE;
+    }
 
-        <button type="button" class="quick-btn" data-qv="${idx}">Quick View</button>
-        <div class="body">
-          <a class="product-link" href="#" data-idx="${idx}">
-            <p class="name">${p.name}</p>
+    /* ------------- Filtering / Sorting ------------- */
+    function getFiltered(){
+      const term = (fSearch.value||'').toLowerCase().trim();
+      const cat = (fCategory.value||'').toLowerCase();
+
+      let list = PRODUCTS.slice();
+
+      if (cat) list = list.filter(p => (p.category||'').toLowerCase() === cat);
+      if (term) list = list.filter(p =>
+        (p.name||'').toLowerCase().includes(term) ||
+        (p.desc||'').toLowerCase().includes(term)
+      );
+
+      switch (fSort.value){
+        case 'price-asc':
+          list.sort((a,b)=> pesoToNumber(a.price) - pesoToNumber(b.price)); break;
+        case 'price-desc':
+          list.sort((a,b)=> pesoToNumber(b.price) - pesoToNumber(a.price)); break;
+        case 'name-asc':
+          list.sort((a,b)=> (a.name||'').localeCompare(b.name||'')); break;
+        case 'name-desc':
+          list.sort((a,b)=> (b.name||'').localeCompare(a.name||'')); break;
+        default: /* featured */ break;
+      }
+      return list;
+    }
+
+    function renderPager(total){
+      pager.innerHTML = '';
+      const pages = Math.max(1, Math.ceil(total / PER_PAGE));
+
+      const btnPrev = document.createElement('button');
+      btnPrev.textContent = '‹';
+      btnPrev.disabled = currentPage <= 1;
+      btnPrev.addEventListener('click', ()=> { currentPage = Math.max(1, currentPage-1); paint(); });
+      pager.appendChild(btnPrev);
+
+      for (let p=1; p<=pages; p++){
+        const b = document.createElement('button');
+        b.textContent = p;
+        if (p === currentPage) b.classList.add('active');
+        b.addEventListener('click', ()=> { currentPage = p; paint(); });
+        pager.appendChild(b);
+      }
+
+      const btnNext = document.createElement('button');
+      btnNext.textContent = '›';
+      btnNext.disabled = currentPage >= pages;
+      btnNext.addEventListener('click', ()=> { currentPage = Math.min(pages, currentPage+1); paint(); });
+      pager.appendChild(btnNext);
+    }
+
+    /* ---- RENDER GRID (with wishlist heart) ---- */
+    function paint(){
+      const list = getFiltered();
+      renderPager(list.length);
+      const start = (currentPage - 1) * PER_PAGE;
+      const items = list.slice(start, start + PER_PAGE);
+
+      grid.innerHTML = '';
+      items.forEach((p, i)=>{
+        const idx = start + i; // index in filtered list
+        const wishData = `
+          data-id="${slugify(p.name)}"
+          data-name="${p.name}"
+          data-price="${p.price}"
+          data-img="${toAbs(p.img)}"
+          data-desc="${(p.desc||'').replace(/"/g,'&quot;')}"
+          data-url="${location.href}"
+        `;
+        const card = document.createElement('article');
+        card.className = 'card';
+        card.innerHTML = `
+          <a class="img-wrap product-link" href="#" data-idx="${idx}">
+            <img src="${p.img}" alt="${p.name}">
           </a>
-          <p class="price">${p.price}</p>
-          <div class="meta">
-            <span>${(p.category||'').charAt(0).toUpperCase() + (p.category||'').slice(1)}</span>
-            <span class="stars" title="${p.rating||0}">${starsHTML(p.rating||0)}</span>
+
+          <!-- ❤️ Favorites button (picked up by wishlist.js) -->
+          <button type="button" class="wishlist-btn" aria-label="Add to favorites" ${wishData}>
+            <i class="fa-regular fa-heart"></i>
+          </button>
+
+          <button type="button" class="quick-btn" data-qv="${idx}">Quick View</button>
+          <div class="body">
+            <a class="product-link" href="#" data-idx="${idx}">
+              <p class="name">${p.name}</p>
+            </a>
+            <p class="price">${p.price}</p>
+            <div class="meta">
+              <span>${(p.category||'').charAt(0).toUpperCase() + (p.category||'').slice(1)}</span>
+              <span class="stars" title="${p.rating||0}">${starsHTML(p.rating||0)}</span>
+            </div>
           </div>
-        </div>
-      `;
-      grid.appendChild(card);
-    });
-  }
-  // expose for the ?cat= pre-filter script
-  window.paint = paint;
-  window.currentPage = currentPage;
+        `;
+        grid.appendChild(card);
+      });
+    }
+    // expose for the ?cat= pre-filter script
+    window.paint = paint;
+    window.currentPage = currentPage;
 
-  function productByFilteredIndex(filteredIndex){
-    const list = getFiltered();
-    return list[filteredIndex];
-  }
-
-  /* ------------- Quick View ------------- */
-  const qvOverlay = document.getElementById('qvOverlay');
-  const qvModal   = document.getElementById('qvModal');
-  const qvImg     = document.getElementById('qvImg');
-  const qvName    = document.getElementById('qvName');
-  const qvPrice   = document.getElementById('qvPrice');
-  const qvDesc    = document.getElementById('qvDesc');
-  const qvClose   = document.getElementById('qvClose');
-  const qvAdd     = document.getElementById('qvAdd');
-  const qvView    = document.getElementById('qvView');
-  const qvQty     = document.getElementById('qvQty');
-  const qvDec     = document.getElementById('qvDec');
-  const qvInc     = document.getElementById('qvInc');
-  const qvStock   = document.getElementById('qvStock');
-  const qvRating  = document.getElementById('qvRating');
-  const qvSizeWrap= document.getElementById('qvSizeWrap');
-
-  let currentFilteredIndex = null;
-
-  function openQVByIndex(filteredIdx){
-    currentFilteredIndex = filteredIdx;
-    const p = productByFilteredIndex(filteredIdx);
-    if (!p) return;
-
-    qvImg.src   = p.img;
-    qvImg.alt   = p.name;
-    qvName.textContent  = p.name;
-    qvPrice.textContent = p.price;
-    qvDesc.textContent  = p.desc || '';
-    qvQty.value = 1;
-    qvRating.innerHTML = starsHTML(p.rating || 0);
-    qvStock.hidden = true;
-
-    // Size for clothing only
-    qvSizeWrap.hidden = !isClothing(p);
-    document.querySelectorAll('input[name="qvSize"]').forEach(r => r.checked = false);
-
-    qvOverlay.classList.add('active');
-    qvModal.classList.add('active');
-    document.body.classList.add('lock-scroll');
-    qvClose.focus();
-  }
-
-  function closeQV(){
-    qvOverlay.classList.remove('active');
-    qvModal.classList.remove('active');
-    document.body.classList.remove('lock-scroll');
-    currentFilteredIndex = null;
-  }
-
-  function getChosenQVSize(){
-    const r = Array.from(document.querySelectorAll('input[name="qvSize"]')).find(x=>x.checked);
-    return r ? r.value : null;
-  }
-
-  // Open QV
-  document.addEventListener('click', (e)=>{
-    const btn = e.target.closest('button[data-qv]');
-    if (!btn) return;
-    e.preventDefault();
-    openQVByIndex(Number(btn.dataset.qv));
-  });
-
-  // Qty controls
-  qvDec.addEventListener('click', ()=>{ qvQty.value = Math.max(1, (parseInt(qvQty.value)||1)-1); });
-  qvInc.addEventListener('click', ()=>{ qvQty.value = (parseInt(qvQty.value)||1)+1; });
-
-  // Add to cart from QV
-  qvAdd.addEventListener('click', ()=>{
-    if (currentFilteredIndex == null) return;
-    const p = productByFilteredIndex(currentFilteredIndex);
-    const clothing = isClothing(p);
-    let chosenSize = null;
-    if (clothing) {
-      chosenSize = getChosenQVSize();
-      if (!chosenSize) { alert('Please choose a size.'); return; }
+    function productByFilteredIndex(filteredIndex){
+      const list = getFiltered();
+      return list[filteredIndex];
     }
 
-    addToCart({
-      baseName: p.name,
-      name: clothing && chosenSize ? `${p.name} (Size: ${chosenSize})` : p.name,
-      img: p.img,
-      price: p.price,
-      desc: p.desc || '',
-      size: chosenSize || null,
-      quantity: Math.max(1, parseInt(qvQty.value)||1)
+    /* ------------- Quick View ------------- */
+    const qvOverlay = document.getElementById('qvOverlay');
+    const qvModal   = document.getElementById('qvModal');
+    const qvImg     = document.getElementById('qvImg');
+    const qvName    = document.getElementById('qvName');
+    const qvPrice   = document.getElementById('qvPrice');
+    const qvDesc    = document.getElementById('qvDesc');
+    const qvClose   = document.getElementById('qvClose');
+    const qvAdd     = document.getElementById('qvAdd');
+    const qvView    = document.getElementById('qvView');
+    const qvQty     = document.getElementById('qvQty');
+    const qvDec     = document.getElementById('qvDec');
+    const qvInc     = document.getElementById('qvInc');
+    const qvStock   = document.getElementById('qvStock');
+    const qvRating  = document.getElementById('qvRating');
+    const qvSizeWrap= document.getElementById('qvSizeWrap');
+
+    let currentFilteredIndex = null;
+
+    function openQVByIndex(filteredIdx){
+      currentFilteredIndex = filteredIdx;
+      const p = productByFilteredIndex(filteredIdx);
+      if (!p) return;
+
+      qvImg.src   = p.img;
+      qvImg.alt   = p.name;
+      qvName.textContent  = p.name;
+      qvPrice.textContent = p.price;
+      qvDesc.textContent  = p.desc || '';
+      qvQty.value = 1;
+      qvRating.innerHTML = starsHTML(p.rating || 0);
+      qvStock.hidden = true;
+
+      // Size for clothing only
+      qvSizeWrap.hidden = !isClothing(p);
+      document.querySelectorAll('input[name="qvSize"]').forEach(r => r.checked = false);
+
+      qvOverlay.classList.add('active');
+      qvModal.classList.add('active');
+      document.body.classList.add('lock-scroll');
+      qvClose.focus();
+    }
+
+    function closeQV(){
+      qvOverlay.classList.remove('active');
+      qvModal.classList.remove('active');
+      document.body.classList.remove('lock-scroll');
+      currentFilteredIndex = null;
+    }
+
+    function getChosenQVSize(){
+      const r = Array.from(document.querySelectorAll('input[name="qvSize"]')).find(x=>x.checked);
+      return r ? r.value : null;
+    }
+
+    // Open QV
+    document.addEventListener('click', (e)=>{
+      const btn = e.target.closest('button[data-qv]');
+      if (!btn) return;
+      e.preventDefault();
+      openQVByIndex(Number(btn.dataset.qv));
     });
-    closeQV();
-  });
 
-  // View details from QV
-  qvView.addEventListener('click', ()=>{
-    if (currentFilteredIndex == null) return;
-    const p = productByFilteredIndex(currentFilteredIndex);
-    const clothing = isClothing(p);
-    const chosenSize = clothing ? getChosenQVSize() : null;
+    // Qty controls
+    qvDec.addEventListener('click', ()=>{ qvQty.value = Math.max(1, (parseInt(qvQty.value)||1)-1); });
+    qvInc.addEventListener('click', ()=>{ qvQty.value = (parseInt(qvQty.value)||1)+1; });
 
-    goToProductDetail({
-      img: p.img,
-      images: Array.isArray(p.images) && p.images.length ? p.images : [p.img],
-      name: p.name,
-      price: p.price,
-      desc: p.desc || '',
-      rating: p.rating || 0,
-      reviewsCount: p.reviews || 0,
-      bullets: p.bullets || [],
-      preselectedSize: chosenSize,
-      category: p.category || ''
+    // Add to cart from QV (use global cart.js API)
+    qvAdd.addEventListener('click', ()=>{
+      if (currentFilteredIndex == null) return;
+      const p = productByFilteredIndex(currentFilteredIndex);
+      const clothing = isClothing(p);
+      let chosenSize = null;
+      if (clothing) {
+        chosenSize = getChosenQVSize();
+        if (!chosenSize) { alert('Please choose a size.'); return; }
+      }
+
+      window.addToCart({
+        id: slugify(p.name),
+        baseName: p.name,
+        name: clothing && chosenSize ? `${p.name} (Size: ${chosenSize})` : p.name,
+        img: toAbs(p.img),
+        price: p.price,
+        desc: p.desc || '',
+        size: chosenSize || null,
+        quantity: Math.max(1, parseInt(qvQty.value)||1)
+      });
+      window.openCartDrawer?.();
+      closeQV();
     });
-  });
 
-  // Close QV
-  qvClose.addEventListener('click', closeQV);
-  qvOverlay.addEventListener('click', closeQV);
-  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && qvModal.classList.contains('active')) closeQV(); });
+    // View details from QV
+    qvView.addEventListener('click', ()=>{
+      if (currentFilteredIndex == null) return;
+      const p = productByFilteredIndex(currentFilteredIndex);
+      const clothing = isClothing(p);
+      const chosenSize = clothing ? getChosenQVSize() : null;
 
-  /* ------------- Card click -> product page ------------- */
-  document.addEventListener('click', (e)=>{
-    const link = e.target.closest('.product-link');
-    if (!link) return;
-    e.preventDefault();
-    const filteredIdx = Number(link.dataset.idx);
-    const p = productByFilteredIndex(filteredIdx);
-    if (!p) return;
-
-    goToProductDetail({
-      img: p.img,
-      images: Array.isArray(p.images) && p.images.length ? p.images : [p.img],
-      name: p.name,
-      price: p.price,
-      desc: p.desc || '',
-      rating: p.rating || 0,
-      reviewsCount: p.reviews || 0,
-      bullets: p.bullets || [],
-      preselectedSize: null,
-      category: p.category || ''
+      goToProductDetail({
+        img: p.img,
+        images: Array.isArray(p.images) && p.images.length ? p.images : [p.img],
+        name: p.name,
+        price: p.price,
+        desc: p.desc || '',
+        rating: p.rating || 0,
+        reviewsCount: p.reviews || 0,
+        bullets: p.bullets || [],
+        preselectedSize: chosenSize,
+        category: p.category || ''
+      });
     });
-  });
 
-   /* ------------- Filters / Reset ------------- */
-   fSearch.addEventListener('input', ()=>{ currentPage = 1; paint(); });
-  fCategory.addEventListener('change', ()=>{ currentPage = 1; paint(); });
-  fSort.addEventListener('change', ()=>{ currentPage = 1; paint(); });
-  fReset.addEventListener('click', ()=>{
-    fSearch.value = '';
-    fCategory.value = '';
-    fSort.value = 'featured';
-    currentPage = 1;
+    // Close QV
+    qvClose.addEventListener('click', closeQV);
+    qvOverlay.addEventListener('click', closeQV);
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && qvModal.classList.contains('active')) closeQV(); });
+
+    /* ------------- Card click -> product page ------------- */
+    document.addEventListener('click', (e)=>{
+      const link = e.target.closest('.product-link');
+      if (!link) return;
+      e.preventDefault();
+      const filteredIdx = Number(link.dataset.idx);
+      const p = productByFilteredIndex(filteredIdx);
+      if (!p) return;
+
+      goToProductDetail({
+        img: p.img,
+        images: Array.isArray(p.images) && p.images.length ? p.images : [p.img],
+        name: p.name,
+        price: p.price,
+        desc: p.desc || '',
+        rating: p.rating || 0,
+        reviewsCount: p.reviews || 0,
+        bullets: p.bullets || [],
+        preselectedSize: null,
+        category: p.category || ''
+      });
+    });
+
+    /* ------------- Filters / Reset ------------- */
+    fSearch.addEventListener('input', ()=>{ currentPage = 1; paint(); });
+    fCategory.addEventListener('change', ()=>{ currentPage = 1; paint(); });
+    fSort.addEventListener('change', ()=>{ currentPage = 1; paint(); });
+    fReset.addEventListener('click', ()=>{
+      fSearch.value = '';
+      fCategory.value = '';
+      fSort.value = 'featured';
+      currentPage = 1;
+      paint();
+    });
+
+    /* ------------- Init ------------- */
     paint();
-  });
-
-  /* ------------- Init ------------- */
-  paint();
   </script>
 
   <!-- Load global cart API (window.addToCart, window.openCartDrawer) -->

@@ -12,11 +12,48 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="cart.css">
   <link rel="stylesheet" href="wishlist.css">
-</head>
 
+  <style>
+    :root{
+      --ink:#2b1f1a; --ink-2:#7a6f68; --line:#e8e3da; --card:#fff; --tone:#6d6a33;
+    }
+    .fav-wrap{ max-width:1200px; margin:24px auto 80px; padding:0 20px; }
+    .fav-head{ display:flex; justify-content:space-between; align-items:end; gap:16px; margin:8px 0 18px; }
+    .fav-head h1{ margin:0; color:var(--ink); font-size:2.2rem; }
+    .fav-count{ color:var(--ink-2); font-weight:700; }
+    .fav-actions{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .btn-clear, .btn-continue{
+      height:38px; padding:0 14px; border-radius:10px; border:1px solid #cfc7c1; background:#fff; cursor:pointer; font-weight:700; color:var(--ink);
+    }
+    .btn-continue{ border-color:var(--tone); color:#fff; background:var(--tone); }
+
+    .fav-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:22px; }
+    @media (max-width: 992px){ .fav-grid{ grid-template-columns:repeat(3,1fr); } }
+    @media (max-width: 768px){ .fav-grid{ grid-template-columns:repeat(2,1fr); } }
+    @media (max-width: 520px){ .fav-grid{ grid-template-columns:1fr; } }
+
+    .fav-card{ background:var(--card); border:1px solid #eee; border-radius:14px; overflow:hidden; position:relative; transition:box-shadow .25s, transform .25s; }
+    .fav-card:hover{ transform:translateY(-3px); box-shadow:0 10px 20px rgba(0,0,0,.08); }
+    .fav-img{ aspect-ratio:1/1; background:#f6f5ef; display:grid; place-items:center; overflow:hidden; }
+    .fav-img img{ width:100%; height:100%; object-fit:cover; }
+    .fav-body{ padding:14px 16px 16px; }
+    .fav-name{ margin:0 0 4px; color:var(--ink); font-weight:800; }
+    .fav-price{ margin:0 0 10px; color:var(--ink); font-weight:800; }
+    .fav-desc{ color:#6b625b; font-size:.95rem; min-height:2.6em; }
+
+    .fav-controls{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:12px; }
+    .btn{ height:40px; border-radius:10px; font-weight:800; cursor:pointer; border:1px solid #cfc7c1; background:#fff; color:var(--ink); }
+    .btn.primary{ background:var(--tone); color:#fff; border-color:var(--tone); }
+    .btn.light{ background:#fff; }
+    .fav-remove{ position:absolute; top:10px; right:10px; width:36px; height:36px; border-radius:999px; border:1px solid #d8d2c8; background:#fff; color:#b33; cursor:pointer; }
+
+    .empty{ color:var(--ink-2); text-align:center; margin:30px 0 10px; }
+    .empty a{ color:var(--tone); font-weight:800; }
+  </style>
+</head>
 <body>
 
-  <!-- ===== HEADER (SAME STRUCTURE AS SHOP ALL) ===== -->
+  <!-- ===== HEADER ===== -->
   <header class="header">
     <div class="logo">
       <a href="index.html" aria-label="Home">
@@ -39,7 +76,6 @@
             <a href="#" class="catmenu-toggle" aria-expanded="false">
               Shop by Category <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
             </a>
-            <!-- Optional mega; keep empty if you don’t need it -->
             <div class="mega" id="catMega" role="menu" aria-label="Shop by Category"></div>
           </li>
         </ul>
@@ -48,31 +84,25 @@
 
     <nav class="utils">
       <ul class="nav-links">
-        <li><a href="login.html"><i class="fa-solid fa-user"></i></a></li>
-
-        <!-- Cart (same ID + href as Shop All so cart.js binds) -->
+        <li><a href="login.html" aria-label="Account"><i class="fa-solid fa-user"></i></a></li>
         <li class="cart-icon">
           <a href="#" id="openCart" aria-label="Open cart">
             <i class="fa-solid fa-cart-shopping"></i>
             <span class="cart-count">0</span>
           </a>
         </li>
-
-        <!-- Wishlist -->
         <li style="position: relative;">
           <a href="wishlist.html" aria-label="Favorites" id="wishlistLink">
             <i class="fa-regular fa-heart"></i>
             <span class="wishlist-count" id="wishlistCount">0</span>
           </a>
         </li>
-
-        <!-- Support -->
         <li><a href="support.html" aria-label="Support"><i class="fa-solid fa-headset"></i></a></li>
       </ul>
     </nav>
   </header>
 
-  <!-- ===== Cart Drawer (COPIED FROM SHOP ALL) ===== -->
+  <!-- ===== Cart Drawer ===== -->
   <div class="cd-overlay" id="cdOverlay" aria-hidden="true"></div>
   <aside class="cd-drawer" id="cdDrawer" aria-hidden="true" role="dialog" aria-label="Cart drawer">
     <div class="cd-header">
@@ -99,27 +129,64 @@
   <!-- ===== CONTENT ===== -->
   <main class="fav-wrap">
     <div class="fav-head">
-      <h1>Your Favorites</h1>
-      <div id="favCount" class="fav-count">0 ITEMS</div>
+      <div>
+        <h1>Your Favorites</h1>
+        <div id="favCount" class="fav-count">0 ITEMS</div>
+      </div>
+      <div class="fav-actions">
+        <button id="btnContinue" class="btn-continue" type="button">Continue shopping</button>
+        <button id="btnClear" class="btn-clear" type="button" aria-label="Clear all favorites">Clear all</button>
+      </div>
     </div>
 
-    <!-- Grid that wishlist.js fills -->
-    <section id="favGrid" class="fav-grid"></section>
-
-    <!-- Empty state -->
-    <p id="wlEmpty" style="display:none; color:#7a6f68; margin-top:16px;">
-      You don’t have any favorites yet.
+    <section id="favGrid" class="fav-grid" aria-live="polite"></section>
+    <p id="wlEmpty" class="empty" hidden>
+      You don’t have any favorites yet. <a href="shop-all.html">Browse products</a> and tap the ♥.
     </p>
   </main>
 
-  <!-- ===== SCRIPTS ===== -->
-  <!-- Make sure your wishlist.js is the version that stores absolute URLs -->
-  <script src="wishlist.js" defer></script>
+  <!-- ===== FOOTER (optional; reuse yours) ===== -->
+  <footer class="footer">
+    <div class="footer-section">
+      <h1>Contact Us</h1>
+      <ul class="footer-list">
+        <li>lokal@info.com</li>
+        <li>lokal@admin.com</li>
+        <li>Manila Philippines</li>
+        <li class="border-list"></li>
+        <li class="socials">
+          <i class="fa-brands fa-square-instagram"></i>
+          <i class="fa-brands fa-square-facebook"></i>
+          <i class="fa-brands fa-tiktok"></i>
+        </li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h1>Quick Links</h1>
+      <ul class="footer-list">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="shop-all.html">Shop All</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="terms.html">Terms & Conditions</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h1>Subscribe to Newsletter</h1>
+      <ul class="footer-list">
+        <li>A local marketplace is a community hub where people buy, sell, or trade goods and services within their area.</li>
+        <li class="sub">
+          <input type="text" placeholder="Your email">
+          <button class="button">Subscribe</button>
+        </li>
+      </ul>
+    </div>
+  </footer>
 
-  <!-- Same cart logic used in Shop All -->
+  <!-- ===== SCRIPTS ===== -->
+  <script src="wishlist.js"></script>
   <script src="cart.js"></script>
 
-  <!-- Match Shop All: lock body scroll when drawer toggles -->
+  <!-- Lock body scroll when cart drawer toggles -->
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       const drawer = document.getElementById('cdDrawer');
@@ -129,14 +196,5 @@
       new MutationObserver(toggleLock).observe(drawer, { attributes: true, attributeFilter: ['class'] });
     });
   </script>
-
-  <!-- (Optional) If hidden overlays ever block clicks, uncomment this quick fix
-  <style>
-    .header .utils { position: relative; z-index: 3000; }
-    .has-megamenu .mega { pointer-events: none; opacity:0; visibility:hidden; }
-    .has-megamenu.open .mega,
-    .catmenu-toggle[aria-expanded="true"] + .mega { pointer-events:auto; opacity:1; visibility:visible; }
-  </style>
-  -->
 </body>
 </html>

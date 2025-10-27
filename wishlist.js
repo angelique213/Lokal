@@ -1,52 +1,48 @@
-/* ===== Wishlist — Final Full Version for Lokal =====
-   ✅ Saves ABSOLUTE image URLs (fixes broken images from grid)
-   ✅ Full product data from PRODUCTS_CACHE
-   ✅ Clickable hearts everywhere
-   ✅ Solid red hearts (active)
-   ✅ Silent add to cart (no alert)
-======================================================== */
+/* ===== Wishlist — Lokal (style-preserving) =====
+   ✅ Keeps your existing CSS classes/markup
+   ✅ Saves ABSOLUTE image URLs (works from subfolders)
+   ✅ Uses PRODUCTS_CACHE when available
+   ✅ Hearts sync (solid when saved)
+   ✅ Silent add-to-cart + optional open cart
+================================================== */
 (function () {
   const PRODUCT_PAGE = "best-pick/product.html";
   const KEY = "wishlist";
 
   // ---------- Helpers ----------
-  const $ = (s) => document.querySelector(s);
-  const $$ = (s) => document.querySelectorAll(s);
-  const read = () => JSON.parse(localStorage.getItem(KEY) || "[]");
-  const write = (a) => localStorage.setItem(KEY, JSON.stringify(a));
+  const $  = (s, sc) => (sc || document).querySelector(s);
+  const $$ = (s, sc) => (sc || document).querySelectorAll(s);
+
+  const read  = () => { try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch { return []; } };
+  const write = (a) => localStorage.setItem(KEY, JSON.stringify(a || []));
+
   const slugify = (s) =>
     String(s || "")
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
 
-  // Convert any path (relative/absolute) to an absolute URL
-  function absUrl(p) {
-    try {
-      if (!p) return p;
-      // Use window.location.origin so it works across pages/folders
-      return new URL(p, window.location.origin).href;
-    } catch {
-      return p;
-    }
+  // Make any path absolute relative to current page (handles subfolders)
+  function toAbs(p) {
+    try { return p ? new URL(p, location.href).href : p; }
+    catch { return p; }
   }
 
-  const PRODUCTS = JSON.parse(localStorage.getItem("PRODUCTS_CACHE") || "[]");
+  const PRODUCTS = (() => {
+    try { return JSON.parse(localStorage.getItem("PRODUCTS_CACHE") || "[]"); }
+    catch { return []; }
+  })();
 
-  // Get complete product data (with fallback) — ensures absolute URLs
+  // Build a full product object; prefer cache match by slug(name)
   function fullProduct(item) {
-    const id = item.id || slugify(item.name);
-    const found =
-      PRODUCTS.find(
-        (p) =>
-          slugify(p.name) === id ||
-          (p.name && item.name && p.name.trim() === item.name.trim())
-      ) || {};
+    const id = item.id || slugify(item.name || "");
+    const found = PRODUCTS.find(
+      (p) => slugify(p.name || "") === id || (item.name && p.name && p.name.trim() === item.name.trim())
+    ) || {};
 
-    const primaryImg = absUrl(found.img || item.img || "");
-    const imgs = (found.images || item.images || [found.img || item.img || ""])
-      .filter(Boolean)
-      .map(absUrl);
+    const primaryImg = toAbs(found.img || item.img || "");
+    const imgsRaw = found.images || item.images || [found.img || item.img || ""];
+    const images = (Array.isArray(imgsRaw) ? imgsRaw : [imgsRaw]).filter(Boolean).map(toAbs);
 
     return {
       id,
@@ -54,80 +50,87 @@
       price: found.price || item.price || "₱0",
       desc: found.desc || item.desc || "",
       img: primaryImg,
-      images: imgs.length ? imgs : (primaryImg ? [primaryImg] : []),
+      images: images.length ? images : (primaryImg ? [primaryImg] : []),
       rating: found.rating || item.rating || 4.6,
       reviewsCount: found.reviews || item.reviewsCount || 3,
       bullets: found.bullets || item.bullets || [],
       category: found.category || item.category || "",
-      url: item.url || window.location.href
+      url: item.url || location.href
     };
   }
 
-  // ---------- Wishlist utilities ----------
-  function isInWishlist(name) {
-    const list = read();
-    return list.some((x) => slugify(x.name) === slugify(name));
+  // ---------- Core wishlist ----------
+  function idFrom(data) {
+    return (data && data.id) ? String(data.id).trim() : slugify(data?.name || "");
+  }
+
+  function isInWishlist(id) {
+    return read().some((x) => x.id === id);
   }
 
   function toggleWishlist(rawItem) {
-    let list = read();
-    const normalized = {
-      id: rawItem.id || slugify(rawItem.name),
-      name: rawItem.name,
-      price: rawItem.price || "",
-      // 🔧 Always store absolute URL to prevent broken images on wishlist.html
-      img: absUrl(rawItem.img || ""),
-      desc: rawItem.desc || "",
-      url: rawItem.url || window.location.href
-    };
-    const id = slugify(normalized.name);
-    const index = list.findIndex((x) => slugify(x.name) === id);
-    if (index > -1) list.splice(index, 1);
-    else list.push(normalized);
+    const id = idFrom(rawItem);
+    if (!id) return;
+
+    const list = read();
+    const idx = list.findIndex((x) => x.id === id);
+
+    if (idx > -1) {
+      list.splice(idx, 1);
+    } else {
+      list.push({
+        id,
+        name: rawItem.name || "",
+        price: rawItem.price || "",
+        img: toAbs(rawItem.img || ""),
+        desc: rawItem.desc || "",
+        url: rawItem.url || location.href
+      });
+    }
     write(list);
     updateBadge();
   }
 
+  // ---------- Header badge + hearts ----------
   function updateBadge() {
     const el = $("#wishlistCount");
     if (!el) return;
     const n = read().length;
-    el.textContent = n > 0 ? String(n) : "";
-    el.style.display = n > 0 ? "inline-block" : "none";
+    // keep your original behavior: hide when 0
+    el.textContent = n ? String(n) : "";
+    el.style.display = n ? "inline-block" : "none";
   }
 
   function syncHeartStates() {
-    const list = read();
+    const ids = new Set(read().map((x) => x.id));
     $$(".wishlist-btn").forEach((btn) => {
-      const name = btn.dataset.name || btn.dataset.id || "";
-      const active = list.some((x) => slugify(x.name) === slugify(name));
-      btn.classList.toggle("active", active);
+      const id = idFrom({ id: btn.dataset.id, name: btn.dataset.name });
+      const active = id && ids.has(id);
+      btn.classList.toggle("active", !!active);
       const icon = btn.querySelector("i");
-      if (icon) {
-        icon.className = active ? "fa-solid fa-heart" : "fa-regular fa-heart";
-      }
+      if (icon) icon.className = active ? "fa-solid fa-heart" : "fa-regular fa-heart";
     });
   }
 
-  // ---------- Render Wishlist ----------
+  // ---------- Wishlist page rendering (keeps your classes) ----------
   function renderWishlist() {
     const grid = $("#favGrid");
+    if (!grid) return; // not on wishlist.html
+
+    const list = read();
     const empty = $("#wlEmpty");
     const favCount = $("#favCount");
-    const list = read();
-
-    if (!grid) return;
 
     if (empty) empty.style.display = list.length ? "none" : "block";
-    if (favCount)
-      favCount.textContent = `${list.length} item${list.length !== 1 ? "s" : ""}`;
+    if (favCount) favCount.textContent = `${list.length} item${list.length !== 1 ? "s" : ""}`;
+
     grid.innerHTML = "";
 
     list.forEach((item, i) => {
       const p = fullProduct(item);
       const card = document.createElement("article");
-      card.className = "wish-card";
-      card.dataset.id = slugify(p.name);
+      card.className = "wish-card"; // <-- unchanged
+      card.dataset.id = p.id;
       card.innerHTML = `
         <div class="img-wrap">
           <a href="#" class="to-detail" data-index="${i}">
@@ -147,7 +150,7 @@
     });
   }
 
-  // ---------- Open Product Detail ----------
+  // ---------- Navigation to product detail ----------
   function openProductDetail(item) {
     const product = fullProduct(item);
     localStorage.setItem("productDetail", JSON.stringify(product));
@@ -155,31 +158,29 @@
     location.href = `${PRODUCT_PAGE}?id=${encodeURIComponent(id)}`;
   }
 
-  // ---------- Event Listeners ----------
+  // ---------- Events ----------
   document.addEventListener("click", (e) => {
     const t = e.target;
 
-    // Wishlist heart click (Shop All / Best Picks / any grid)
+    // Hearts on grids (Shop All / Best Picks / anywhere)
     const heart = t.closest(".wishlist-btn");
     if (heart) {
       e.preventDefault();
-      const item = {
+      toggleWishlist({
         id: heart.dataset.id,
         name: heart.dataset.name,
         price: heart.dataset.price,
-        // 🔧 Convert dataset image to absolute right here
-        img: absUrl(heart.dataset.img),
+        img: heart.dataset.img,
         desc: heart.dataset.desc,
-        url: heart.dataset.url || window.location.href
-      };
-      toggleWishlist(item);
+        url: heart.dataset.url || location.href
+      });
       heart.classList.add("pulse");
-      syncHeartStates();
       setTimeout(() => heart.classList.remove("pulse"), 300);
+      syncHeartStates();
       return;
     }
 
-    // View product (from wishlist page)
+    // View product (wishlist page)
     const detail = t.closest(".to-detail");
     if (detail) {
       e.preventDefault();
@@ -189,9 +190,10 @@
       return;
     }
 
-    // Remove from favorites (inside wishlist)
+    // Remove from favorites (wishlist page)
     const rm = t.closest("[data-remove]");
     if (rm) {
+      e.preventDefault();
       const idx = Number(rm.dataset.remove);
       const list = read();
       list.splice(idx, 1);
@@ -202,48 +204,54 @@
       return;
     }
 
-    // Add to cart (silent)
-    const cartBtn = t.closest("[data-cart]");
-    if (cartBtn) {
-      const idx = Number(cartBtn.dataset.cart);
+    // Add to cart (silent) from wishlist
+    const addBtn = t.closest("[data-cart]");
+    if (addBtn) {
+      e.preventDefault();
+      const idx = Number(addBtn.dataset.cart);
       const list = read();
       const p = fullProduct(list[idx]);
       const cart = JSON.parse(localStorage.getItem("cart") || "[]");
       const exist = cart.findIndex((x) => x.name === p.name);
       if (exist > -1) cart[exist].quantity += 1;
-      else cart.push({ ...p, quantity: 1 });
+      else cart.push({
+        baseName: p.name,
+        name: p.name,
+        img: toAbs(p.img),
+        price: p.price,
+        desc: p.desc || "",
+        size: null,
+        quantity: 1
+      });
       localStorage.setItem("cart", JSON.stringify(cart));
-      // Optionally remove from wishlist after adding to cart:
+
+      // optional: remove from wishlist after adding
       list.splice(idx, 1);
       write(list);
       renderWishlist();
       updateBadge();
       syncHeartStates();
+
+      // open cart drawer if available
+      window.openCartDrawer?.();
       return;
     }
   });
 
-  // ---------- Optional: broken-image fallback ----------
-  // Add a small placeholder image at: images/placeholder.png (recommended ~300x300)
-  document.addEventListener(
-    "error",
-    (e) => {
-      const img = e.target;
-      if (img && img.tagName === "IMG") {
-        if (!img.dataset.fallback) {
-          img.dataset.fallback = "1";
-          img.src = "images/placeholder.png";
-          img.alt = "Image not available";
-        }
-      }
-    },
-    true
-  );
+  // ---------- Broken-image fallback ----------
+  document.addEventListener("error", (e) => {
+    const img = e.target;
+    if (img && img.tagName === "IMG" && !img.dataset.fallback) {
+      img.dataset.fallback = "1";
+      img.src = "images/placeholder.png";
+      img.alt = "Image not available";
+    }
+  }, true);
 
   // ---------- Init ----------
   document.addEventListener("DOMContentLoaded", () => {
-    renderWishlist();
-    updateBadge();
-    syncHeartStates();
+    renderWishlist();   // paints only on wishlist.html
+    updateBadge();      // header count
+    syncHeartStates();  // hearts on any page
   });
 })();

@@ -1,193 +1,235 @@
-// Update cart counter
+/* ===== lokal.js / main.js — Lokal storefront glue =====
+   ✅ Updates all .cart-count badges
+   ✅ Safe, silent add-to-cart (opens drawer if available)
+   ✅ Works from subfolders (absolute image URLs)
+   ✅ Product-card add support
+   ✅ Quick View modal (if present)
+   ✅ Auto banner slider (if present)
+   ✅ Search modal (if present)
+   ✅ Category mega menu (desktop hover / touch tap)
+========================================================= */
+
+/* ------------------ Utilities ------------------ */
+function toAbs(p) {
+  try { return p ? new URL(p, location.href).href : p; } catch { return p; }
+}
+
+function getCart() {
+  try { return JSON.parse(localStorage.getItem("cart") || "[]"); } catch { return []; }
+}
+
+function setCart(cart) {
+  localStorage.setItem("cart", JSON.stringify(cart || []));
+}
+
 function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
-    const cartCountElem = document.querySelector(".cart-count");
-    if (cartCountElem) cartCountElem.textContent = totalQuantity;
+  const cart = getCart();
+  const totalQty = cart.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+  document.querySelectorAll(".cart-count").forEach(el => { el.textContent = totalQty; });
 }
 
-// Call on page load
+/* Expose addToCart so other scripts (e.g., Best Picks / Shop All) can call it */
+window.addToCart = function addToCart(product) {
+  // Normalize & harden
+  const item = {
+    baseName: product.baseName || product.name,
+    name: product.name,                 // can include size suffix if any
+    img: toAbs(product.img || ""),
+    price: product.price || "₱0",
+    desc: product.desc || "",
+    size: product.size ?? null,
+    quantity: Math.max(1, parseInt(product.quantity) || 1),
+  };
+
+  let cart = getCart();
+
+  // Merge by (baseName + size) so clothing variants are distinct
+  const idx = cart.findIndex(x => (x.baseName || x.name) === item.baseName && (x.size ?? null) === (item.size ?? null));
+  if (idx > -1) cart[idx].quantity += item.quantity;
+  else cart.push(item);
+
+  setCart(cart);
+  updateCartCount();
+
+  // Optional: open cart drawer if your page has it wired
+  if (typeof window.openCartDrawer === "function") window.openCartDrawer();
+  // If you still want an alert, uncomment:
+  // alert(`${item.name} added to cart!`);
+};
+
+/* ------------------ On Load ------------------ */
 document.addEventListener("DOMContentLoaded", () => {
-    updateCartCount();
+  updateCartCount();
 });
 
-// Add to Cart function
-function addToCart(product) {
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const index = cart.findIndex(item => item.name === product.name);
-    if(index > -1){
-        cart[index].quantity += product.quantity;
-    } else {
-        cart.push(product);
-    }
-    localStorage.setItem("cart", JSON.stringify(cart));
-    updateCartCount(); // Update cart counter
-    alert(`${product.name} added to cart!`);
-}
+/* ------------------ Add from product card ------------------ */
+/* Assumes a button inside .best-product (like your current markup).
+   If you prefer a specific selector, add a data attribute and swap the matches() check. */
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".best-product .button");
+  if (!btn) return;
 
-// Add from product card
-document.addEventListener("click", function(e){
-    if(e.target.classList.contains("button") && e.target.closest(".best-product")){
-        const p = e.target.closest(".best-product");
-        addToCart({
-            img: p.dataset.img,
-            name: p.dataset.name,
-            price: p.dataset.price,
-            desc: p.dataset.desc,
-            quantity: 1
-        });
-    }
+  const card = btn.closest(".best-product");
+  if (!card) return;
+
+  const data = {
+    img: card.dataset.img,
+    name: card.dataset.name,
+    price: card.dataset.price,
+    desc: card.dataset.desc,
+    quantity: 1
+  };
+  window.addToCart(data);
 });
 
-// Quick View modal code (optional)
-const modal = document.getElementById("quickViewModal");
-if(modal){
-    const modalImg = document.getElementById("modal-img");
-    const modalName = document.getElementById("modal-name");
-    const modalDesc = document.getElementById("modal-desc");
-    const modalPrice = document.getElementById("modal-price");
-    const modalRating = document.getElementById("modal-rating");
-    const modalAddBtn = modal.querySelector("button");
-    const closeModal = document.querySelector(".close-modal");
+/* ------------------ Quick View Modal (optional) ------------------ */
+/* Requires:
+   #quickViewModal
+   #modal-img, #modal-name, #modal-desc, #modal-price, #modal-rating
+   a numeric <input> inside the modal for quantity
+   .close-modal for the close button
+   a single <button> in the modal to add-to-cart
+*/
+(function quickViewInit(){
+  const modal = document.getElementById("quickViewModal");
+  if (!modal) return;
 
-    document.addEventListener('click', function(e){
-        if(e.target.classList.contains('quick-view-btn')){
-            const product = e.target.closest(".best-product");
-            modalImg.src = product.dataset.img;
-            modalName.textContent = product.dataset.name;
-            modalDesc.textContent = product.dataset.desc;
-            modalPrice.textContent = product.dataset.price;
-            modalRating.textContent = product.dataset.rating;
-            modal.querySelector("input").value = 1;
-            modal.style.display = "flex";
-        }
+  const modalImg    = document.getElementById("modal-img");
+  const modalName   = document.getElementById("modal-name");
+  const modalDesc   = document.getElementById("modal-desc");
+  const modalPrice  = document.getElementById("modal-price");
+  const modalRating = document.getElementById("modal-rating");
+  const qtyInput    = modal.querySelector('input[type="number"], input[type="text"]');
+  const modalAddBtn = modal.querySelector("button");
+  const closeBtn    = modal.querySelector(".close-modal");
+
+  function openModalFromCard(card) {
+    if (!card) return;
+    if (modalImg)    modalImg.src = card.dataset.img || "";
+    if (modalName)   modalName.textContent = card.dataset.name || "";
+    if (modalDesc)   modalDesc.textContent = card.dataset.desc || "";
+    if (modalPrice)  modalPrice.textContent = card.dataset.price || "";
+    if (modalRating) modalRating.textContent = card.dataset.rating || "";
+    if (qtyInput)    qtyInput.value = 1;
+    modal.style.display = "flex";
+  }
+
+  document.addEventListener("click", (e) => {
+    const trigger = e.target.closest(".quick-view-btn");
+    if (!trigger) return;
+    const card = trigger.closest(".best-product");
+    e.preventDefault();
+    openModalFromCard(card);
+  });
+
+  closeBtn?.addEventListener("click", () => modal.style.display = "none");
+  window.addEventListener("click", (e) => { if (e.target === modal) modal.style.display = "none"; });
+
+  modalAddBtn?.addEventListener("click", () => {
+    const qty = Math.max(1, parseInt(qtyInput?.value) || 1);
+    window.addToCart({
+      img: modalImg?.src,
+      name: modalName?.textContent || "Product",
+      price: modalPrice?.textContent || "₱0",
+      desc: modalDesc?.textContent || "",
+      quantity: qty
     });
+    modal.style.display = "none";
+  });
+})();
 
-    closeModal.addEventListener("click", ()=> modal.style.display="none");
-    window.addEventListener("click", (e)=> { if(e.target === modal) modal.style.display="none"; });
+/* ------------------ Automatic banner slider (optional) ------------------ */
+/* Markup: .banner .slide + .banner .slide.active for the visible one */
+(function bannerSlider(){
+  const slides = document.querySelectorAll(".banner .slide");
+  if (!slides.length) return;
 
-    modalAddBtn.addEventListener("click", ()=>{
-        const qty = parseInt(modal.querySelector("input").value) || 1;
-        addToCart({
-            img: modalImg.src,
-            name: modalName.textContent,
-            price: modalPrice.textContent,
-            desc: modalDesc.textContent,
-            quantity: qty
-        });
-        modal.style.display = "none";
-    });
-}
+  let current = 0;
+  const interval = 5000;
 
-// lokal.js - Automatic banner slider
-document.addEventListener("DOMContentLoaded", () => {
-    const slides = document.querySelectorAll(".banner .slide");
-    let current = 0;
-    const interval = 5000; // time between slides in milliseconds (5s)
-  
-    function showSlide(index) {
-      slides.forEach((slide, i) => {
-        slide.classList.toggle("active", i === index);
-      });
-    }
-  
-    function nextSlide() {
-      current = (current + 1) % slides.length;
-      showSlide(current);
-    }
-  
-    // Show the first slide immediately
+  function showSlide(i) {
+    slides.forEach((s, idx) => s.classList.toggle("active", idx === i));
+  }
+  function next() {
+    current = (current + 1) % slides.length;
     showSlide(current);
-  
-    // Auto-switch every 5 seconds
-    setInterval(nextSlide, interval);
-  });
+  }
 
+  showSlide(current);
+  setInterval(next, interval);
+})();
 
-  // --- Search Modal Controls ---
-document.addEventListener('DOMContentLoaded', () => {
-    const trigger = document.getElementById('openSearch');
-    const modal = document.getElementById('searchModal');
-    const closeBtn = document.getElementById('closeSearch');
-    const input = document.getElementById('global-q');
-    const form = document.getElementById('searchForm');
-  
-    if (!modal) return; // modal not on this page
-  
-    function openModal(e) {
-      if (e) e.preventDefault();
-      modal.classList.add('active');
-      modal.setAttribute('aria-hidden', 'false');
-      setTimeout(() => input && input.focus(), 50);
-    }
-  
-    function closeModal() {
-      modal.classList.remove('active');
-      modal.setAttribute('aria-hidden', 'true');
-    }
-  
-    // Open from header icon
-    if (trigger) trigger.addEventListener('click', openModal);
-  
-    // Close with X
-    if (closeBtn) closeBtn.addEventListener('click', closeModal);
-  
-    // Close when clicking backdrop
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) closeModal();
-    });
-  
-    // Close on Escape
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
-    });
-  
-    // Optional: prevent empty queries
-    if (form) {
-      form.addEventListener('submit', (e) => {
-        const q = (input?.value || '').trim();
-        if (!q) {
-          e.preventDefault();
-          input?.focus();
-        }
-      });
-    }
+/* ------------------ Search Modal Controls (optional) ------------------ */
+/* Requires: #openSearch, #searchModal, #closeSearch, #global-q, #searchForm */
+(function searchModal(){
+  const trigger = document.getElementById("openSearch");
+  const modal   = document.getElementById("searchModal");
+  if (!modal) return;
+
+  const closeBtn = document.getElementById("closeSearch");
+  const input    = document.getElementById("global-q");
+  const form     = document.getElementById("searchForm");
+
+  function open(e){ e?.preventDefault(); modal.classList.add("active"); modal.setAttribute("aria-hidden","false"); setTimeout(()=>input?.focus(), 50); }
+  function close(){ modal.classList.remove("active"); modal.setAttribute("aria-hidden","true"); }
+
+  trigger?.addEventListener("click", open);
+  closeBtn?.addEventListener("click", close);
+  modal.addEventListener("click", (e)=>{ if (e.target === modal) close(); });
+  window.addEventListener("keydown", (e)=>{ if (e.key === "Escape" && modal.classList.contains("active")) close(); });
+
+  form?.addEventListener("submit", (e)=>{
+    const q = (input?.value || "").trim();
+    if (!q) { e.preventDefault(); input?.focus(); }
   });
-  /* SHOP BY CATEGORY — hover (desktop) / tap (touch) */
-(function(){
-  const host = document.querySelector('.has-megamenu');
-  const btn  = host ? host.querySelector('.catmenu-toggle') : null;
+})();
+
+/* ------------------ Shop by Category (mega) ------------------ */
+/* Desktop: hover via CSS; Touch: tap to toggle.
+   Markup: .has-megamenu > .catmenu-toggle + .mega
+*/
+(function categoryMega(){
+  const host = document.querySelector(".has-megamenu");
+  const btn  = host ? host.querySelector(".catmenu-toggle") : null;
   if (!host || !btn) return;
 
-  // Touch-only devices: tap to open/close
-  const touchOnly = matchMedia('(hover: none)').matches && !matchMedia('(pointer: fine)').matches;
+  const touchOnly = matchMedia("(hover: none)").matches && !matchMedia("(pointer: fine)").matches;
+
   if (touchOnly) {
-    btn.addEventListener('click', (e)=>{
+    btn.addEventListener("click", (e)=>{
       e.preventDefault();
-      host.classList.toggle('open');
-      btn.setAttribute('aria-expanded', host.classList.contains('open') ? 'true' : 'false');
+      host.classList.toggle("open");
+      btn.setAttribute("aria-expanded", host.classList.contains("open") ? "true" : "false");
     });
-    document.addEventListener('click', (e)=>{
+    document.addEventListener("click", (e)=>{
       if (!host.contains(e.target)) {
-        host.classList.remove('open');
-        btn.setAttribute('aria-expanded', 'false');
+        host.classList.remove("open");
+        btn.setAttribute("aria-expanded", "false");
       }
     });
   } else {
-    // On hover devices, CSS :hover handles it
-    host.classList.remove('open');
-    btn.setAttribute('aria-expanded','false');
+    host.classList.remove("open");
+    btn.setAttribute("aria-expanded","false");
   }
 
-  // Optional: if landing on shop-all.html?cat=xxx, preselect that category
-  try{
+  // Optional: pre-select category when landing with ?cat=xxx
+  try {
     const params = new URLSearchParams(location.search);
-    const cat = (params.get('cat')||"").toLowerCase();
-    if (cat && document.getElementById('fCategory')) {
-      const sel = document.getElementById('fCategory');
+    const cat = (params.get("cat") || "").toLowerCase();
+    const sel = document.getElementById("fCategory");
+    if (cat && sel) {
       sel.value = cat;
-      if (typeof paint === 'function'){ window.currentPage = 1; paint(); }
-      history.replaceState({}, '', location.pathname);
+      if (typeof window.paint === "function") { window.currentPage = 1; window.paint(); }
+      history.replaceState({}, "", location.pathname);
     }
-  }catch(e){}
+  } catch {}
+})();
+
+/* ------------------ Body lock with cart drawer (optional) ------------------ */
+/* If your page has the cart drawer, keep scroll lock in sync */
+(function cartDrawerLock(){
+  const drawer = document.getElementById("cdDrawer");
+  if (!drawer) return;
+  const toggleLock = () => document.body.classList.toggle("lock-scroll", drawer.classList.contains("active"));
+  new MutationObserver(toggleLock).observe(drawer, { attributes: true, attributeFilter: ["class"] });
 })();

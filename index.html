@@ -7,16 +7,37 @@
 
 <!-- libs -->
 <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" crossorigin="anonymous"/>
+<!-- Use stable FA 6.x (7.x CDN path can be flaky) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
 
 <!-- your styles -->
 <link rel="stylesheet" href="style.css">
-<!-- cart drawer styles -->
 <link rel="stylesheet" href="cart.css">
-<!-- favorites styles -->
 <link rel="stylesheet" href="wishlist.css">
-<!-- favorites logic (defer = load after HTML) -->
 <script src="wishlist.js" defer></script>
+
+<!-- ===== Set your project base for GitHub Pages =====
+     If deploying at https://username.github.io/Lokal/  -> use /Lokal/
+     If deploying at https://lokal.yourdomain.com/      -> use /
+-->
+<meta name="site-base" content="/Lokal/">
+
+<!-- ===== Image / asset resolver (works local + GH Pages) ===== -->
+<script>
+  (function(){
+    const SITE_BASE = (document.querySelector('meta[name="site-base"]')?.content || "/").replace(/\/+$/, "/");
+    const ORIGIN_BASE = location.origin + SITE_BASE;
+    // Make relative "images/..." paths absolute against the project base
+    window.resolveAsset = function resolveAsset(p){
+      if (!p) return "";
+      if (/^https?:\/\//i.test(p)) return p; // already absolute
+      const cleaned = String(p).replace(/^\/+/, "");
+      const hit = cleaned.match(/(?:^|\/)(images\/.+)$/i);
+      const tail = hit ? hit[1] : cleaned;
+      try { return new URL(tail, ORIGIN_BASE).href; } catch { return p; }
+    };
+  })();
+</script>
 
 <!-- small fixes so labels stay visible + tidy mega menu columns -->
 <style>
@@ -28,45 +49,45 @@
 /* Shop-by-Category: center panel + 2-column fill-down layout */
 .has-megamenu { position: relative; }
 .has-megamenu .mega{
-position: absolute; left: 50%; top: 100%;
-transform: translate(-50%, 12px);
-width: min(860px, 92vw);
-background: #fff; border: 1px solid #e8e3da; border-radius: 14px;
-box-shadow: 0 24px 60px rgba(0,0,0,.12);
-padding: 22px 26px;
-opacity: 0; visibility: hidden;
-transition: opacity .15s, transform .15s, visibility .15s;
-z-index: 1000;
+  position: absolute; left: 50%; top: 100%;
+  transform: translate(-50%, 12px);
+  width: min(860px, 92vw);
+  background: #fff; border: 1px solid #e8e3da; border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(0,0,0,.12);
+  padding: 22px 26px;
+  opacity: 0; visibility: hidden;
+  transition: opacity .15s, transform .15s, visibility .15s;
+  z-index: 1000;
 }
 @media (hover:hover) and (pointer:fine){
-.has-megamenu:hover > .mega{ opacity:1; visibility:visible; transform:translate(-50%, 16px); }
+  .has-megamenu:hover > .mega{ opacity:1; visibility:visible; transform:translate(-50%, 16px); }
 }
 .has-megamenu.open > .mega{ opacity:1; visibility:visible; transform:translate(-50%, 16px); }
 .has-megamenu .mega a{ color:#2b1f1a; text-shadow:none; font-weight:800; text-decoration:none; }
 
 .cat-heading{ margin:0 0 10px; font: 800 0.9rem/1 'Montserrat', system-ui; letter-spacing:.08em; text-transform:uppercase; color:#6d6a33; }
 .cat-list{
-list-style:none; margin:0; padding:0;
-display:grid;
-grid-auto-flow: column; /* fill down first then new column */
-grid-template-rows: repeat(4, auto); /* 4 rows -> 2 columns for 7 items */
-grid-auto-columns: minmax(240px, 1fr);
-gap: 14px 32px;
+  list-style:none; margin:0; padding:0;
+  display:grid;
+  grid-auto-flow: column; /* fill down first then new column */
+  grid-template-rows: repeat(4, auto); /* 4 rows -> 2 columns for 7 items */
+  grid-auto-columns: minmax(240px, 1fr);
+  gap: 14px 32px;
 }
 .cat-list a{
-display:inline-flex; align-items:center; gap:10px;
-padding:10px 12px; border-radius:10px;
+  display:inline-flex; align-items:center; gap:10px;
+  padding:10px 12px; border-radius:10px;
 }
 .cat-list a:hover{ background:#f8f6f2; box-shadow: inset 0 0 0 1px #e8e3da; color:#6d6a33; }
 @media (max-width: 720px){
-.has-megamenu .mega{ width:min(600px,96vw); }
-.cat-list{ grid-template-rows: repeat(7,auto); } /* likely single column */
+  .has-megamenu .mega{ width:min(600px,96vw); }
+  .cat-list{ grid-template-rows: repeat(7,auto); } /* likely single column */
 }
 @media (max-width: 560px){
-.cat-list{ grid-auto-flow: row; grid-template-rows:none; grid-template-columns:1fr; }
+  .cat-list{ grid-auto-flow: row; grid-template-rows:none; grid-template-columns:1fr; }
 }
 
-/* ✅ Let the heart button anchor to each product image */
+/* ❤️ Let the heart button anchor to each product image */
 .product .product-image { position: relative; }
 </style>
 </head>
@@ -74,543 +95,549 @@ padding:10px 12px; border-radius:10px;
 
 <!-- HEADER -->
 <header class="header">
-<div class="logo">
-<!-- click logo to go home -->
-<a href="index.html" aria-label="Home">
-<img src="images/projectlogo.png" alt="logo">
-</a>
-</div>
+  <div class="logo">
+    <a href="index.html" aria-label="Home">
+      <img src="images/projectlogo.png" alt="logo">
+    </a>
+  </div>
 
-<div class="nav-center">
-<!-- Beautiful Glassy Search -->
-<form class="site-search" action="search.html" method="GET">
-<i class="fa-solid fa-magnifying-glass"></i>
-<input type="search" name="q" placeholder="Search products, categories..." autocomplete="off" />
-<button type="submit">Search</button>
-</form>
+  <div class="nav-center">
+    <!-- Beautiful Glassy Search -->
+    <form class="site-search" action="search.html" method="GET">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="search" name="q" placeholder="Search products, categories..." autocomplete="off" />
+      <button type="submit">Search</button>
+    </form>
 
-<!-- Best Picks / Shop All / Shop by Category -->
-<nav class="main-links">
-<ul>
-<li><a href="best-pick/best-picks.html">Best Picks</a></li>
-<li><a href="shop-all.html">Shop All</a></li>
+    <!-- Best Picks / Shop All / Shop by Category -->
+    <nav class="main-links">
+      <ul>
+        <li><a href="best-pick/best-picks.html">Best Picks</a></li>
+        <li><a href="shop-all.html">Shop All</a></li>
 
-<li class="has-megamenu">
-<a href="#" class="catmenu-toggle" aria-expanded="false">
-Shop by Category <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
-</a>
+        <li class="has-megamenu">
+          <a href="#" class="catmenu-toggle" aria-expanded="false">
+            Shop by Category <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+          </a>
 
-<!-- centered mega panel -->
-<div class="mega" id="catMega" role="menu" aria-label="Shop by Category">
-<h3 class="cat-heading">All Categories</h3>
-<ul class="cat-list">
-<li><a href="shop-all.html?cat=flavors"><i class="fa-solid fa-cookie-bite"></i> Flavors</a></li>
-<li><a href="shop-all.html?cat=accessories"><i class="fa-solid fa-gear"></i> Accessories</a></li>
-<li><a href="shop-all.html?cat=bags"><i class="fa-solid fa-bag-shopping"></i> Bags</a></li>
-<li><a href="shop-all.html?cat=clothing"><i class="fa-solid fa-shirt"></i> Clothing</a></li>
-<li><a href="shop-all.html?cat=home"><i class="fa-solid fa-mug-hot"></i> Home</a></li>
-<li><a href="shop-all.html?cat=crafts"><i class="fa-solid fa-scissors"></i> Crafts</a></li>
-<li><a href="shop-all.html?cat=christmas"><i class="fa-solid fa-snowflake"></i> Christmas / Season</a></li>
-</ul>
-</div>
-</li>
+          <!-- centered mega panel -->
+          <div class="mega" id="catMega" role="menu" aria-label="Shop by Category">
+            <h3 class="cat-heading">All Categories</h3>
+            <ul class="cat-list">
+              <li><a href="shop-all.html?cat=flavors"><i class="fa-solid fa-cookie-bite"></i> Flavors</a></li>
+              <li><a href="shop-all.html?cat=accessories"><i class="fa-solid fa-gear"></i> Accessories</a></li>
+              <li><a href="shop-all.html?cat=bags"><i class="fa-solid fa-bag-shopping"></i> Bags</a></li>
+              <li><a href="shop-all.html?cat=clothing"><i class="fa-solid fa-shirt"></i> Clothing</a></li>
+              <li><a href="shop-all.html?cat=home"><i class="fa-solid fa-mug-hot"></i> Home</a></li>
+              <li><a href="shop-all.html?cat=crafts"><i class="fa-solid fa-scissors"></i> Crafts</a></li>
+              <li><a href="shop-all.html?cat=christmas"><i class="fa-solid fa-snowflake"></i> Christmas / Season</a></li>
+            </ul>
+          </div>
+        </li>
 
-</ul>
-</nav>
-</div>
+      </ul>
+    </nav>
+  </div>
 
-<!-- RIGHT ICONS -->
-<nav class="utils">
-<ul class="nav-links">
-<li><a href="login.html" aria-label="Account"><i class="fa-solid fa-user"></i></a></li>
+  <!-- RIGHT ICONS -->
+  <nav class="utils">
+    <ul class="nav-links">
+      <li><a href="login.html" aria-label="Account"><i class="fa-solid fa-user"></i></a></li>
 
-<!-- Cart icon now opens drawer (no navigation) -->
-<li>
-<a href="#" id="openCart" aria-label="Open cart">
-<i class="fa-solid fa-cart-shopping"></i>
-<span class="cart-count">0</span>
-</a>
-</li>
+      <!-- Cart icon now opens drawer (no navigation) -->
+      <li>
+        <a href="#" id="openCart" aria-label="Open cart">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span class="cart-count">0</span>
+        </a>
+      </li>
 
-<!-- Favorites link + counter -->
-<li style="position: relative;">
-<a href="wishlist.html" aria-label="Favorites" id="wishlistLink">
-<i class="fa-regular fa-heart"></i>
-<span class="wishlist-count" id="wishlistCount">0</span>
-</a>
-</li>
-<li><a href="support.html" aria-label="Support"><i class="fa-solid fa-headset"></i></a></li>
-</ul>
-</nav>
+      <!-- Favorites link + counter -->
+      <li style="position: relative;">
+        <a href="wishlist.html" aria-label="Favorites" id="wishlistLink">
+          <i class="fa-regular fa-heart"></i>
+          <span class="wishlist-count" id="wishlistCount">0</span>
+        </a>
+      </li>
+      <li><a href="support.html" aria-label="Support"><i class="fa-solid fa-headset"></i></a></li>
+    </ul>
+  </nav>
 </header>
 
 <!-- BANNER -->
 <section class="banner">
-<div class="banner-slider">
-<div class="slide active">
-<div class="slide-details">
-<h1>Supporting Local, One Purchase at a Time.</h1>
-<p>Discover a wide variety of everyday essentials and unique finds from trusted local sellers. Every purchase you make supports small businesses and strengthens our community.</p>
-<button class="button" onclick="location.href='shop-all.html'">Shop Now</button>
-</div>
-</div>
-<div class="slide">
-<div class="slide-details">
-<h1>Handmade Crafts for Every Occasion.</h1>
-<p>Unique gifts and décor made with love. Each purchase supports artisans in your community.</p>
-<button class="button" onclick="location.href='shop-all.html?cat=crafts'">Explore Crafts</button>
-</div>
-</div>
-<div class="slide">
-<div class="slide-details">
-<h1>Celebrate Christmas with Local Gifts!</h1>
-<p>Find the perfect holiday gifts handcrafted by local artisans. Make this season special while supporting small businesses in your community.</p>
-<button class="button" onclick="location.href='shop-all.html?cat=christmas'">Shop Christmas</button>
-</div>
-</div>
-</div>
+  <div class="banner-slider">
+    <div class="slide active">
+      <div class="slide-details">
+        <h1>Supporting Local, One Purchase at a Time.</h1>
+        <p>Discover a wide variety of everyday essentials and unique finds from trusted local sellers. Every purchase you make supports small businesses and strengthens our community.</p>
+        <button class="button" onclick="location.href='shop-all.html'">Shop Now</button>
+      </div>
+    </div>
+    <div class="slide">
+      <div class="slide-details">
+        <h1>Handmade Crafts for Every Occasion.</h1>
+        <p>Unique gifts and décor made with love. Each purchase supports artisans in your community.</p>
+        <button class="button" onclick="location.href='shop-all.html?cat=crafts'">Explore Crafts</button>
+      </div>
+    </div>
+    <div class="slide">
+      <div class="slide-details">
+        <h1>Celebrate Christmas with Local Gifts!</h1>
+        <p>Find the perfect holiday gifts handcrafted by local artisans. Make this season special while supporting small businesses in your community.</p>
+        <button class="button" onclick="location.href='shop-all.html?cat=christmas'">Shop Christmas</button>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- FEATURED -->
 <section class="featured">
-<div class="featured-box-1">
-<div class="overlay">
-<!-- changed to filtered Shop-All -->
-<button class="button btn" onclick="location.href='shop-all.html?cat=clothing'">Shop Local Clothing</button>
-</div>
-<div class="bg-image">
-<img src="images/filipiniana.png" alt="Clothing">
-</div>
-</div>
+  <div class="featured-box-1">
+    <div class="overlay">
+      <button class="button btn" onclick="location.href='shop-all.html?cat=clothing'">Shop Local Clothing</button>
+    </div>
+    <div class="bg-image">
+      <img src="images/filipiniana.png" alt="Clothing">
+    </div>
+  </div>
 
-<div class="featured-box-2">
-<div class="featured-box-2-box-1">
-<div class="overlay">
-<button class="button btn" onclick="location.href='shop-all.html?cat=crafts'">Shop Local Crafts</button>
-</div>
-<div class="bg-image">
-<img src="images/16.png" alt="Crafts">
-</div>
-</div>
+  <div class="featured-box-2">
+    <div class="featured-box-2-box-1">
+      <div class="overlay">
+        <button class="button btn" onclick="location.href='shop-all.html?cat=crafts'">Shop Local Crafts</button>
+      </div>
+      <div class="bg-image">
+        <img src="images/16.png" alt="Crafts">
+      </div>
+    </div>
 
-<div class="featured-box-2-box-2">
-<div class="overlay">
-<button class="button btn" onclick="location.href='shop-all.html?cat=accessories'">Shop Accessories</button>
-</div>
-<div class="bg-image">
-<img src="images/4p.webp" alt="Accessories">
-</div>
-</div>
+    <div class="featured-box-2-box-2">
+      <div class="overlay">
+        <button class="button btn" onclick="location.href='shop-all.html?cat=accessories'">Shop Accessories</button>
+      </div>
+      <div class="bg-image">
+        <img src="images/4p.webp" alt="Accessories">
+      </div>
+    </div>
 
-<div class="featured-box-2-box-3">
-<div class="overlay">
-<!-- FOOTWEAR -> BAGS (label + link changed) -->
-<button class="button btn" onclick="location.href='shop-all.html?cat=bags'">Shop Bags</button>
-</div>
-<div class="bg-image">
-<!-- you said you’ll change the image to bag later -->
-<img src="images/bags.png" alt="Bags">
-</div>
-</div>
-</div>
+    <div class="featured-box-2-box-3">
+      <div class="overlay">
+        <button class="button btn" onclick="location.href='shop-all.html?cat=bags'">Shop Bags</button>
+      </div>
+      <div class="bg-image">
+        <img src="images/bags.png" alt="Bags">
+      </div>
+    </div>
+  </div>
 
-<div class="featured-box-3">
-<div class="overlay">
-<button class="button btn" onclick="location.href='shop-all.html?cat=flavors'">Shop Local Flavors</button>
-</div>
-<div class="bg-image">
-<img src="images/delicacies.png" alt="Flavors">
-</div>
-</div>
+  <div class="featured-box-3">
+    <div class="overlay">
+      <button class="button btn" onclick="location.href='shop-all.html?cat=flavors'">Shop Local Flavors</button>
+    </div>
+    <div class="bg-image">
+      <img src="images/delicacies.png" alt="Flavors">
+    </div>
+  </div>
 </section>
 
 <!-- PRODUCTS 1 -->
 <section class="products">
-<h1 class="section-title">Top products of the Season</h1>
+  <h1 class="section-title">Top products of the Season</h1>
 
-<!-- Added data- attributes so Add To Cart can read name/price/img/desc -->
-<div class="products-list">
-<div class="product" data-name="Santa Ornament" data-price="₱479.00" data-img="images/main-image.png" data-desc="Festive Santa ornament for your tree.">
-<div class="product-image">
-<div class="main-image"><img src="images/main-image.png" alt="Santa Ornament"></div>
-<div class="effect-image"><img src="images/effect-image.png" alt="Santa Ornament Alt"></div>
-<div class="overlay-image"><button class="button btn">Add To Cart</button></div>
+  <!-- Added data- attributes so Add To Cart can read name/price/img/desc -->
+  <div class="products-list">
+    <div class="product" data-name="Santa Ornament" data-price="₱479.00" data-img="images/main-image.png" data-desc="Festive Santa ornament for your tree.">
+      <div class="product-image">
+        <div class="main-image"><img src="images/main-image.png" alt="Santa Ornament"></div>
+        <div class="effect-image"><img src="images/effect-image.png" alt="Santa Ornament Alt"></div>
+        <div class="overlay-image"><button class="button btn">Add To Cart</button></div>
 
-<!-- ❤️ Favorites heart -->
-<button
-class="wishlist-btn"
-aria-label="Add to favorites"
-title="Add to favorites"
-data-id="santa-ornament"
-data-name="Santa Ornament"
-data-price="₱479.00"
-data-img="images/main-image.png"
-data-desc="Festive Santa ornament for your tree."
-data-url="best-pick/product.html"
-type="button"
->
-<i class="fa-regular fa-heart"></i>
-</button>
-</div>
-<div class="product-details">
-<p class="product-name">Santa Ornament</p>
-<p>₱479.00</p>
-</div>
-</div>
+        <!-- ❤️ Favorites heart -->
+        <button
+          class="wishlist-btn"
+          aria-label="Add to favorites"
+          title="Add to favorites"
+          data-id="santa-ornament"
+          data-name="Santa Ornament"
+          data-price="₱479.00"
+          data-img="images/main-image.png"
+          data-desc="Festive Santa ornament for your tree."
+          data-url="best-pick/product.html"
+          type="button"
+        >
+          <i class="fa-regular fa-heart"></i>
+        </button>
+      </div>
+      <div class="product-details">
+        <p class="product-name">Santa Ornament</p>
+        <p>₱479.00</p>
+      </div>
+    </div>
 
-<div class="product" data-name="Christmas Parol" data-price="₱900.00" data-img="images/main-image2.png" data-desc="Classic parol to brighten your holidays.">
-<div class="product-image">
-<div class="main-image"><img src="images/main-image2.png" alt="Christmas Parol"></div>
-<div class="effect-image"><img src="images/effect-image2.png" alt="Christmas Parol Alt"></div>
-<div class="overlay-image"><button class="button btn">Add To Cart</button></div>
+    <div class="product" data-name="Christmas Parol" data-price="₱900.00" data-img="images/main-image2.png" data-desc="Classic parol to brighten your holidays.">
+      <div class="product-image">
+        <div class="main-image"><img src="images/main-image2.png" alt="Christmas Parol"></div>
+        <div class="effect-image"><img src="images/effect-image2.png" alt="Christmas Parol Alt"></div>
+        <div class="overlay-image"><button class="button btn">Add To Cart</button></div>
 
-<button
-class="wishlist-btn"
-aria-label="Add to favorites"
-title="Add to favorites"
-data-id="christmas-parol"
-data-name="Christmas Parol"
-data-price="₱900.00"
-data-img="images/main-image2.png"
-data-desc="Classic parol to brighten your holidays."
-data-url="best-pick/product.html"
-type="button"
->
-<i class="fa-regular fa-heart"></i>
-</button>
-</div>
-<div class="product-details">
-<p class="product-name">Christmas Parol</p>
-<p>₱900.00</p>
-</div>
-</div>
+        <button
+          class="wishlist-btn"
+          aria-label="Add to favorites"
+          title="Add to favorites"
+          data-id="christmas-parol"
+          data-name="Christmas Parol"
+          data-price="₱900.00"
+          data-img="images/main-image2.png"
+          data-desc="Classic parol to brighten your holidays."
+          data-url="best-pick/product.html"
+          type="button"
+        >
+          <i class="fa-regular fa-heart"></i>
+        </button>
+      </div>
+      <div class="product-details">
+        <p class="product-name">Christmas Parol</p>
+        <p>₱900.00</p>
+      </div>
+    </div>
 
-<div class="product" data-name="Santa Stockings" data-price="₱295.00" data-img="images/main-image3.png" data-desc="Cozy stockings for gifts and treats.">
-<div class="product-image">
-<div class="main-image"><img src="images/main-image3.png" alt="Santa Stockings"></div>
-<div class="effect-image"><img src="images/effect-image3.png" alt="Santa Stockings Alt"></div>
-<div class="overlay-image"><button class="button btn">Add To Cart</button></div>
+    <div class="product" data-name="Santa Stockings" data-price="₱295.00" data-img="images/main-image3.png" data-desc="Cozy stockings for gifts and treats.">
+      <div class="product-image">
+        <div class="main-image"><img src="images/main-image3.png" alt="Santa Stockings"></div>
+        <div class="effect-image"><img src="images/effect-image3.png" alt="Santa Stockings Alt"></div>
+        <div class="overlay-image"><button class="button btn">Add To Cart</button></div>
 
-<button
-class="wishlist-btn"
-aria-label="Add to favorites"
-title="Add to favorites"
-data-id="santa-stockings"
-data-name="Santa Stockings"
-data-price="₱295.00"
-data-img="images/main-image3.png"
-data-desc="Cozy stockings for gifts and treats."
-data-url="best-pick/product.html"
-type="button"
->
-<i class="fa-regular fa-heart"></i>
-</button>
-</div>
-<div class="product-details">
-<p class="product-name">Santa Stockings</p>
-<p>₱295.00</p>
-</div>
-</div>
+        <button
+          class="wishlist-btn"
+          aria-label="Add to favorites"
+          title="Add to favorites"
+          data-id="santa-stockings"
+          data-name="Santa Stockings"
+          data-price="₱295.00"
+          data-img="images/main-image3.png"
+          data-desc="Cozy stockings for gifts and treats."
+          data-url="best-pick/product.html"
+          type="button"
+        >
+          <i class="fa-regular fa-heart"></i>
+        </button>
+      </div>
+      <div class="product-details">
+        <p class="product-name">Santa Stockings</p>
+        <p>₱295.00</p>
+      </div>
+    </div>
 
-<div class="product" data-name="Queso de Bola" data-price="₱300.00" data-img="images/main-image4.png" data-desc="Holiday favorite cheese ball.">
-<div class="product-image">
-<div class="main-image"><img src="images/main-image4.png" alt="Queso de Bola"></div>
-<div class="effect-image"><img src="images/effect-image4.png" alt="Queso de Bola Alt"></div>
-<div class="overlay-image"><button class="button btn">Add To Cart</button></div>
+    <div class="product" data-name="Queso de Bola" data-price="₱300.00" data-img="images/main-image4.png" data-desc="Holiday favorite cheese ball.">
+      <div class="product-image">
+        <div class="main-image"><img src="images/main-image4.png" alt="Queso de Bola"></div>
+        <div class="effect-image"><img src="images/effect-image4.png" alt="Queso de Bola Alt"></div>
+        <div class="overlay-image"><button class="button btn">Add To Cart</button></div>
 
-<button
-class="wishlist-btn"
-aria-label="Add to favorites"
-title="Add to favorites"
-data-id="queso-de-bola"
-data-name="Queso de Bola"
-data-price="₱300.00"
-data-img="images/main-image4.png"
-data-desc="Holiday favorite cheese ball."
-data-url="best-pick/product.html"
-type="button"
->
-<i class="fa-regular fa-heart"></i>
-</button>
-</div>
-<div class="product-details">
-<p class="product-name">Queso de Bola</p>
-<p>₱300.00</p>
-</div>
-</div>
-</div>
+        <button
+          class="wishlist-btn"
+          aria-label="Add to favorites"
+          title="Add to favorites"
+          data-id="queso-de-bola"
+          data-name="Queso de Bola"
+          data-price="₱300.00"
+          data-img="images/main-image4.png"
+          data-desc="Holiday favorite cheese ball."
+          data-url="best-pick/product.html"
+          type="button"
+        >
+          <i class="fa-regular fa-heart"></i>
+        </button>
+      </div>
+      <div class="product-details">
+        <p class="product-name">Queso de Bola</p>
+        <p>₱300.00</p>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- CATEGORIES -->
 <section class="categories">
-<div class="category" data-aos="fade-up" data-aos-delay="200">
-<div class="cat-img"><img src="images/category1.png" alt="Cebu's Best"></div>
-<div class="product-details"><p class="product-name">Cebu's Best</p></div>
-</div>
-<div class="category" data-aos="fade-up" data-aos-delay="200">
-<div class="cat-img"><img src="images/category2.png" alt="Cavite's Best"></div>
-<div class="product-details"><p class="product-name">Cavite's Best</p></div>
-</div>
-<div class="category">
-<div class="cat-img" data-aos="fade-up" data-aos-delay="200"><img src="images/category3.png" alt="Laguna's Best"></div>
-<div class="product-details"><p class="product-name">Laguna's Best</p></div>
-</div>
+  <div class="category" data-aos="fade-up" data-aos-delay="200">
+    <div class="cat-img"><img src="images/category1.png" alt="Cebu's Best"></div>
+    <div class="product-details"><p class="product-name">Cebu's Best</p></div>
+  </div>
+  <div class="category" data-aos="fade-up" data-aos-delay="200">
+    <div class="cat-img"><img src="images/category2.png" alt="Cavite's Best"></div>
+    <div class="product-details"><p class="product-name">Cavite's Best</p></div>
+  </div>
+  <div class="category">
+    <div class="cat-img" data-aos="fade-up" data-aos-delay="200"><img src="images/category3.png" alt="Laguna's Best"></div>
+    <div class="product-details"><p class="product-name">Laguna's Best</p></div>
+  </div>
 </section>
 
 <!-- PRODUCTS 2 -->
 <section class="products">
-<h1 class="section-title">Heritage Inspired Home</h1>
-<div class="products-list">
-<div class="product" data-name="Picture Frame" data-price="₱1,599.00" data-img="images/main2-image1.png" data-desc="Elegant wood picture frame.">
-<div class="product-image">
-<div class="main-image"><img src="images/main2-image1.png" alt="Picture Frame"></div>
-<div class="effect-image"><img src="images/effect2-image1.png" alt="Picture Frame Alt"></div>
-<div class="overlay-image"><button class="button btn">Add To Cart</button></div>
+  <h1 class="section-title">Heritage Inspired Home</h1>
+  <div class="products-list">
+    <div class="product" data-name="Picture Frame" data-price="₱1,599.00" data-img="images/main2-image1.png" data-desc="Elegant wood picture frame.">
+      <div class="product-image">
+        <div class="main-image"><img src="images/main2-image1.png" alt="Picture Frame"></div>
+        <div class="effect-image"><img src="images/effect2-image1.png" alt="Picture Frame Alt"></div>
+        <div class="overlay-image"><button class="button btn">Add To Cart</button></div>
 
-<button
-class="wishlist-btn"
-aria-label="Add to favorites"
-title="Add to favorites"
-data-id="picture-frame"
-data-name="Picture Frame"
-data-price="₱1,599.00"
-data-img="images/main2-image1.png"
-data-desc="Elegant wood picture frame."
-data-url="best-pick/product.html"
-type="button"
->
-<i class="fa-regular fa-heart"></i>
-</button>
-</div>
-<div class="product-details"><p class="product-name">Picture Frame</p><p>₱1,599.00</p></div>
-</div>
+        <button
+          class="wishlist-btn"
+          aria-label="Add to favorites"
+          title="Add to favorites"
+          data-id="picture-frame"
+          data-name="Picture Frame"
+          data-price="₱1,599.00"
+          data-img="images/main2-image1.png"
+          data-desc="Elegant wood picture frame."
+          data-url="best-pick/product.html"
+          type="button"
+        >
+          <i class="fa-regular fa-heart"></i>
+        </button>
+      </div>
+      <div class="product-details"><p class="product-name">Picture Frame</p><p>₱1,599.00</p></div>
+    </div>
 
-<div class="product" data-name="Coco Planter" data-price="₱1,500.00" data-img="images/main2-image2.png" data-desc="Sustainable coconut shell planter.">
-<div class="product-image">
-<div class="main-image"><img src="images/main2-image2.png" alt="Coco Planter"></div>
-<div class="effect-image"><img src="images/effect2-image2.png" alt="Coco Planter Alt"></div>
-<div class="overlay-image"><button class="button btn">Add To Cart</button></div>
+    <div class="product" data-name="Coco Planter" data-price="₱1,500.00" data-img="images/main2-image2.png" data-desc="Sustainable coconut shell planter.">
+      <div class="product-image">
+        <div class="main-image"><img src="images/main2-image2.png" alt="Coco Planter"></div>
+        <div class="effect-image"><img src="images/effect2-image2.png" alt="Coco Planter Alt"></div>
+        <div class="overlay-image"><button class="button btn">Add To Cart</button></div>
 
-<button
-class="wishlist-btn"
-aria-label="Add to favorites"
-title="Add to favorites"
-data-id="coco-planter"
-data-name="Coco Planter"
-data-price="₱1,500.00"
-data-img="images/main2-image2.png"
-data-desc="Sustainable coconut shell planter."
-data-url="best-pick/product.html"
-type="button"
->
-<i class="fa-regular fa-heart"></i>
-</button>
-</div>
-<div class="product-details"><p class="product-name">Coco Planter</p><p>₱1,500.00</p></div>
-</div>
+        <button
+          class="wishlist-btn"
+          aria-label="Add to favorites"
+          title="Add to favorites"
+          data-id="coco-planter"
+          data-name="Coco Planter"
+          data-price="₱1,500.00"
+          data-img="images/main2-image2.png"
+          data-desc="Sustainable coconut shell planter."
+          data-url="best-pick/product.html"
+          type="button"
+        >
+          <i class="fa-regular fa-heart"></i>
+        </button>
+      </div>
+      <div class="product-details"><p class="product-name">Coco Planter</p><p>₱1,500.00</p></div>
+    </div>
 
-<div class="product" data-name="Picnic Basket" data-price="₱2,000.00" data-img="images/main2-image3.png" data-desc="Handwoven picnic basket.">
-<div class="product-image">
-<div class="main-image"><img src="images/main2-image3.png" alt="Picnic Basket"></div>
-<div class="effect-image"><img src="images/effect2-image3.png" alt="Picnic Basket Alt"></div>
-<div class="overlay-image"><button class="button btn">Add To Cart</button></div>
+    <div class="product" data-name="Picnic Basket" data-price="₱2,000.00" data-img="images/main2-image3.png" data-desc="Handwoven picnic basket.">
+      <div class="product-image">
+        <div class="main-image"><img src="images/main2-image3.png" alt="Picnic Basket"></div>
+        <div class="effect-image"><img src="images/effect2-image3.png" alt="Picnic Basket Alt"></div>
+        <div class="overlay-image"><button class="button btn">Add To Cart</button></div>
 
-<button
-class="wishlist-btn"
-aria-label="Add to favorites"
-title="Add to favorites"
-data-id="picnic-basket"
-data-name="Picnic Basket"
-data-price="₱2,000.00"
-data-img="images/main2-image3.png"
-data-desc="Handwoven picnic basket."
-data-url="best-pick/product.html"
-type="button"
->
-<i class="fa-regular fa-heart"></i>
-</button>
-</div>
-<div class="product-details"><p class="product-name">Picnic Basket</p><p>₱2,000.00</p></div>
-</div>
+        <button
+          class="wishlist-btn"
+          aria-label="Add to favorites"
+          title="Add to favorites"
+          data-id="picnic-basket"
+          data-name="Picnic Basket"
+          data-price="₱2,000.00"
+          data-img="images/main2-image3.png"
+          data-desc="Handwoven picnic basket."
+          data-url="best-pick/product.html"
+          type="button"
+        >
+          <i class="fa-regular fa-heart"></i>
+        </button>
+      </div>
+      <div class="product-details"><p class="product-name">Picnic Basket</p><p>₱2,000.00</p></div>
+    </div>
 
-<div class="product" data-name="Wooden Cup" data-price="₱499.00" data-img="images/main2-image4.png" data-desc="Minimalist wooden cup.">
-<div class="product-image">
-<div class="main-image"><img src="images/main2-image4.png" alt="Wooden Cup"></div>
-<div class="effect-image"><img src="images/effect2-image4.png" alt="Wooden Cup Alt"></div>
-<div class="overlay-image"><button class="button btn">Add To Cart</button></div>
+    <div class="product" data-name="Wooden Cup" data-price="₱499.00" data-img="images/main2-image4.png" data-desc="Minimalist wooden cup.">
+      <div class="product-image">
+        <div class="main-image"><img src="images/main2-image4.png" alt="Wooden Cup"></div>
+        <div class="effect-image"><img src="images/effect2-image4.png" alt="Wooden Cup Alt"></div>
+        <div class="overlay-image"><button class="button btn">Add To Cart</button></div>
 
-<button
-class="wishlist-btn"
-aria-label="Add to favorites"
-title="Add to favorites"
-data-id="wooden-cup"
-data-name="Wooden Cup"
-data-price="₱499.00"
-data-img="images/main2-image4.png"
-data-desc="Minimalist wooden cup."
-data-url="best-pick/product.html"
-type="button"
->
-<i class="fa-regular fa-heart"></i>
-</button>
-</div>
-<div class="product-details"><p class="product-name">Wooden Cup</p><p>₱499.00</p></div>
-</div>
-</div>
+        <button
+          class="wishlist-btn"
+          aria-label="Add to favorites"
+          title="Add to favorites"
+          data-id="wooden-cup"
+          data-name="Wooden Cup"
+          data-price="₱499.00"
+          data-img="images/main2-image4.png"
+          data-desc="Minimalist wooden cup."
+          data-url="best-pick/product.html"
+          type="button"
+        >
+          <i class="fa-regular fa-heart"></i>
+        </button>
+      </div>
+      <div class="product-details"><p class="product-name">Wooden Cup</p><p>₱499.00</p></div>
+    </div>
+  </div>
 </section>
 
 <!-- INSTAGRAM -->
 <section class="insta">
-<h1 class="section-title">Shop Now</h1>
-<div class="posts">
-<div class="post-image" data-aos="zoom-in" data-aos-delay="200"><img src="images/insta1.png" alt="insta"></div>
-<div class="post-image" data-aos="zoom-in" data-aos-delay="200"><img src="images/insta2.png" alt="insta"></div>
-<div class="post-image" data-aos="zoom-in" data-aos-delay="200"><img src="images/insta3.png" alt="insta"></div>
-<div class="post-image" data-aos="zoom-in" data-aos-delay="200"><img src="images/insta4.png" alt="insta"></div>
-<div class="post-image" data-aos="zoom-in" data-aos-delay="200"><img src="images/insta5.png" alt="insta"></div>
-<div class="post-image" data-aos="zoom-in" data-aos-delay="200"><img src="images/insta6.png" alt="insta"></div>
-</div>
+  <h1 class="section-title">Shop Now</h1>
+  <div class="posts">
+    <div class="post-image" data-aos="zoom-in" data-aos-delay="200"><img src="images/insta1.png" alt="insta"></div>
+    <div class="post-image" data-aos="zoom-in" data-aos-delay="200"><img src="images/insta2.png" alt="insta"></div>
+    <div class="post-image" data-aos="zoom-in" data-aos-delay="200"><img src="images/insta3.png" alt="insta"></div>
+    <div class="post-image" data-aos="zoom-in" data-aos-delay="200"><img src="images/insta4.png" alt="insta"></div>
+    <div class="post-image" data-aos="zoom-in" data-aos-delay="200"><img src="images/insta5.png" alt="insta"></div>
+    <div class="post-image" data-aos="zoom-in" data-aos-delay="200"><img src="images/insta6.png" alt="insta"></div>
+  </div>
 </section>
 
 <!-- FOOTER -->
 <footer class="footer">
-<div class="footer-section">
-<h1>Contact Us</h1>
-<ul class="footer-list">
-<li>lokal@info.com</li>
-<li>lokal@admin.com</li>
-<li>Manila Philippines</li>
-<li class="border-list"></li>
-<li class="socials">
-<i class="fa-brands fa-square-instagram"></i>
-<i class="fa-brands fa-square-facebook"></i>
-<i class="fa-brands fa-tiktok"></i>
-</li>
-</ul>
-</div>
-<div class="footer-section">
-<h1>Quick Links</h1>
-<ul class="footer-list">
-<li><a href="index.html">Home</a></li>
-<li><a href="shop-all.html">Shop All</a></li>
-<li><a href="about.html">About Us</a></li>
-<li><a href="terms.html">Terms & Conditions</a></li>
-</ul>
-</div>
-<div class="footer-section">
-<h1>Subscribe to Newsletter</h1>
-<ul class="footer-list">
-<li>A local marketplace is a community hub where people buy, sell, or trade goods and services within their area.</li>
-<li class="sub">
-<input type="text" placeholder="Your email">
-<button class="button">Subscribe</button>
-</li>
-</ul>
-</div>
+  <div class="footer-section">
+    <h1>Contact Us</h1>
+    <ul class="footer-list">
+      <li>lokal@info.com</li>
+      <li>lokal@admin.com</li>
+      <li>Manila Philippines</li>
+      <li class="border-list"></li>
+      <li class="socials">
+        <i class="fa-brands fa-square-instagram"></i>
+        <i class="fa-brands fa-square-facebook"></i>
+        <i class="fa-brands fa-tiktok"></i>
+      </li>
+    </ul>
+  </div>
+  <div class="footer-section">
+    <h1>Quick Links</h1>
+    <ul class="footer-list">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop-all.html">Shop All</a></li>
+      <li><a href="about.html">About Us</a></li>
+      <li><a href="terms.html">Terms & Conditions</a></li>
+    </ul>
+  </div>
+  <div class="footer-section">
+    <h1>Subscribe to Newsletter</h1>
+    <ul class="footer-list">
+      <li>A local marketplace is a community hub where people buy, sell, or trade goods and services within their area.</li>
+      <li class="sub">
+        <input type="text" placeholder="Your email">
+        <button class="button">Subscribe</button>
+      </li>
+    </ul>
+  </div>
 </footer>
 
 <!-- CART DRAWER (overlay + panel) -->
 <div class="cd-overlay" id="cdOverlay" aria-hidden="true"></div>
 
 <aside class="cd-drawer" id="cdDrawer" aria-labelledby="cdTitle" aria-hidden="true" role="dialog">
-<header class="cd-header">
-<h2 id="cdTitle">Cart</h2>
-<button class="cd-close" id="cdClose" aria-label="Close cart">&times;</button>
-</header>
+  <header class="cd-header">
+    <h2 id="cdTitle">Cart</h2>
+    <button class="cd-close" id="cdClose" aria-label="Close cart">&times;</button>
+  </header>
 
-<div class="cd-body">
-<div class="cd-items" id="cdItems"></div>
+  <div class="cd-body">
+    <div class="cd-items" id="cdItems"></div>
 
-<div class="cd-summary">
-<div class="cd-row">
-<span>Subtotal</span>
-<strong id="cdSubtotal">₱0.00</strong>
-</div>
-<p class="cd-note">Shipping, taxes, and discount codes calculated at checkout.</p>
+    <div class="cd-summary">
+      <div class="cd-row">
+        <span>Subtotal</span>
+        <strong id="cdSubtotal">₱0.00</strong>
+      </div>
+      <p class="cd-note">Shipping, taxes, and discount codes calculated at checkout.</p>
 
-<label class="cd-terms">
-<input type="checkbox" id="cdAgree">
-I agree with the <a href="terms.html" target="_blank" rel="noopener">terms and conditions</a>
-</label>
+      <label class="cd-terms">
+        <input type="checkbox" id="cdAgree">
+        I agree with the <a href="terms.html" target="_blank" rel="noopener">terms and conditions</a>
+      </label>
 
-<button class="cd-checkout" id="cdCheckout" disabled>Check Out</button>
-</div>
-</div>
+      <button class="cd-checkout" id="cdCheckout" disabled>Check Out</button>
+    </div>
+  </div>
 </aside>
 
 <!-- SCRIPTS -->
 <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
 <script>AOS.init();</script>
 
-<!-- your site scripts -->
 <script src="lokal.js"></script>
-
-<!-- cart drawer logic -->
-<meta name="site-base" content="/">
 <script src="cart.js" defer></script>
 
-<!-- Page helpers: mega-menu on touch + Add To Cart for homepage cards + cart badge -->
+<!-- Page helpers: mega-menu on touch + Add To Cart for homepage cards + cart badge + data-img absolutizer -->
 <script>
 // --- Mega menu: tap to open on touch-only devices
 (function(){
-const host = document.querySelector('.has-megamenu');
-const btn = host ? host.querySelector('.catmenu-toggle') : null;
-if (!host || !btn) return;
+  const host = document.querySelector('.has-megamenu');
+  const btn = host ? host.querySelector('.catmenu-toggle') : null;
+  if (!host || !btn) return;
 
-const touchOnly = matchMedia('(hover: none)').matches && !matchMedia('(pointer: fine)').matches;
-if (touchOnly) {
-btn.addEventListener('click', (e)=>{
-e.preventDefault();
-host.classList.toggle('open');
-btn.setAttribute('aria-expanded', host.classList.contains('open') ? 'true' : 'false');
-});
-document.addEventListener('click', (e)=>{
-if (!host.contains(e.target)) {
-host.classList.remove('open');
-btn.setAttribute('aria-expanded', 'false');
-}
-});
-} else {
-// hover devices use CSS :hover
-host.classList.remove('open');
-btn.setAttribute('aria-expanded','false');
-}
+  const touchOnly = matchMedia('(hover: none)').matches && !matchMedia('(pointer: fine)').matches;
+  if (touchOnly) {
+    btn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      host.classList.toggle('open');
+      btn.setAttribute('aria-expanded', host.classList.contains('open') ? 'true' : 'false');
+    });
+    document.addEventListener('click', (e)=>{
+      if (!host.contains(e.target)) {
+        host.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  } else {
+    host.classList.remove('open');
+    btn.setAttribute('aria-expanded','false');
+  }
+})();
+
+// --- Ensure any data-img (and wishlist heart img) are absolute for GH Pages
+(function(){
+  function absAttr(el, attr){
+    const v = el.getAttribute(attr);
+    if (v) el.setAttribute(attr, window.resolveAsset ? resolveAsset(v) : v);
+  }
+  document.querySelectorAll('.product').forEach(card=>{
+    absAttr(card,'data-img');
+    const heart = card.querySelector('.wishlist-btn');
+    if (heart) absAttr(heart,'data-img');
+  });
 })();
 
 // --- Cart helpers for homepage cards
 (function(){
-function updateCartCount() {
-const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-const total = cart.reduce((s,i)=> s + (i.quantity||0), 0);
-const badge = document.querySelector(".cart-count");
-if (badge) badge.textContent = total;
-}
-function addToCart(item){
-const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-const idx = cart.findIndex(p => p.name === item.name);
-if (idx > -1) cart[idx].quantity += item.quantity;
-else cart.push(item);
-localStorage.setItem("cart", JSON.stringify(cart));
-updateCartCount();
-if (typeof window.openCartDrawer === "function") window.openCartDrawer();
-}
+  function updateCartCount() {
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    const total = cart.reduce((s,i)=> s + (i.quantity||0), 0);
+    const badge = document.querySelector(".cart-count");
+    if (badge) badge.textContent = total;
+  }
+  function addToCart(item){
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    const idx = cart.findIndex(p => p.name === item.name);
+    if (idx > -1) cart[idx].quantity += item.quantity;
+    else cart.push(item);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    updateCartCount();
+    if (typeof window.openCartDrawer === "function") window.openCartDrawer();
+  }
 
-// Delegate all homepage product "Add To Cart" buttons
-document.addEventListener("click", (e)=>{
-const btn = e.target.closest(".overlay-image .button");
-if (!btn) return;
-const card = btn.closest(".product");
-if (!card) return;
+  // Delegate all homepage product "Add To Cart" buttons
+  document.addEventListener("click", (e)=>{
+    const btn = e.target.closest(".overlay-image .button");
+    if (!btn) return;
+    const card = btn.closest(".product");
+    if (!card) return;
 
-const name = card.dataset.name || card.querySelector(".product-name")?.textContent?.trim() || "Product";
-const price = card.dataset.price || card.querySelector(".product-details p:last-child")?.textContent?.trim() || "₱0";
-const img = card.dataset.img || card.querySelector(".main-image img")?.src || "";
-const desc = card.dataset.desc || "";
+    const name = card.dataset.name || card.querySelector(".product-name")?.textContent?.trim() || "Product";
+    const price = card.dataset.price || card.querySelector(".product-details p:last-child")?.textContent?.trim() || "₱0";
+    // resolve image to absolute so it never breaks on GH Pages
+    const imgRel = card.dataset.img || card.querySelector(".main-image img")?.getAttribute("src") || "";
+    const img = window.resolveAsset ? resolveAsset(imgRel) : imgRel;
+    const desc = card.dataset.desc || "";
 
-addToCart({ name, price, img, desc, quantity: 1 });
-});
+    addToCart({ name, price, img, desc, quantity: 1 });
+  });
 
-document.addEventListener("DOMContentLoaded", updateCartCount);
+  document.addEventListener("DOMContentLoaded", updateCartCount);
 })();
 </script>
 </body>

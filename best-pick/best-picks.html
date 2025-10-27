@@ -9,13 +9,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
 
   <!-- Site / Cart / Wishlist styles (paths are relative to /best-pick/) -->
-  <meta name="site-base" content="/">
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../cart.css">
   <link rel="stylesheet" href="../wishlist.css">
   <script src="../wishlist.js" defer></script>
-
-  
 
   <!-- Page-only styles (Best Picks grid + Quick View) -->
   <style>
@@ -51,7 +48,7 @@
     }
     .best-product:hover .quick-view{ opacity:.96; pointer-events:auto; }
 
-    /* Place the heart on each card (wishlist.css covers base look) */
+    /* Heart button (wishlist.css provides base look) */
     .best-product .wishlist-btn{
       position:absolute; right:10px; top:10px; z-index:2;
     }
@@ -278,8 +275,8 @@
 
   <!-- PAGE SCRIPTS -->
   <script>
-    /* ================= Helpers ================= */
-    // Always convert relative -> absolute; this keeps cart images correct from subfolders
+    /* ============== Helpers ============== */
+    // Make all asset paths absolute so cart/wishlist images remain correct from subfolders
     const toAbs = (p) => { try { return new URL(p, location.href).href; } catch { return p; } };
 
     const PRODUCT_PAGE = 'product.html';
@@ -305,57 +302,46 @@
       location.href = PRODUCT_PAGE;
     }
 
-    function addToCart(product){
-      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-      const idx = cart.findIndex(i => i.baseName === product.baseName && i.size === product.size);
-      const item = { ...product, img: toAbs(product.img) }; // ensure absolute image is saved
-      if (idx > -1){ cart[idx].quantity += item.quantity; }
-      else { cart.push(item); }
-      localStorage.setItem('cart', JSON.stringify(cart));
-      if (typeof window.openCartDrawer === 'function') window.openCartDrawer();
-    }
-
-    /* ================= Demo Data ================= */
+    /* ============== Demo Data (20 items) ============== */
     const productImages = [
       "../images/flavors/flavors1.png","../images/flavors/flavors2.png","../images/flavors/flavors5.png","../images/flavors/flavors6.png","../images/crafts/crafts1.png",
-      "../images/clothing/clothing1.png","../images/bags/bag1.png","../images/accessories/accessories1.png","../images/accessories/accessories2.png","../images/clothing/clothing2.png",
-      "../images/accessories/accessories3.png","../images/accessories/accessories4.png","../images/flavors/flavors7.png","../images/flavors/flavors8.png","../images/flavors/flavors9.png",
+      "../images/clothing/clothing1.png","../images/bags/bag1.png","../images/accessories/accessories3.png","../images/accessories/accessories4.png","../images/clothing/clothing2.png",
+      "../images/accessories/accessories9.png","../images/accessories/accessories10.png","../images/flavors/flavors7.png","../images/flavors/flavors8.png","../images/flavors/flavors9.png",
       "../images/flavors/flavors10.png","../images/home/home1.png","../images/home/home2.png","../images/home/home3.png","../images/home/home4.png"
     ];
     const productNames = [
       "Shamrock Otap","Shamrock Rosquillos","Mango Flavorful Candy","7D Dried Mangoes Dark Chocolate","Model Jeepney",
-      "Bolero","Bayong Bag","Habing Maragondon Face Mask","Bucket Hat with PH Embroidery","Men's Cocoon Fully Callado Barong",
-      "Firebend 02 Bamboo Shades","Sunglasses Cork Case","Davana Cassava Chips Barbeque","Auro Plant-based Chocolates","Pure Benguet Honey",
+      "Bolero","Bayong Bag","Firebend 02 Bamboo Shades","Sunglasses Cork Case","Men's Cocoon Fully Callado Barong",
+      "Straw Headband Sunvisor","Flat Head Hat","Davana Cassava Chips Barbeque","Auro Plant-based Chocolates","Pure Benguet Honey",
       "Chocolea Choco Drink","Handwoven Bath Towels","Napkin Ring Floral","Mother of Pearl Utility Dish","Atin Reed Diffuser"
     ];
     const productPrices = [
       "₱120","₱120","₱100","₱170","₱200",
-      "₱2,400","₱1,600","₱350","₱250","₱10,000",
-      "₱4,000","₱600","₱120","₱110","₱400",
+      "₱2,400","₱1,600","₱4,000","₱600","₱10,000",
+      "₱250","₱300","₱120","₱110","₱400",
       "₱350","₱1,000","₱800","₱2,000","₱900"
     ];
     const productDescriptions = [
-      "Made from shamrock fresh eggs and flour folded into delicate layers.",
-      "Iconic biscuits from Cebu with crisp, buttery goodness.","Chewy treat with sweet natural mango taste.","7D dried mangoes coated in rich dark chocolate.","The iconic King of the Road for your collection!",
-      "Handmade Bolero from Cavite — skill and artistry.","Locally made Bayong Bag that blends culture and practicality.","First local handwoven mask meeting global standards.","Foldable wide brim hat you can easily take with you.","Formal barong with intricate cutwork embroidery.",
-      "Handcrafted bamboo frame with polarized lens.","Fold-flat sunglass case made of cork.","High-quality cassava chips.","Fiesta-inspired chocolate collection.","Locally produced pure Benguet honey.",
-      "Single-origin cocoa drink mix infused with coconut sugar.","Made of handwoven fabric from polyester yarn.","Table décor / party accessory.","Elegant multi-purpose Mother of Pearl utility dish.","Marine + jasmine + woody notes; tropical tranquility."
+      "Delicate layered pastry from Cebu.","Iconic buttery biscuits from Cebu.","Chewy candy with ripe mango flavor.","Premium dried mangoes dipped in rich dark chocolate.","Miniature Jeepney—handcrafted.",
+      "Elegant handmade bolero (Cavite).","Sustainable woven bayong bag.","Polarized bamboo sunglasses.","Fold-flat cork eyewear case.","Cocoon barong with callado embroidery.",
+      "Breathable, foldable sunvisor.","Packable wide-brim hat.","Crunchy BBQ cassava chips.","Fiesta-inspired plant-based chocolates.","Wildflower honey from Benguet.",
+      "Single-origin cacao drink mix.","Soft, absorbent handwoven towels.","Decorative floral napkin ring.","Shell-inlay multi-purpose dish.","Marine, jasmine & woody notes."
     ];
-    const productRatings = [4.5,4.2,4.0,4.7,4.6,4.8,4.3,4.1,4.0,4.9,4.2,4.4,4.0,4.5,4.6,4.3,4.1,4.0,4.2,4.4];
+    const productRatings = [4.5,4.2,4.0,4.7,4.6,4.8,4.3,4.6,4.4,4.9,4.4,4.3,4.2,4.5,4.6,4.3,4.1,4.0,4.2,4.4];
     const productReviews = new Array(productNames.length).fill(3);
     const productGalleries = [
-      ["../images/flavors/flavors1.png","../images/flavors/flavors1a.png","../images/flavors/flavors1b.png","../images/flavors/flavors1c.png"],
+      ["../images/flavors/flavors1.png","../images/flavors/flavors1a.png","../images/flavors/flavors1b.png"],
       ["../images/flavors/flavors2.png","../images/flavors/flavors2a.png"],
-      ["../images/flavors/flavors5.png","../images/flavors/flavors5a.png","../images/flavors/flavors5b.png"],
+      ["../images/flavors/flavors5.png","../images/flavors/flavors5a.png"],
       ["../images/flavors/flavors6.png","../images/flavors/flavors6a.png","../images/flavors/flavors6b.png"],
       ["../images/crafts/crafts1.png","../images/crafts/crafts1a.png","../images/crafts/crafts1b.png"],
       ["../images/clothing/clothing1.png"],
       ["../images/bags/bag1.png","../images/bags/bag1a.png","../images/bags/bag1b.png"],
-      ["../images/accessories/accessories1.png","../images/accessories/accessories1a.png"],
-      ["../images/accessories/accessories2.png","../images/accessories/accessories2a.png"],
-      ["../images/clothing/clothing2.png","../images/clothing/clothing2a.png","../images/clothing/clothing2b.png","../images/clothing/clothing2c.png"],
       ["../images/accessories/accessories3.png","../images/accessories/accessories3a.png"],
       ["../images/accessories/accessories4.png","../images/accessories/accessories4a.png"],
+      ["../images/clothing/clothing2.png","../images/clothing/clothing2a.png","../images/clothing/clothing2b.png","../images/clothing/clothing2c.png"],
+      ["../images/accessories/accessories9.png","../images/accessories/accessories9a.png","../images/accessories/accessories9b.png"],
+      ["../images/accessories/accessories10.png","../images/accessories/accessories10a.png","../images/accessories/accessories10b.png"],
       ["../images/flavors/flavors7.png"],
       ["../images/flavors/flavors8.png","../images/flavors/flavors8a.png","../images/flavors/flavors8b.png"],
       ["../images/flavors/flavors9.png","../images/flavors/flavors9a.png"],
@@ -365,32 +351,30 @@
       ["../images/home/home3.png","../images/home/home3a.png"],
       ["../images/home/home4.png","../images/home/home4a.png","../images/home/home4b.png"]
     ];
-
-    /* ✅ Bullets/features (ADDED) */
     const productBullets = [
-      ["Delicately layered pastry","Made with fresh eggs","Cebu’s favorite snack"],
-      ["Crisp buttery rings","Iconic Cebu pasalubong","Perfect with coffee"],
-      ["Tropical mango flavor","Chewy texture","Great for kids"],
-      ["Premium mangoes","Dark chocolate coated","Sweet and tart balance"],
-      ["Handcrafted metal","Made in the Philippines","Perfect souvenir"],
+      ["Delicately layered pastry","Cebu favorite","Perfect pasalubong"],
+      ["Crisp buttery rings","Iconic Cebu treat","Great with coffee"],
+      ["Tropical mango flavor","Chewy texture","Kid-friendly snack"],
+      ["Premium mangoes","Dark chocolate coat","Sweet–tart balance"],
+      ["Handcrafted metal","Made in PH","Classic souvenir"],
       ["Elegant handmade bolero","Comfortable fabric","Locally crafted"],
-      ["Sustainable materials","Spacious and durable","Modern Filipino design"],
-      ["Locally woven","Breathable and reusable","Stylish protection"],
-      ["Wide brim","Adjustable fit","PH embroidery detail"],
-      ["Classic barong style","Callado embroidery","Handmade with care"],
-      ["Bamboo frame","Polarized lenses","Eco-friendly design"],
-      ["Compact and foldable","Made of cork","Protective interior lining"],
-      ["Crispy cassava snack","Barbecue flavor","Locally sourced"],
-      ["Vegan and plant-based","Artisan chocolate","Fiesta-inspired taste"],
-      ["100% pure honey","From Benguet highlands","Perfect natural sweetener"],
-      ["Rich cocoa flavor","Coconut sugar blend","Single-origin chocolate"],
-      ["Soft texture","Locally handwoven","Elegant design"],
-      ["Floral motif","Perfect for tablescapes","Locally crafted"],
-      ["Shell inlay","Handcrafted elegance","Multi-purpose use"],
-      ["Tropical jasmine scent","Made in the Philippines","Long-lasting fragrance"]
+      ["Sustainable materials","Spacious & durable","Modern Filipino design"],
+      ["Bamboo frame","Polarized lenses","Eco-friendly"],
+      ["Fold-flat design","Cork exterior","Protective lining"],
+      ["Cocoon silk","Callado embroidery","Handmade"],
+      ["Wide brim","Packs flat","Breathable"],
+      ["Packable","Everyday shade","Adjustable fit"],
+      ["Gluten-free","Local cassava","Smoky BBQ"],
+      ["Vegan","Artisan bars","Fiesta-inspired"],
+      ["100% pure wildflower","Local beekeepers","No preservatives"],
+      ["Single-origin","Coconut sugar","Hot or iced"],
+      ["Soft texture","Handwoven","Elegant neutral"],
+      ["Floral décor","Tablescapes","Locally made"],
+      ["Genuine shell inlay","Handcrafted","Multi-purpose"],
+      ["Calming scent","Made in PH","Long-lasting"]
     ];
 
-    /* ================= Render cards ================= */
+    /* ============== Render cards ============== */
     const productsContainer = document.querySelector('.products-list');
     const pageMain = document.getElementById('pageMain');
 
@@ -399,10 +383,10 @@
       const img  = (productImages[i]||"").toLowerCase();
       return /(barong|bolero|shirt|dress|top|blouse|pants|trousers|skirt|coat|jacket)/i.test(name) || img.includes("/clothing/");
     }
-
     function slugify(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
 
     for (let i=0;i<productNames.length;i++){
+      const absImg = toAbs(productImages[i]); // ensure absolute for wishlist/cart
       const card = document.createElement('article');
       card.className = 'best-product';
       card.innerHTML = `
@@ -415,7 +399,7 @@
           data-id="${slugify(productNames[i])}"
           data-name="${productNames[i]}"
           data-price="${productPrices[i]}"
-          data-img="${productImages[i]}"
+          data-img="${absImg}"
           data-desc="${(productDescriptions[i]||'').replace(/"/g,'&quot;')}"
           data-url="${location.href}">
           <i class="fa-regular fa-heart"></i>
@@ -430,7 +414,7 @@
       productsContainer.appendChild(card);
     }
 
-    /* ================= Quick View ================= */
+    /* ============== Quick View ============== */
     const qvOverlay = document.getElementById('qvOverlay');
     const qvModal   = document.getElementById('qvModal');
     const qvImg     = document.getElementById('qvImg');
@@ -488,6 +472,7 @@
     qvClose.addEventListener('click',closeQV); qvOverlay.addEventListener('click',closeQV);
     document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && qvModal.classList.contains('active')) closeQV(); });
 
+    // Add to cart using the global cart.js API
     qvAdd.addEventListener('click', ()=>{
       if(currentIndex==null) return;
       const clothing = isClothingIndex(currentIndex);
@@ -498,7 +483,8 @@
         if (!chosenSize){ alert('Please choose a size.'); return; }
       }
       const baseName = productNames[currentIndex];
-      addToCart({
+      window.addToCart?.({
+        id: slugify(baseName),
         baseName,
         name: clothing && chosenSize ? `${baseName} (Size: ${chosenSize})` : baseName,
         img: toAbs(productImages[currentIndex]),
@@ -507,6 +493,7 @@
         size: chosenSize || null,
         quantity: Math.max(1, parseInt(qvQty.value)||1)
       });
+      window.openCartDrawer?.();
       closeQV();
     });
 
@@ -523,13 +510,13 @@
         desc: productDescriptions[currentIndex],
         rating: productRatings[currentIndex] || 0,
         reviewsCount: productReviews[currentIndex] || 0,
-        bullets: productBullets[currentIndex] || [],   // ✅ now sending bullets
+        bullets: productBullets[currentIndex] || [],
         preselectedSize: chosenSize,
         category: clothing ? "Clothing" : ""
       });
     });
 
-    /* ================= Card link -> product ================= */
+    /* ============== Card link -> product ============== */
     document.addEventListener('click',(e)=>{
       const link = e.target.closest('.product-link');
       if (!link || link.dataset.i === undefined) return;
