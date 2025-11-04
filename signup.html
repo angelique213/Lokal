@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lokal — Sign up</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --brand:#6A6932; --hover:#8A8841; --line:#D7D6AA; --bg:#E6E5CA; --ink:#2b1f1a;
+    }
+    body{
+      margin:0; font-family:Montserrat,system-ui,Arial,sans-serif;
+      background:var(--bg); color:var(--ink);
+      display:grid; place-items:center; min-height:100vh;
+    }
+    .card{
+      width:min(560px,92vw); border:1px solid var(--line); border-radius:14px;
+      background:#fff; box-shadow:0 16px 40px rgba(0,0,0,.08); padding:22px;
+    }
+    h1{ margin:0 0 12px; font-weight:800; font-size:1.2rem; color:var(--brand); }
+    label{ display:block; font-weight:700; color:#6a635b; margin:.25rem 0 .4rem; }
+    input{
+      width:98%; max-width:500px; padding:12px;
+      border:2px solid var(--line); border-radius:10px;
+      font-weight:600; display:block; outline:none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    input:focus{ border-color:#A9A74F; box-shadow:0 0 0 4px rgba(169,167,79,.22); }
+    .row{ margin-bottom:12px; }
+    .btn{
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      width:50%; padding:14px; margin:20px auto;
+      background:var(--brand); color:#fff; border:0; border-radius:10px;
+      font-weight:800; cursor:pointer; letter-spacing:.02em;
+      transition: background .2s, transform .05s, filter .2s;
+    }
+    .btn:hover{ background:var(--hover); }
+    .btn:active{ transform:translateY(1px); }
+    .help{ min-height:1.1em; font-size:.9rem; text-align:center; }
+    .err{ color:#a52834; font-weight:800; }
+    .ok{ color:#146c43; font-weight:800; }
+    .tiny{ font-size:.85rem; text-align:center; }
+    .tiny a{ color:var(--hover); font-weight:700; text-decoration:underline; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Create your Lokal account</h1>
+
+    <form id="signupForm" novalidate>
+      <div class="row">
+        <label for="fn">First name</label>
+        <input id="fn" name="first_name" required autocomplete="given-name" />
+      </div>
+
+      <div class="row">
+        <label for="ln">Last name</label>
+        <input id="ln" name="last_name" required autocomplete="family-name" />
+      </div>
+
+      <div class="row">
+        <label for="em">Email</label>
+        <input id="em" name="email" type="email" required autocomplete="email" />
+      </div>
+
+      <div class="row">
+        <label for="pw">Password</label>
+        <input id="pw" name="password" type="password" minlength="6" required autocomplete="new-password" />
+      </div>
+
+      <div class="row">
+        <button class="btn" id="createBtn" type="submit">
+          <i class="fa-solid fa-user-plus"></i> Create account
+        </button>
+      </div>
+
+      <div id="msg" class="help" role="status" aria-live="polite"></div>
+    </form>
+
+    <p class="tiny">Already have an account? <a href="login.html?redirect=user.html">Sign in</a></p>
+  </main>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Your Supabase client -->
+  <script>
+    // replace YOUR-KEY with your actual anon public key from Settings → API
+    const sb = supabase.createClient(
+      "https://jwomoxtdrwbezyhqmevb.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp3b21veHRkcndiZXp5aHFtZXZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIwMjk3MTgsImV4cCI6MjA3NzYwNTcxOH0.TjXfNClNZu4M_YRYqW9T-zkR5noDYCW7_4c9mSSfcdE"
+    );
+  </script>
+
+  <script>
+  (function(){
+    const form = document.querySelector('#signupForm');
+    const msg = document.querySelector('#msg');
+    const btn = document.querySelector('#createBtn');
+
+    function showMessage(text, ok=false){
+      msg.textContent = text;
+      msg.className = ok ? 'help ok' : 'help err';
+    }
+
+    form.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      showMessage('');
+      btn.disabled = true;
+
+      const first = (document.querySelector('#fn').value || '').trim();
+      const last  = (document.querySelector('#ln').value || '').trim();
+      const email = (document.querySelector('#em').value || '').trim().toLowerCase();
+      const pass  = (document.querySelector('#pw').value || '').trim();
+
+      if (!email || !pass){
+        showMessage('Please enter email and password.');
+        btn.disabled = false;
+        return;
+      }
+
+      try {
+        // 1️⃣ Create user
+        const { data, error } = await sb.auth.signUp({
+          email,
+          password: pass,
+          options: {
+            emailRedirectTo: 'https://angelique213.github.io/Lokal/user.html'
+          }
+        });
+
+        if (error) { showMessage(error.message); btn.disabled=false; return; }
+
+        const user = data?.user;
+        if (!user){ showMessage('No user returned from auth.'); btn.disabled=false; return; }
+
+        // 2️⃣ Save names to profiles
+        const { error: profErr } = await sb
+          .from('profiles')
+          .upsert({ id:user.id, first_name:first, last_name:last });
+
+        if (profErr) { showMessage('Profile save failed: '+profErr.message); btn.disabled=false; return; }
+
+        showMessage('Account created! Redirecting…', true);
+        window.location.href = 'user.html';
+      }
+      catch(ex){
+        showMessage(ex?.message || 'Unexpected error.');
+      }
+      finally{
+        btn.disabled = false;
+      }
+    });
+  })();
+  </script>
+</body>
+</html>

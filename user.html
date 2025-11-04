@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Lokal — My Account</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --brand:#6A6932; --brand-2:#8A8841; --accent:#A9A74F;
+    --line:#D7D6AA; --bg:#E6E5CA; --ink:#2b1f1a;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:Montserrat,system-ui,Arial,sans-serif; color:var(--ink);
+    background:var(--bg);
+  }
+  .wrap{max-width:960px;margin:24px auto;padding:0 16px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.08);padding:20px}
+  h1{margin:0 0 12px;font-size:1.25rem;font-weight:800;color:var(--brand)}
+  h2{margin:8px 0 12px;font-size:1.05rem;color:#3b342e}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media (max-width:640px){.row{grid-template-columns:1fr}}
+  label{display:block;font-weight:700;font-size:.9rem;margin:.25rem 0 .4rem}
+  input{
+    width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;
+    font-weight:600;outline:none;transition:border-color .15s, box-shadow .15s;
+    background:#fff;color:var(--ink)
+  }
+  input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(169,167,79,.22)}
+  .btn{
+    height:46px;padding:0 18px;border-radius:10px;border:0;background:var(--brand);
+    color:#fff;font-weight:800;cursor:pointer;letter-spacing:.02em
+  }
+  .btn:hover{background:var(--brand-2)}
+  .bar{display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-top:14px}
+  .ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .ghost:hover{filter:brightness(.98)}
+  .status{min-height:1.1em;font-size:.95rem;font-weight:800;margin-top:8px}
+  .ok{color:#166534}.err{color:#b91c1c}
+  .banner{
+    background:#fff8d8;border:1px solid #f2e2a8;color:#6a5f2a;border-radius:12px;
+    padding:12px 14px;margin:0 0 14px;display:flex;gap:10px;align-items:center
+  }
+  .section{margin-top:18px}
+  .grid{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+  @media (max-width:900px){.grid{grid-template-columns:1fr}}
+  .mini{font-size:.9rem;color:#6b7280}
+</style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="card">
+      <h1>My Account</h1>
+
+      <!-- Email verify banner (hidden until JS decides) -->
+      <div id="verifyBanner" class="banner" hidden>
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <div>
+          Please verify your email to unlock all features. Check your inbox for a confirmation link.
+          <div class="mini">Didn’t get it? <button id="resendBtn" class="btn ghost" style="height:34px;padding:0 12px;margin-left:6px">Resend</button></div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <!-- Profile panel -->
+        <section class="section">
+          <h2>Profile</h2>
+          <form id="profileForm">
+            <div class="row">
+              <div>
+                <label for="first">First name</label>
+                <input id="first" autocomplete="given-name" />
+              </div>
+              <div>
+                <label for="last">Last name</label>
+                <input id="last" autocomplete="family-name" />
+              </div>
+            </div>
+            <div class="row" style="margin-top:8px">
+              <div>
+                <label for="email">Email</label>
+                <input id="email" type="email" disabled />
+              </div>
+              <div>
+                <label for="uid">User ID</label>
+                <input id="uid" disabled />
+              </div>
+            </div>
+            <div class="bar">
+              <button type="button" id="signOutBtn" class="btn ghost">Sign out</button>
+              <button type="submit" class="btn">Save changes</button>
+            </div>
+            <div id="status" class="status" role="status" aria-live="polite"></div>
+          </form>
+        </section>
+
+        <!-- Quick info / placeholders -->
+        <aside class="section">
+          <h2>Membership</h2>
+          <p class="mini" id="memberSince">Member since —</p>
+          <h2 style="margin-top:16px">Shortcuts</h2>
+          <div class="bar" style="justify-content:flex-start">
+            <a class="btn ghost" href="wishlist.html"><i class="fa-regular fa-heart"></i>&nbsp; Wishlist</a>
+            <a class="btn ghost" href="shop-all.html"><i class="fa-solid fa-shop"></i>&nbsp; Shop</a>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <!-- Supabase client then your project client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script>
+  (function(){
+    const $ = s => document.querySelector(s);
+    const status = $('#status');
+
+    function setMsg(text, ok=false){
+      status.textContent = text || '';
+      status.className = 'status ' + (text ? (ok ? 'ok' : 'err') : '');
+    }
+
+    async function ensureSession(){
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) {
+        const red = encodeURIComponent('user.html');
+        location.href = `login.html?redirect=${red}`;
+        return null;
+      }
+      return session;
+    }
+
+    async function loadProfile(user){
+      // Fill email/uid
+      $('#email').value = user.email || '';
+      $('#uid').value   = user.id;
+
+      // Email verification banner
+      const verified = !!(user.email_confirmed_at || user.confirmed_at);
+      $('#verifyBanner').hidden = verified;
+
+      // Load profile row
+      const { data, error } = await sb
+        .from('profiles')
+        .select('first_name,last_name,created_at')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (error) { setMsg('Load error: ' + error.message); return; }
+
+      if (data){
+        $('#first').value = data.first_name || '';
+        $('#last').value  = data.last_name  || '';
+        // nice “member since”
+        try{
+          const dt = data.created_at ? new Date(data.created_at) : null;
+          $('#memberSince').textContent = 'Member since ' + (dt ? dt.toLocaleDateString() : '—');
+        }catch(_){ /* ignore */ }
+      }
+    }
+
+    // Resend verify email
+    $('#resendBtn').addEventListener('click', async ()=>{
+      setMsg('');
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) return;
+      const email = session.user.email;
+      const { error } = await sb.auth.resend({
+        type: 'signup',
+        email
+      });
+      if (error) setMsg('Could not resend: ' + error.message);
+      else setMsg('Verification email sent.', true);
+    });
+
+    // Save profile
+    $('#profileForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      setMsg('');
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) return;
+      const id = session.user.id;
+      const first = $('#first').value.trim();
+      const last  = $('#last').value.trim();
+
+      const { error } = await sb
+        .from('profiles')
+        .upsert({ id, first_name:first, last_name:last }, { onConflict:'id' });
+
+      if (error) setMsg('Save error: ' + error.message);
+      else setMsg('Profile saved.', true);
+    });
+
+    // Sign out
+    $('#signOutBtn').addEventListener('click', async ()=>{
+      await sb.auth.signOut();
+      location.href = 'login.html';
+    });
+
+    // Bootstrap
+    (async ()=>{
+      const session = await ensureSession();
+      if (!session) return; // redirected
+      await loadProfile(session.user);
+
+      // Also react to auth state changes (e.g., token refresh/signout)
+      sb.auth.onAuthStateChange((evt, sess)=>{
+        if (!sess) location.href = 'login.html';
+      });
+    })();
+  })();
+  </script>
+</body>
+</html>

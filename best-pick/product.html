@@ -86,6 +86,34 @@
     @media (max-width:1024px){ .product-wrap{ grid-template-columns:1fr; gap:24px; } .gallery{ grid-template-columns:90px 1fr; } .p-actions{ grid-template-columns:1fr; max-width:420px; } }
     @media (max-width:560px){ .gallery{ grid-template-columns:1fr; } .thumbs{ order:2; grid-template-columns:repeat(4,1fr); } .thumbs button{ width:100%; height:90px; } }
   </style>
+
+  <!-- LOKAL AUTH POPUP styles -->
+  <style>
+    .lokal-auth{
+      --la-ink:#222; --la-primary:#6A6932; --la-primary-hover:#8A8841; --la-focus:#A9A74F; --la-line:#D7D6AA; --la-bg:#fff;
+    }
+    .lokal-auth.la-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;place-items:center;z-index:3000}
+    .lokal-auth.la-overlay[aria-hidden="false"]{display:grid}
+    .lokal-auth .la-modal{width:min(440px,92vw);background:var(--la-bg);border-radius:6px;border:1px solid var(--la-line);box-shadow:0 16px 50px rgba(0,0,0,.25);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;animation:fadeIn .25s ease;}
+    @keyframes fadeIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+    .lokal-auth .la-head{display:flex;align-items:center;justify-content:space-between;padding:22px 26px 14px 26px;}
+    .lokal-auth .la-title{font-size:1.05rem;font-weight:700;letter-spacing:.02em;margin:0;color:var(--la-ink);}
+    .lokal-auth .la-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--la-ink)}
+    .lokal-auth .la-body{padding:0 26px 20px 26px;}
+    .lokal-auth .la-intro{font-weight:600;color:var(--la-ink);margin-bottom:20px;}
+    .lokal-auth .la-label{display:block;font-size:.9rem;font-weight:600;margin-bottom:6px;color:var(--la-ink);}
+    .lokal-auth .la-input{width:100%;padding:13px 12px;border:1px solid var(--la-ink);border-radius:4px;font-size:.9rem;color:var(--la-ink);font-weight:500;outline:none;}
+    .lokal-auth .la-input:focus{border-color:var(--la-focus);box-shadow:0 0 0 2px rgba(169,167,79,.3);}
+    .lokal-auth .la-btn{width:100%;padding:14px;border:none;border-radius:4px;background:var(--la-primary);color:#fff;font-weight:600;letter-spacing:.05em;cursor:pointer;margin-top:16px;font-size:.95rem;}
+    .lokal-auth .la-btn:hover{background:var(--la-primary-hover);}
+    .lokal-auth .la-btn:active{transform:translateY(1px);}
+    .lokal-auth .la-sub{text-align:center;margin-top:8px;}
+    .lokal-auth .la-sub a{color:var(--la-ink);text-decoration:underline;font-size:.88rem;}
+    .lokal-auth .la-foot{text-align:center;border-top:1px solid var(--la-line);padding:18px 0 20px 0;}
+    .lokal-auth .la-mini{display:flex;justify-content:center;align-items:center;gap:6px;font-size:.85rem;color:#555;}
+    .lokal-auth .la-mini i{font-size:14px;}
+    .lokal-auth .la-mlink{color:var(--la-ink);text-decoration:underline;font-weight:600;display:inline-block;margin-top:10px;font-size:.9rem;}
+  </style>
 </head>
 <body>
 
@@ -104,7 +132,7 @@
 
       <nav class="main-links">
         <ul>
-          <li><a href="../best-pick/best-picks.html">Best Picks</a></li>
+          <li><a href="best-picks.html">Best Picks</a></li>
           <li><a href="../shop-all.html">Shop All</a></li>
           <li class="has-megamenu"><a href="../shop-all.html">Shop by Category</a></li>
         </ul>
@@ -113,7 +141,8 @@
 
     <nav class="utils">
       <ul class="nav-links">
-        <li><a href="../login.html"><i class="fa-solid fa-user"></i></a></li>
+        <!-- Open popup -->
+        <li><a href="#" aria-label="Account"><i class="fa-solid fa-user"></i></a></li>
         <li class="cart-icon">
           <a href="#" id="openCart" aria-label="Open cart"><i class="fa-solid fa-cart-shopping"></i><span class="cart-count">0</span></a>
         </li>
@@ -374,5 +403,97 @@
       new MutationObserver(toggleLock).observe(drawer, { attributes: true, attributeFilter: ['class'] });
     });
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../supabase.js"></script>
+
+  <!-- LOKAL AUTH POPUP (HTML) -->
+  <div class="lokal-auth la-overlay" id="lokalAuthOverlay" aria-hidden="true">
+    <div class="la-modal" role="dialog" aria-modal="true" aria-labelledby="laTitle">
+      <div class="la-head">
+        <h3 id="laTitle" class="la-title">SIGN IN</h3>
+        <button class="la-close" id="laClose" aria-label="Close">×</button>
+      </div>
+
+      <div class="la-body">
+        <p class="la-intro">Sign in with your email or sign up to become a Lokal Member.</p>
+
+        <!-- Step 1: Email -->
+        <form id="laEmailForm" novalidate>
+          <label class="la-label" for="laEmail">Email <span style="color:#b02a37">*</span></label>
+          <input class="la-input" id="laEmail" type="email" placeholder="Email" required />
+          <button class="la-btn" type="submit">CONTINUE</button>
+        </form>
+
+        <!-- Step 2: Password -->
+        <form id="laPassForm" hidden novalidate>
+          <label class="la-label" for="laPass">Password</label>
+          <input class="la-input" id="laPass" type="password" placeholder="••••••" required minlength="6" />
+          <button class="la-btn" type="submit">SIGN IN</button>
+          <p class="la-sub"><a href="#" id="laBackEmail">Use another email</a></p>
+        </form>
+      </div>
+
+      <div class="la-foot">
+        <div class="la-mini"><i class="fa-solid fa-lock"></i> All data is kept secure (demo)</div>
+        <a class="la-mlink" href="../membership.html">Lokal Membership</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOKAL AUTH POPUP (JS) -->
+  <script>
+  (function(){
+    const $=s=>document.querySelector(s);
+    const read=(k,def)=>JSON.parse(localStorage.getItem(k)||JSON.stringify(def));
+    const write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+    const USERS_KEY='USERS',USER_KEY='USER',AUTH_KEY='AUTH';
+
+    // seed one demo user if missing
+    if(!localStorage.getItem(USERS_KEY)){
+      write(USERS_KEY,[{email:'angel@example.com',password:'lokal123',firstName:'Angel',lastName:'Lokal'}]);
+    }
+
+    const overlay=$('#lokalAuthOverlay');
+    const emailForm=$('#laEmailForm'), passForm=$('#laPassForm');
+    const emailInput=$('#laEmail'),     passInput=$('#laPass');
+
+    const openAuth=()=>{overlay.setAttribute('aria-hidden','false');emailForm.hidden=false;passForm.hidden=true;setTimeout(()=>emailInput.focus(),50);}
+    const closeAuth=()=>overlay.setAttribute('aria-hidden','true');
+
+    // open popup on user icon
+    document.addEventListener('click',e=>{
+      const a=e.target.closest('a[aria-label="Account"],#openAuth');
+      if(!a)return; e.preventDefault(); openAuth();
+    });
+    $('#laClose').onclick=closeAuth;
+    overlay.addEventListener('click',e=>{if(e.target===overlay)closeAuth();});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAuth();});
+
+    // Email step
+    emailForm.onsubmit=e=>{
+      e.preventDefault();
+      const email=(emailInput.value||'').trim().toLowerCase();
+      const users=read(USERS_KEY,[]);
+      const found=users.find(u=>(u.email||'').toLowerCase()===email);
+      if(found){emailForm.hidden=true;passForm.hidden=false;passForm.dataset.email=email;passInput.focus();}
+      else{location.href='../membership.html?email='+encodeURIComponent(email);}
+    };
+
+    // Password step
+    passForm.onsubmit=e=>{
+      e.preventDefault();
+      const email=passForm.dataset.email,pw=passInput.value;
+      const users=read(USERS_KEY,[]);
+      const found=users.find(u=>(u.email||'').toLowerCase()===email);
+      if(!found||found.password!==pw){alert('Incorrect password');return;}
+      write(USER_KEY,found);
+      localStorage.setItem(AUTH_KEY,JSON.stringify({email,ts:Date.now()}));
+      closeAuth(); location.href='../user.html';
+    };
+
+    $('#laBackEmail').onclick=e=>{e.preventDefault();emailForm.hidden=false;passForm.hidden=true;emailInput.focus();};
+  })();
+  </script>
+
 </body>
 </html>

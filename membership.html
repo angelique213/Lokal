@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lokal Membership</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <!-- NEW: load Montserrat -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --brand:#6A6932;       /* primary deep olive */
+      --brand-2:#8A8841;     /* hover/alt */
+      --accent:#A9A74F;      /* highlight */
+      --tint1:#BAB86C;       /* light tint */
+      --tint2:#D7D6AA;       /* lighter tint */
+      --tint3:#E6E5CA;       /* background neutral */
+      --ink:#2b1f1a;
+      --line:#D7D6AA;
+    }
+  
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Montserrat,system-ui,Arial,sans-serif;
+      background:var(--tint3);
+      color:var(--ink);
+    }
+  
+    .wrap{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      min-height:100svh;
+    }
+    @media (max-width:900px){.wrap{grid-template-columns:1fr}}
+  
+    .photo{
+      background:url('images/projectlogo.png') center/contain no-repeat;
+      background-color:var(--tint2);
+    }
+  
+    .content{display:flex;align-items:center;background:#fff;}
+    .inner{max-width:620px;margin:0 auto;padding:40px 24px;}
+  
+    h1{
+      font-weight:800;
+      font-size:1.2rem;
+      letter-spacing:.04em;
+      margin:0 0 .75rem;
+      color:var(--brand);
+    }
+  
+    p{
+      color:#3b342e;
+      font-weight:600;
+      line-height:1.6;
+      margin:.25rem 0 1.25rem;
+    }
+  
+    .btn{
+      display:inline-block;
+      text-decoration:none;
+      border-radius:10px;
+      padding:14px 18px;
+      font-weight:800;
+      transition:background .2s, transform .05s;
+    }
+  
+    /* Button color update */
+    .btn.black{
+      background:var(--brand);
+      color:#fff;
+    }
+    .btn.black:hover{
+      background:var(--brand-2);
+    }
+    .btn.black:active{
+      transform:translateY(1px);
+    }
+  
+    .link{
+      color:var(--brand-2);
+      text-decoration:underline;
+      font-weight:700;
+    }
+  
+    .chips{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin:16px 0;
+    }
+  
+    .chip{
+      border:1px solid var(--line);
+      background:var(--tint3);
+      border-radius:999px;
+      padding:8px 12px;
+      font-weight:700;
+      color:var(--brand);
+    }
+  
+    .chip i{
+      color:var(--accent);
+    }
+  </style>
+  
+</head>
+<body>
+  <div class="wrap">
+    <div class="photo" aria-hidden="true"></div>
+    <div class="content">
+      <div class="inner">
+        <h1>LOKAL MEMBERS EXPERIENCE MORE</h1>
+        <p>Enjoy exclusive perks, wishlist sync, and early access to local drops.</p>
+        <div class="chips">
+          <span class="chip"><i class="fa-regular fa-heart"></i> Wishlist sync</span>
+          <span class="chip"><i class="fa-solid fa-receipt"></i> Order history</span>
+          <span class="chip"><i class="fa-solid fa-gift"></i> Member promos</span>
+        </div>
+        <p><a class="btn black" href="signup.html">EXPERIENCE MORE</a></p>
+        <!-- NEW: remove leading slash so redirects work on /Lokal/ too -->
+        <p>Already a member? <a class="link" href="login.html?redirect=user.html">Sign in</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+
+  <script>
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      // Already signed in → go to account
+      location.href = 'user.html';
+    }
+    // Optional: prefill email to signup if ?email= is present
+    const email = new URLSearchParams(location.search).get('email');
+    if (email) {
+      const btn = document.querySelector('a[href*="signup.html"]');
+      if (btn) btn.href = `signup.html?email=${encodeURIComponent(email)}`;
+    }
+  })();
+  </script>
+
+</body>
+</html>

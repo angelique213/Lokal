@@ -1,9 +1,10 @@
-/* ===== Wishlist — Lokal (style-preserving) =====
-   ✅ Keeps your existing CSS classes/markup
-   ✅ Saves ABSOLUTE image URLs (works from subfolders)
-   ✅ Uses PRODUCTS_CACHE when available
-   ✅ Hearts sync (solid when saved)
-   ✅ Silent add-to-cart + optional open cart
+
+/* ===== Wishlist — Lokal (enhanced) =====
+   - Preserves your classes/markup
+   - Absolute image URLs
+   - Hearts sync (solid when saved)
+   - Silent add-to-cart + optional open cart
+   - NEW: "Continue shopping" + "Clear all" buttons wired
 ================================================== */
 (function () {
   const PRODUCT_PAGE = "best-pick/product.html";
@@ -22,7 +23,6 @@
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
 
-  // Make any path absolute relative to current page (handles subfolders)
   function toAbs(p) {
     try { return p ? new URL(p, location.href).href : p; }
     catch { return p; }
@@ -88,6 +88,7 @@
       });
     }
     write(list);
+    renderWishlist();   // keep page in sync if you're on it
     updateBadge();
   }
 
@@ -96,7 +97,6 @@
     const el = $("#wishlistCount");
     if (!el) return;
     const n = read().length;
-    // keep your original behavior: hide when 0
     el.textContent = n ? String(n) : "";
     el.style.display = n ? "inline-block" : "none";
   }
@@ -112,7 +112,7 @@
     });
   }
 
-  // ---------- Wishlist page rendering (keeps your classes) ----------
+  // ---------- Wishlist page rendering ----------
   function renderWishlist() {
     const grid = $("#favGrid");
     if (!grid) return; // not on wishlist.html
@@ -121,22 +121,22 @@
     const empty = $("#wlEmpty");
     const favCount = $("#favCount");
 
-    if (empty) empty.style.display = list.length ? "none" : "block";
-    if (favCount) favCount.textContent = `${list.length} item${list.length !== 1 ? "s" : ""}`;
+    if (empty) empty.hidden = list.length !== 0;
+    if (favCount) favCount.textContent = `${list.length} ITEM${list.length === 1 ? "" : "S"}`;
 
     grid.innerHTML = "";
 
     list.forEach((item, i) => {
       const p = fullProduct(item);
       const card = document.createElement("article");
-      card.className = "wish-card"; // <-- unchanged
+      card.className = "wish-card";
       card.dataset.id = p.id;
       card.innerHTML = `
         <div class="img-wrap">
           <a href="#" class="to-detail" data-index="${i}">
             <img src="${p.img}" alt="${p.name}">
           </a>
-          <button type="button" class="like-btn" data-remove="${i}" title="Remove from favorites">
+          <button type="button" class="like-btn" data-remove="${i}" title="Remove from favorites" aria-label="Remove ${p.name}">
             <i class="fa-solid fa-heart"></i>
           </button>
         </div>
@@ -156,6 +156,31 @@
     localStorage.setItem("productDetail", JSON.stringify(product));
     const id = slugify(product.name);
     location.href = `${PRODUCT_PAGE}?id=${encodeURIComponent(id)}`;
+  }
+
+  // ---------- Clear & Continue ----------
+  function smartContinue() {
+    // If came from a Lokal page on same origin, go back; else go to Shop All.
+    try {
+      const ref = document.referrer || "";
+      if (ref && new URL(ref).origin === location.origin) {
+        history.back();
+        return;
+      }
+    } catch {}
+    location.href = "shop-all.html";
+  }
+
+  function clearAllWishlist() {
+    const list = read();
+    if (!list.length) return; // nothing to do
+    const ok = confirm("Remove all favorites?");
+    if (!ok) return;
+
+    write([]);                 // clear local
+    renderWishlist();
+    updateBadge();
+    syncHeartStates();
   }
 
   // ---------- Events ----------
@@ -190,7 +215,7 @@
       return;
     }
 
-    // Remove from favorites (wishlist page)
+    // Remove single favorite (wishlist page)
     const rm = t.closest("[data-remove]");
     if (rm) {
       e.preventDefault();
@@ -204,7 +229,7 @@
       return;
     }
 
-    // Add to cart (silent) from wishlist
+    // Add to cart (from wishlist)
     const addBtn = t.closest("[data-cart]");
     if (addBtn) {
       e.preventDefault();
@@ -238,6 +263,12 @@
     }
   });
 
+  // Header buttons
+  document.addEventListener("DOMContentLoaded", () => {
+    $("#btnContinue")?.addEventListener("click", smartContinue);
+    $("#btnClear")?.addEventListener("click", clearAllWishlist);
+  });
+
   // ---------- Broken-image fallback ----------
   document.addEventListener("error", (e) => {
     const img = e.target;
@@ -255,3 +286,4 @@
     syncHeartStates();  // hearts on any page
   });
 })();
+

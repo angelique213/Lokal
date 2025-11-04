@@ -32,27 +32,25 @@
     @media (max-width: 768px){ .fav-grid{ grid-template-columns:repeat(2,1fr); } }
     @media (max-width: 520px){ .fav-grid{ grid-template-columns:1fr; } }
 
-    .fav-card{ background:var(--card); border:1px solid #eee; border-radius:14px; overflow:hidden; position:relative; transition:box-shadow .25s, transform .25s; }
-    .fav-card:hover{ transform:translateY(-3px); box-shadow:0 10px 20px rgba(0,0,0,.08); }
-    .fav-img{ aspect-ratio:1/1; background:#f6f5ef; display:grid; place-items:center; overflow:hidden; }
-    .fav-img img{ width:100%; height:100%; object-fit:cover; }
-    .fav-body{ padding:14px 16px 16px; }
-    .fav-name{ margin:0 0 4px; color:var(--ink); font-weight:800; }
-    .fav-price{ margin:0 0 10px; color:var(--ink); font-weight:800; }
-    .fav-desc{ color:#6b625b; font-size:.95rem; min-height:2.6em; }
-
-    .fav-controls{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:12px; }
-    .btn{ height:40px; border-radius:10px; font-weight:800; cursor:pointer; border:1px solid #cfc7c1; background:#fff; color:var(--ink); }
-    .btn.primary{ background:var(--tone); color:#fff; border-color:var(--tone); }
-    .btn.light{ background:#fff; }
-    .fav-remove{ position:absolute; top:10px; right:10px; width:36px; height:36px; border-radius:999px; border:1px solid #d8d2c8; background:#fff; color:#b33; cursor:pointer; }
+    .wish-card{ background:var(--card); border:1px solid #eee; border-radius:14px; overflow:hidden; position:relative; transition:box-shadow .25s, transform .25s; }
+    .wish-card:hover{ transform:translateY(-3px); box-shadow:0 10px 20px rgba(0,0,0,.08); }
+    .img-wrap{ aspect-ratio:1/1; background:#f6f5ef; display:grid; place-items:center; overflow:hidden; position:relative; }
+    .img-wrap img{ width:100%; height:100%; object-fit:cover; }
+    .like-btn{ position:absolute; top:10px; right:10px; width:36px; height:36px; border-radius:999px; border:1px solid #d8d2c8; background:#fff; color:#b33; cursor:pointer; }
+    .info{ padding:14px 16px 16px; }
+    .name{ margin:0 0 4px; color:var(--ink); font-weight:800; text-decoration:none; display:inline-block; }
+    .price{ margin:0 0 10px; color:var(--ink); font-weight:800; }
+    .cta{ height:40px; border-radius:10px; font-weight:800; cursor:pointer; border:1px solid #cfc7c1; background:#6d6a33; color:#fff; width:100%; }
 
     .empty{ color:var(--ink-2); text-align:center; margin:30px 0 10px; }
     .empty a{ color:var(--tone); font-weight:800; }
   </style>
 </head>
-<body>
 
+<!-- ===== Optional Auth Popup (unchanged) ===== -->
+<link href="https://fonts.googleapis.com/css2?family=Helvetica:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<body>
   <!-- ===== HEADER ===== -->
   <header class="header">
     <div class="logo">
@@ -76,7 +74,17 @@
             <a href="#" class="catmenu-toggle" aria-expanded="false">
               Shop by Category <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
             </a>
-            <div class="mega" id="catMega" role="menu" aria-label="Shop by Category"></div>
+            <div class="mega" id="catMega" role="menu" aria-label="Shop by Category">
+              <ul class="cat-list">
+                <li><a href="shop-all.html?cat=flavors"><i class="fa-solid fa-cookie-bite"></i> Flavors</a></li>
+                <li><a href="shop-all.html?cat=accessories"><i class="fa-solid fa-gear"></i> Accessories</a></li>
+                <li><a href="shop-all.html?cat=bags"><i class="fa-solid fa-bag-shopping"></i> Bags</a></li>
+                <li><a href="shop-all.html?cat=clothing"><i class="fa-solid fa-shirt"></i> Clothing</a></li>
+                <li><a href="shop-all.html?cat=home"><i class="fa-solid fa-mug-hot"></i> Home</a></li>
+                <li><a href="shop-all.html?cat=crafts"><i class="fa-solid fa-scissors"></i> Crafts</a></li>
+                <li><a href="shop-all.html?cat=christmas"><i class="fa-solid fa-snowflake"></i> Christmas</a></li>
+              </ul>
+            </div>
           </li>
         </ul>
       </nav>
@@ -145,7 +153,7 @@
     </p>
   </main>
 
-  <!-- ===== FOOTER (optional; reuse yours) ===== -->
+  <!-- ===== FOOTER ===== -->
   <footer class="footer">
     <div class="footer-section">
       <h1>Contact Us</h1>
@@ -196,5 +204,9 @@
       new MutationObserver(toggleLock).observe(drawer, { attributes: true, attributeFilter: ['class'] });
     });
   </script>
+
+  <!-- (Optional) Supabase if you add cloud sync later -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
 </body>
 </html>
