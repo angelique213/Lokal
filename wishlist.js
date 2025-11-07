@@ -1,16 +1,15 @@
-
-/* ===== Wishlist — Lokal (enhanced) =====
-   - Preserves your classes/markup
-   - Absolute image URLs
-   - Hearts sync (solid when saved)
-   - Silent add-to-cart + optional open cart
-   - NEW: "Continue shopping" + "Clear all" buttons wired
-================================================== */
+/* ===== Wishlist — Lokal (enhanced + Supabase sync) =====
+   - Keeps your existing HTML/CSS classes and behaviors
+   - LocalStorage for offline + Supabase cloud sync when signed in
+   - Hearts toggle, badge count, clear all, continue shopping, add-to-cart
+   - Safe absolute image URLs
+   - Works even if user is signed out (local only), then merges on sign-in
+================================================================ */
 (function () {
   const PRODUCT_PAGE = "best-pick/product.html";
   const KEY = "wishlist";
 
-  // ---------- Helpers ----------
+  /* ---------------- Helpers ---------------- */
   const $  = (s, sc) => (sc || document).querySelector(s);
   const $$ = (s, sc) => (sc || document).querySelectorAll(s);
 
@@ -28,10 +27,10 @@
     catch { return p; }
   }
 
-  const PRODUCTS = (() => {
-    try { return JSON.parse(localStorage.getItem("PRODUCTS_CACHE") || "[]"); }
-    catch { return []; }
-  })();
+  function wlKey(it){ return (it?.name||"").trim().toLowerCase() + "||" + (it?.size?String(it.size).trim().toLowerCase():""); }
+
+  // Optional cache your site may set elsewhere
+  const PRODUCTS = (() => { try { return JSON.parse(localStorage.getItem("PRODUCTS_CACHE") || "[]"); } catch { return []; } })();
 
   // Build a full product object; prefer cache match by slug(name)
   function fullProduct(item) {
@@ -55,11 +54,12 @@
       reviewsCount: found.reviews || item.reviewsCount || 3,
       bullets: found.bullets || item.bullets || [],
       category: found.category || item.category || "",
-      url: item.url || location.href
+      url: item.url || location.href,
+      size: item.size || ""
     };
   }
 
-  // ---------- Core wishlist ----------
+  /* ---------------- Local wishlist core ---------------- */
   function idFrom(data) {
     return (data && data.id) ? String(data.id).trim() : slugify(data?.name || "");
   }
@@ -76,23 +76,30 @@
     const idx = list.findIndex((x) => x.id === id);
 
     if (idx > -1) {
-      list.splice(idx, 1);
+      const removed = list.splice(idx, 1)[0];
+      write(list);
+      renderWishlist(); updateBadge(); syncHeartStates();
+      // Cloud: delete
+      removed && wlDeleteRemote(removed).catch(()=>{});
     } else {
-      list.push({
+      const item = {
         id,
         name: rawItem.name || "",
         price: rawItem.price || "",
         img: toAbs(rawItem.img || ""),
         desc: rawItem.desc || "",
+        size: rawItem.size || "",
         url: rawItem.url || location.href
-      });
+      };
+      list.push(item);
+      write(list);
+      renderWishlist(); updateBadge(); syncHeartStates();
+      // Cloud: upsert
+      wlUpsertRemote(item).catch(()=>{});
     }
-    write(list);
-    renderWishlist();   // keep page in sync if you're on it
-    updateBadge();
   }
 
-  // ---------- Header badge + hearts ----------
+  /* ---------------- Header badge + hearts ---------------- */
   function updateBadge() {
     const el = $("#wishlistCount");
     if (!el) return;
@@ -112,7 +119,7 @@
     });
   }
 
-  // ---------- Wishlist page rendering ----------
+  /* ---------------- Wishlist page rendering ---------------- */
   function renderWishlist() {
     const grid = $("#favGrid");
     if (!grid) return; // not on wishlist.html
@@ -142,6 +149,7 @@
         </div>
         <div class="info">
           <a href="#" class="to-detail name" data-index="${i}">${p.name}</a>
+          ${p.size ? `<div class="mini" style="color:#7a6f68;margin:.2rem 0 .4rem">Size: <strong>${p.size}</strong></div>` : ""}
           <p class="price">${p.price}</p>
           <button type="button" class="cta" data-cart="${i}">Add to Cart</button>
         </div>
@@ -150,7 +158,7 @@
     });
   }
 
-  // ---------- Navigation to product detail ----------
+  /* ---------------- Navigation to product detail ---------------- */
   function openProductDetail(item) {
     const product = fullProduct(item);
     localStorage.setItem("productDetail", JSON.stringify(product));
@@ -158,32 +166,106 @@
     location.href = `${PRODUCT_PAGE}?id=${encodeURIComponent(id)}`;
   }
 
-  // ---------- Clear & Continue ----------
+  /* ---------------- Clear & Continue ---------------- */
   function smartContinue() {
-    // If came from a Lokal page on same origin, go back; else go to Shop All.
     try {
       const ref = document.referrer || "";
-      if (ref && new URL(ref).origin === location.origin) {
-        history.back();
-        return;
-      }
+      if (ref && new URL(ref).origin === location.origin) { history.back(); return; }
     } catch {}
     location.href = "shop-all.html";
   }
 
-  function clearAllWishlist() {
+  async function clearAllWishlist() {
     const list = read();
-    if (!list.length) return; // nothing to do
+    if (!list.length) return;
     const ok = confirm("Remove all favorites?");
     if (!ok) return;
 
-    write([]);                 // clear local
-    renderWishlist();
-    updateBadge();
-    syncHeartStates();
+    write([]);
+    renderWishlist(); updateBadge(); syncHeartStates();
+    // Cloud delete all for this user
+    try { await wlClearRemote(); } catch {}
   }
 
-  // ---------- Events ----------
+  /* ---------------- Supabase sync (requires window.sb from supabase.js) ---------------- */
+  async function wlSession() {
+    try { const { data:{ session } } = await sb.auth.getSession(); return session || null; }
+    catch { return null; }
+  }
+
+  async function wlPull(user_id) {
+    const { data, error } = await sb
+      .from("wishlist_items")
+      .select("name,size,img,price,created_at")
+      .eq("user_id", user_id)
+      .order("created_at", { ascending:false });
+    if (error) throw error;
+    return (data||[]).map(r => ({ name:r.name, size:r.size||"", img:r.img||"", price:r.price||"" }));
+  }
+
+  async function wlUpsertRemote(item) {
+    const sess = await wlSession(); if (!sess) return;
+    const user_id = sess.user.id;
+    const row = { user_id, name:item.name, size:item.size||"", img:item.img||"", price:item.price||"" };
+    const { error } = await sb.from("wishlist_items").upsert(row, { onConflict: "user_id,name,size" });
+    if (error) throw error;
+  }
+
+  async function wlDeleteRemote(item) {
+    const sess = await wlSession(); if (!sess) return;
+    const user_id = sess.user.id;
+    const { error } = await sb
+      .from("wishlist_items")
+      .delete()
+      .eq("user_id", user_id)
+      .eq("name", item.name)
+      .eq("size", item.size || "");
+    if (error) throw error;
+  }
+
+  async function wlClearRemote() {
+    const sess = await wlSession(); if (!sess) return;
+    const user_id = sess.user.id;
+    const { error } = await sb.from("wishlist_items").delete().eq("user_id", user_id);
+    if (error) throw error;
+  }
+
+  function mergeLists(local, remote){
+    const map = new Map();
+    [...local, ...remote].forEach(it => map.set(wlKey(it), it));
+    return [...map.values()];
+  }
+
+  // Call this anytime (exposed) to sync cloud ⇆ local
+  async function syncWishlistIfAuthed() {
+    const session = await wlSession();
+    if (!session) return;
+
+    // 1) pull remote
+    let remote = [];
+    try { remote = await wlPull(session.user.id); } catch {}
+
+    // 2) merge
+    const local = read();
+    const merged = mergeLists(local, remote);
+
+    // 3) push new local items up
+    const remoteKeys = new Set(remote.map(wlKey));
+    for (const it of merged) {
+      if (!remoteKeys.has(wlKey(it))) {
+        try { await wlUpsertRemote(it); } catch {}
+      }
+    }
+
+    // 4) save + repaint
+    write(merged);
+    renderWishlist(); updateBadge(); syncHeartStates();
+  }
+
+  // Expose so other scripts/pages can trigger a sync after they modify localStorage
+  window.syncWishlistIfAuthed = syncWishlistIfAuthed;
+
+  /* ---------------- Events ---------------- */
   document.addEventListener("click", (e) => {
     const t = e.target;
 
@@ -197,11 +279,11 @@
         price: heart.dataset.price,
         img: heart.dataset.img,
         desc: heart.dataset.desc,
+        size: heart.dataset.size || "",
         url: heart.dataset.url || location.href
       });
       heart.classList.add("pulse");
       setTimeout(() => heart.classList.remove("pulse"), 300);
-      syncHeartStates();
       return;
     }
 
@@ -221,11 +303,10 @@
       e.preventDefault();
       const idx = Number(rm.dataset.remove);
       const list = read();
-      list.splice(idx, 1);
+      const removed = list.splice(idx, 1)[0];
       write(list);
-      renderWishlist();
-      updateBadge();
-      syncHeartStates();
+      renderWishlist(); updateBadge(); syncHeartStates();
+      removed && wlDeleteRemote(removed).catch(()=>{});
       return;
     }
 
@@ -237,27 +318,24 @@
       const list = read();
       const p = fullProduct(list[idx]);
       const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-      const exist = cart.findIndex((x) => x.name === p.name);
+      const exist = cart.findIndex((x) => (x.baseName||x.name) === p.name && (x.size||"") === (p.size||""));
       if (exist > -1) cart[exist].quantity += 1;
       else cart.push({
         baseName: p.name,
-        name: p.name,
+        name: p.name + (p.size ? ` (Size: ${p.size})` : ""),
         img: toAbs(p.img),
         price: p.price,
         desc: p.desc || "",
-        size: null,
+        size: p.size || "",
         quantity: 1
       });
       localStorage.setItem("cart", JSON.stringify(cart));
 
-      // optional: remove from wishlist after adding
-      list.splice(idx, 1);
-      write(list);
-      renderWishlist();
-      updateBadge();
-      syncHeartStates();
+      // Optional: keep item in wishlist. If you prefer to remove, uncomment:
+      // list.splice(idx, 1); write(list);
 
-      // open cart drawer if available
+      renderWishlist(); updateBadge(); syncHeartStates();
+      window._refreshCartCount?.();
       window.openCartDrawer?.();
       return;
     }
@@ -269,7 +347,7 @@
     $("#btnClear")?.addEventListener("click", clearAllWishlist);
   });
 
-  // ---------- Broken-image fallback ----------
+  // Broken-image fallback
   document.addEventListener("error", (e) => {
     const img = e.target;
     if (img && img.tagName === "IMG" && !img.dataset.fallback) {
@@ -279,11 +357,18 @@
     }
   }, true);
 
-  // ---------- Init ----------
+  /* ---------------- Init + Auth reactions ---------------- */
   document.addEventListener("DOMContentLoaded", () => {
     renderWishlist();   // paints only on wishlist.html
     updateBadge();      // header count
     syncHeartStates();  // hearts on any page
+    // Try cloud sync if signed in
+    window.syncWishlistIfAuthed && window.syncWishlistIfAuthed();
+  });
+
+  // Keep in sync with auth changes
+  sb?.auth?.onAuthStateChange?.((_evt, session) => {
+    if (session) window.syncWishlistIfAuthed && window.syncWishlistIfAuthed();
+    else { /* signed out → keep local list; just refresh UI */ renderWishlist(); updateBadge(); syncHeartStates(); }
   });
 })();
-

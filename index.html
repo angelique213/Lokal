@@ -223,6 +223,8 @@
     </ul>
   </nav>
 </header>
+<!-- HOMEPAGE GREETING -->
+<div id="homeGreeting" class="home-greeting" aria-live="polite" hidden></div>
 
 <!-- BANNER -->
 <section class="banner">
@@ -441,86 +443,40 @@
 <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
 <script>AOS.init();</script>
 
-<script src="lokal.js"></script>
-<script src="cart.js" defer></script>
-
-<!-- Page helpers -->
-<script>
-// Mega menu tap behavior on touch devices
-(function(){
-  const host = document.querySelector('.has-megamenu');
-  const btn = host ? host.querySelector('.catmenu-toggle') : null;
-  if (!host || !btn) return;
-  const touchOnly = matchMedia('(hover: none)').matches && !matchMedia('(pointer: fine)').matches;
-  if (touchOnly) {
-    btn.addEventListener('click', (e)=>{
-      e.preventDefault();
-      host.classList.toggle('open');
-      btn.setAttribute('aria-expanded', host.classList.contains('open') ? 'true' : 'false');
-    });
-    document.addEventListener('click', (e)=>{
-      if (!host.contains(e.target)) {
-        host.classList.remove('open');
-        btn.setAttribute('aria-expanded', 'false');
-      }
-    });
-  } else {
-    host.classList.remove('open');
-    btn.setAttribute('aria-expanded','false');
-  }
-})();
-
-// Absolutize images for GH Pages
-(function(){
-  function absAttr(el, attr){
-    const v = el.getAttribute(attr);
-    if (v) el.setAttribute(attr, window.resolveAsset ? resolveAsset(v) : v);
-  }
-  document.querySelectorAll('.product').forEach(card=>{
-    absAttr(card,'data-img');
-    const heart = card.querySelector('.wishlist-btn');
-    if (heart) absAttr(heart,'data-img');
-  });
-})();
-
-// Simple add-to-cart from homepage cards
-(function(){
-  function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const total = cart.reduce((s,i)=> s + (i.quantity||0), 0);
-    const badge = document.querySelector(".cart-count");
-    if (badge) badge.textContent = total;
-  }
-  function addToCart(item){
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const idx = cart.findIndex(p => p.name === item.name);
-    if (idx > -1) cart[idx].quantity += item.quantity;
-    else cart.push(item);
-    localStorage.setItem("cart", JSON.stringify(cart));
-    updateCartCount();
-    if (typeof window.openCartDrawer === "function") window.openCartDrawer();
-  }
-  document.addEventListener("click", (e)=>{
-    const btn = e.target.closest(".overlay-image .button");
-    if (!btn) return;
-    const card = btn.closest(".product");
-    if (!card) return;
-    const name = card.dataset.name || card.querySelector(".product-name")?.textContent?.trim() || "Product";
-    const price = card.dataset.price || card.querySelector(".product-details p:last-child")?.textContent?.trim() || "₱0";
-    const imgRel = card.dataset.img || card.querySelector(".main-image img")?.getAttribute("src") || "";
-    const img = window.resolveAsset ? resolveAsset(imgRel) : imgRel;
-    const desc = card.dataset.desc || "";
-    addToCart({ name, price, img, desc, quantity: 1 });
-  });
-  document.addEventListener("DOMContentLoaded", updateCartCount);
-})();
-</script>
-
-<!-- Supabase (load library then your client) -->
+<!-- Supabase (SDK first, then your client) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 
-<!-- ===== Account link controller (session-aware) ===== -->
+<!-- Ask once for first name and store it (metadata + localStorage) -->
+<script>
+function capName(s){
+  s = String(s || "").trim();
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
+}
+async function ensureFirstName(){
+  try{
+    if (!window.sb || !sb.auth) return;
+    const { data } = await sb.auth.getUser();
+    const user = data?.user;
+    if (!user) return;
+
+    const md = user.user_metadata || {};
+    let first = md.first_name || md.given_name || (md.full_name || md.name || "").split(/\s+/)[0];
+
+    if (!first && user.email){
+      // fallback: use the part before @ (capitalized)
+      const guess = (user.email.split("@")[0] || "").split(/[._-]/)[0];
+      first = guess.charAt(0).toUpperCase() + guess.slice(1);
+      await sb.auth.updateUser({ data: { first_name: first } });
+    }
+
+    if (first) localStorage.setItem("lokalFirstName", first);
+  } catch(_){}
+}
+
+</script>
+
+<!-- Account link controller (unchanged except we call ensureFirstName() after login) -->
 <script>
 (function(){
   const $ = (s)=>document.querySelector(s);
@@ -561,8 +517,8 @@
       const { data, error } = await sb.auth.signInWithPassword({ email, password });
       if (!error && data?.user) {
         isAuthed = true;
+        await ensureFirstName();     // <-- collect & save first name here
         closeAuth();
-        // stay on page, but future clicks go to user.html
         return;
       }
       if (error) {
@@ -596,40 +552,37 @@
 
   // Click handler for the user icon
   accountLink?.addEventListener('click', async (e)=>{
-    // Always prevent default; we decide what to do
     e.preventDefault();
-
     if (!sessionReady) await refreshSessionUI();
 
     if (isAuthed){
-      // Verify user.html exists (HEAD). If missing, alert but don't break UX.
       try{
         const resp = await fetch('user.html', { method:'HEAD' });
-        if (resp.ok) {
-          location.href = 'user.html';         // relative path (works on GH Pages)
-        } else {
-          alert('Profile page (user.html) not found. Please add it to your repo.');
-        }
-      } catch {
-        // If fetch fails (some hosts block HEAD), still try to navigate
-        location.href = 'user.html';
-      }
+        if (resp.ok) location.href = 'user.html';
+        else alert('Profile page (user.html) not found. Please add it to your repo.');
+      } catch { location.href = 'user.html'; }
     } else {
       openAuth();
     }
   });
 
-  // Initialize: listen to Supabase auth state changes to keep isAuthed in sync
+  // Initialize live session sync
   (async function init(){
     await refreshSessionUI();
     if (window.sb && sb.auth && sb.auth.onAuthStateChange){
       sb.auth.onAuthStateChange((_event, session)=>{
         isAuthed = !!session;
+        if (session) ensureFirstName();
       });
     }
   })();
 })();
 </script>
 
+<!-- NOW load lokal.js so it can see Supabase immediately -->
+<script src="lokal.js"></script>
+
+<!-- Your cart logic (deferred is fine) -->
+<script src="cart.js" defer></script>
 </body>
 </html>

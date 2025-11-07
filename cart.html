@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Your Cart | Lokal</title>
 
-  <!-- Icons (same version as your other pages) -->
+  <!-- Make paths work on GitHub Pages subfolder -->
+  <meta name="site-base" content="/Lokal/">
+
+  <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
 
   <!-- Site Styles -->
@@ -45,18 +48,47 @@
     <!-- Utilities -->
     <nav class="utils">
       <ul class="nav-links">
-        <li><a href="login.html" aria-label="Account"><i class="fa-solid fa-user"></i></a></li>
+        <li><a href="login.html" id="accountLink" aria-label="Account"><i class="fa-solid fa-user"></i></a></li>
         <li class="cart-icon">
           <a href="cart.html" aria-label="Cart">
             <i class="fa-solid fa-cart-shopping"></i>
             <span class="cart-count">0</span>
           </a>
         </li>
-        <li><a href="wishlist.html" aria-label="Favorites"><i class="fa-regular fa-heart"></i></a></li>
+        <li>
+          <a href="wishlist.html" aria-label="Favorites" id="wishlistLink">
+            <i class="fa-regular fa-heart"></i>
+            <span class="wishlist-count" id="wishlistCount">0</span>
+          </a>
+        </li>
         <li><a href="support.html" aria-label="Support"><i class="fa-solid fa-headset"></i></a></li>
       </ul>
     </nav>
   </header>
+
+  <!-- (Optional) CART DRAWER — kept so the drawer works here too -->
+  <div class="cd-overlay" id="cdOverlay" aria-hidden="true"></div>
+  <aside class="cd-drawer" id="cdDrawer" aria-hidden="true" role="dialog" aria-label="Cart drawer">
+    <div class="cd-header">
+      <h2>Cart</h2>
+      <button id="cdClose" class="cd-close" aria-label="Close cart">×</button>
+    </div>
+    <div class="cd-body">
+      <div id="cdItems" class="cd-items"></div>
+      <div class="cd-summary">
+        <div class="cd-row">
+          <span>Subtotal</span>
+          <strong id="cdSubtotal">₱0.00</strong>
+        </div>
+        <p class="cd-note">Shipping, taxes, and discount codes calculated at checkout.</p>
+        <label class="cd-terms">
+          <input id="cdAgree" type="checkbox">
+          <span>I agree with the <a href="terms.html" target="_blank" rel="noopener">terms and conditions</a></span>
+        </label>
+        <button id="cdCheckout" class="cd-checkout" disabled>CHECK OUT</button>
+      </div>
+    </div>
+  </aside>
 
   <!-- CART PAGE -->
   <main class="cart-page" aria-live="polite">
@@ -74,7 +106,7 @@
     <div class="cart-summary" id="cartSummary" style="display:none;">
       <div class="cart-row">
         <span>Subtotal</span>
-        <strong>₱<span id="cart-subtotal">0.00</span></strong>
+        <strong>₱<span id="cart-total">0.00</span></strong>
       </div>
       <p class="cd-note">Shipping, taxes, and discount codes calculated at checkout.</p>
       <div class="cart-actions" style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -124,129 +156,10 @@
     </div>
   </footer>
 
-  <!-- SCRIPTS -->
-  <script>
-    // ----- Helpers -----
-    const toAbs = (p) => { try { return p ? new URL(p, location.href).href : p; } catch { return p; } };
-    const pesoToNumber = (p) => Number(String(p).replace(/[^\d.]/g, "")) || 0;
-    const numberToPeso = (n) => n.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-    function getCart(){ try { return JSON.parse(localStorage.getItem("cart") || "[]"); } catch { return []; } }
-    function setCart(c){ localStorage.setItem("cart", JSON.stringify(c || [])); }
-    function updateCartCount(){
-      const total = getCart().reduce((s,i)=> s + (Number(i.quantity)||0), 0);
-      document.querySelectorAll(".cart-count").forEach(el => el.textContent = total);
-    }
-
-    // ----- Render -----
-    const itemsWrap = document.getElementById("cartItems");
-    const emptyEl   = document.getElementById("cart-empty");
-    const sumWrap   = document.getElementById("cartSummary");
-    const subtotalEl= document.getElementById("cart-subtotal");
-
-    function paint(){
-      const cart = getCart();
-      itemsWrap.innerHTML = "";
-      const hasItems = cart.length > 0;
-      emptyEl.style.display = hasItems ? "none" : "block";
-      sumWrap.style.display = hasItems ? "block" : "none";
-
-      let subtotal = 0;
-
-      cart.forEach((p, idx) => {
-        const priceNum = pesoToNumber(p.price);
-        const lineTotal = priceNum * (Number(p.quantity)||1);
-        subtotal += lineTotal;
-
-        const art = document.createElement("article");
-        art.className = "cart-item";
-        art.innerHTML = `
-          <div class="ci-left">
-            <img src="${toAbs(p.img)}" alt="${p.name}" class="ci-img" onerror="this.onerror=null;this.src='images/placeholder.png';">
-          </div>
-          <div class="ci-main">
-            <p class="ci-name">${p.name || p.baseName || "Product"}</p>
-            ${p.size ? `<p class="ci-meta">Size: <strong>${p.size}</strong></p>` : ""}
-            <p class="ci-price">Price: <strong>${p.price}</strong></p>
-            <div class="ci-qty">
-              <button type="button" class="qty-dec" data-i="${idx}" aria-label="Decrease quantity">−</button>
-              <input type="number" min="1" value="${p.quantity || 1}" data-i="${idx}" aria-label="Quantity input">
-              <button type="button" class="qty-inc" data-i="${idx}" aria-label="Increase quantity">+</button>
-            </div>
-          </div>
-          <div class="ci-right">
-            <p class="ci-line">₱${numberToPeso(lineTotal)}</p>
-            <button type="button" class="ci-remove" data-i="${idx}" aria-label="Remove item">
-              <i class="fa-solid fa-trash"></i>
-            </button>
-          </div>
-        `;
-        itemsWrap.appendChild(art);
-      });
-
-      subtotalEl.textContent = numberToPeso(subtotal);
-      updateCartCount();
-    }
-
-    // ----- Events -----
-    document.addEventListener("click", (e)=>{
-      // Increase
-      const inc = e.target.closest(".qty-inc");
-      if (inc){
-        const i = +inc.dataset.i;
-        const cart = getCart();
-        cart[i].quantity = Math.max(1, (parseInt(cart[i].quantity)||1) + 1);
-        setCart(cart); paint(); return;
-      }
-
-      // Decrease
-      const dec = e.target.closest(".qty-dec");
-      if (dec){
-        const i = +dec.dataset.i;
-        const cart = getCart();
-        cart[i].quantity = Math.max(1, (parseInt(cart[i].quantity)||1) - 1);
-        setCart(cart); paint(); return;
-      }
-
-      // Remove
-      const rm = e.target.closest(".ci-remove");
-      if (rm){
-        const i = +rm.dataset.i;
-        const cart = getCart();
-        cart.splice(i,1);
-        setCart(cart); paint(); return;
-      }
-    });
-
-    // Direct qty typing
-    document.addEventListener("change", (e)=>{
-      const qtyInput = e.target.matches('.ci-qty input') ? e.target : null;
-      if (!qtyInput) return;
-      const i = +qtyInput.dataset.i;
-      const val = Math.max(1, parseInt(qtyInput.value)||1);
-      const cart = getCart();
-      cart[i].quantity = val;
-      setCart(cart); paint();
-    });
-
-    // Clear cart
-    document.getElementById("clearCart")?.addEventListener("click", ()=>{
-      if (!confirm("Clear all items from your cart?")) return;
-      setCart([]); paint();
-    });
-
-    // Checkout
-    document.getElementById("checkoutBtn")?.addEventListener("click", ()=>{
-      // Hook up to your real checkout flow here
-      alert("Checkout flow not connected yet. Add your payment/checkout integration.");
-    });
-
-    // Init
-    document.addEventListener("DOMContentLoaded", paint);
-  </script>
-
-  <!-- If you also load your shared scripts, keep them after the inline script: -->
-  <!-- <script src="cart.js"></script> -->
-  <!-- <script src="wishlist.js"></script> -->
+  <!-- SCRIPTS: order matters -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script src="lokal.js"></script>
+  <script src="cart.js"></script>
 </body>
 </html>

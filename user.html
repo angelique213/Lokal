@@ -12,51 +12,146 @@
   :root{
     --brand:#6A6932; --brand-2:#8A8841; --accent:#A9A74F;
     --line:#D7D6AA; --bg:#E6E5CA; --ink:#2b1f1a;
+    --ink-2:#3b342e; --ink-3:#6b7280; --ok:#166534; --err:#b91c1c;
   }
   *{box-sizing:border-box}
   body{
     margin:0; font-family:Montserrat,system-ui,Arial,sans-serif; color:var(--ink);
-    background:var(--bg);
+    background:radial-gradient(1200px 400px at 50% -120px, #eae8c9 0, #d9d6b6 45%, #d2cfad 70%, #cfcda6 100%);
   }
-  .wrap{max-width:960px;margin:24px auto;padding:0 16px}
-  .card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.08);padding:20px}
-  h1{margin:0 0 12px;font-size:1.25rem;font-weight:800;color:var(--brand)}
-  h2{margin:8px 0 12px;font-size:1.05rem;color:#3b342e}
+  a{ color:inherit; text-decoration:none }
+  .wrap{max-width:1100px;margin:28px auto;padding:0 16px}
+  .card{
+    background:#fff;border:1px solid var(--line);border-radius:16px;
+    box-shadow:0 18px 40px rgba(0,0,0,.08);padding:0; overflow:hidden;
+  }
+  .header{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:18px 22px; border-bottom:1px solid var(--line); background:#fffef6;
+  }
+  .title{margin:0;font-size:1.5rem;font-weight:800;color:var(--brand)}
+  .crumb a{font-weight:800}
+  .tabs{ display:flex; gap:6px; padding:12px; border-bottom:1px solid var(--line); background:#fff }
+  .tab{
+    padding:10px 14px; border:1px solid var(--line); border-radius:10px;
+    font-weight:800; font-size:.95rem; color:#2b1f1a; background:#fff; cursor:pointer;
+  }
+  .tab[aria-selected="true"]{ background:var(--brand); color:#fff; border-color:var(--brand)}
+  .section{ padding:18px 22px 24px 22px; display:none }
+  .section.active{ display:block }
+
+  /* Banner */
+  .banner{
+    background:#fff8d8;border:1px solid #f2e2a8;color:#6a5f2a;border-radius:12px;
+    padding:12px 14px;margin:16px 0;display:flex;gap:10px;align-items:center
+  }
+
+  /* Form stuff */
+  .grid{display:grid;grid-template-columns:1.2fr 1fr;gap:18px}
+  @media (max-width:980px){.grid{grid-template-columns:1fr}}
   .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
   @media (max-width:640px){.row{grid-template-columns:1fr}}
+  h2{margin:8px 0 12px;font-size:1.05rem;color:var(--ink-2)}
   label{display:block;font-weight:700;font-size:.9rem;margin:.25rem 0 .4rem}
-  input{
+  input,select,textarea{
     width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;
-    font-weight:600;outline:none;transition:border-color .15s, box-shadow .15s;
-    background:#fff;color:var(--ink)
+    font-weight:600;outline:none;transition:border-color .15s, box-shadow .15s;background:#fff;color:var(--ink)
   }
-  input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(169,167,79,.22)}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(169,167,79,.22)}
+  .bar{display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+
+  /* ==== CENTER the Shortcuts buttons ==== */
+/* Center the Shortcuts row */
+.bar.shortcuts-bar{
+  justify-content: center !important;
+  gap: 22px;
+}
+
+/* Make each Shortcut button center its icon + label */
+.bar.shortcuts-bar .btn.ghost{
+  display: flex;                 /* turn the <a> into a flex box */
+  align-items: center;           /* vertical center */
+  justify-content: center;       /* horizontal center */
+  gap: 10px;                     /* space between icon and text */
+  min-width: 280px;              /* wide pill */
+  height: 68px;                  /* taller pill to feel “cardy” */
+  padding: 0 18px;               /* remove side bias */
+  text-align: center;            /* redundant but harmless */
+}
+
+/* optional: shrink nicely on mobile */
+@media (max-width: 600px){
+  .bar.shortcuts-bar{
+    flex-direction: column;
+    gap: 12px;
+  }
+  .bar.shortcuts-bar .btn.ghost{
+    min-width: 100%;
+  }
+}
+
+
   .btn{
     height:46px;padding:0 18px;border-radius:10px;border:0;background:var(--brand);
     color:#fff;font-weight:800;cursor:pointer;letter-spacing:.02em
   }
   .btn:hover{background:var(--brand-2)}
-  .bar{display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-top:14px}
   .ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
   .ghost:hover{filter:brightness(.98)}
+  .mini{font-size:.9rem;color:var(--ink-3)}
   .status{min-height:1.1em;font-size:.95rem;font-weight:800;margin-top:8px}
-  .ok{color:#166534}.err{color:#b91c1c}
-  .banner{
-    background:#fff8d8;border:1px solid #f2e2a8;color:#6a5f2a;border-radius:12px;
-    padding:12px 14px;margin:0 0 14px;display:flex;gap:10px;align-items:center
+  .ok{color:var(--ok)}.err{color:var(--err)}
+
+  /* Orders */
+  .orders-list{display:grid;grid-template-columns:1fr;gap:12px}
+  .order{
+    border:1px solid var(--line); border-radius:12px; padding:12px 14px; display:grid;
+    grid-template-columns:1fr auto; gap:12px; align-items:center;
   }
-  .section{margin-top:18px}
-  .grid{display:grid;grid-template-columns:2fr 1fr;gap:16px}
-  @media (max-width:900px){.grid{grid-template-columns:1fr}}
-  .mini{font-size:.9rem;color:#6b7280}
+  .order .meta{display:flex; gap:16px; flex-wrap:wrap}
+  .badge{
+    display:inline-flex; align-items:center; gap:6px; font-weight:800; font-size:.8rem;
+    background:#f3f4e1; color:#4c4b23; border:1px solid var(--line); padding:6px 10px; border-radius:999px;
+  }
+  .total{font-weight:800}
+  .order-actions{display:flex; gap:8px}
+  .empty{
+    border:1px dashed var(--line); border-radius:12px; padding:20px; text-align:center; color:var(--ink-3)
+  }
+
+  /* Modal for order details */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;place-items:center;z-index:3000}
+  .modal-overlay[aria-hidden="false"]{display:grid}
+  .modal{
+    width:min(720px,92vw); background:#fff; border-radius:14px; border:1px solid var(--line);
+    box-shadow:0 16px 50px rgba(0,0,0,.25); overflow:hidden;
+  }
+  .m-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--line)}
+  .m-title{margin:0;font-size:1.05rem;font-weight:800}
+  .m-close{background:none;border:none;font-size:24px;cursor:pointer}
+  .m-body{padding:16px 20px}
+  table{width:100%; border-collapse:collapse; font-size:.95rem}
+  th,td{padding:10px 8px; border-bottom:1px solid #eee; text-align:left}
+  th{font-weight:800;color:#4c4b23}
 </style>
 </head>
 <body>
   <main class="wrap">
     <div class="card">
-      <h1>My Account</h1>
+      <div class="header">
+        <h1 class="title"><i class="fa-regular fa-user"></i> &nbsp;My Account</h1>
+        <div class="crumb mini"><a href="index.html">← Back to Home</a></div>
+      </div>
 
-      <!-- Email verify banner (hidden until JS decides) -->
+      <!-- Tabs -->
+      <nav class="tabs" role="tablist" aria-label="Account sections">
+        <button class="tab" role="tab" aria-selected="true"  data-tab="profile"><i class="fa-solid fa-id-card"></i>&nbsp; Profile</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="orders"><i class="fa-solid fa-bag-shopping"></i>&nbsp; Orders</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="addresses"><i class="fa-regular fa-address-book"></i>&nbsp; Addresses</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="security"><i class="fa-solid fa-shield-halved"></i>&nbsp; Security</button>
+      </nav>
+
+      <!-- Verify banner -->
       <div id="verifyBanner" class="banner" hidden>
         <i class="fa-solid fa-circle-exclamation"></i>
         <div>
@@ -65,11 +160,11 @@
         </div>
       </div>
 
-      <div class="grid">
-        <!-- Profile panel -->
-        <section class="section">
-          <h2>Profile</h2>
+      <!-- PROFILE -->
+      <section id="sec-profile" class="section active" role="tabpanel" aria-labelledby="profile">
+        <div class="grid">
           <form id="profileForm">
+            <h2>Profile</h2>
             <div class="row">
               <div>
                 <label for="first">First name</label>
@@ -96,93 +191,201 @@
             </div>
             <div id="status" class="status" role="status" aria-live="polite"></div>
           </form>
-        </section>
 
-        <!-- Quick info / placeholders -->
-        <aside class="section">
-          <h2>Membership</h2>
-          <p class="mini" id="memberSince">Member since —</p>
-          <h2 style="margin-top:16px">Shortcuts</h2>
-          <div class="bar" style="justify-content:flex-start">
-            <a class="btn ghost" href="wishlist.html"><i class="fa-regular fa-heart"></i>&nbsp; Wishlist</a>
-            <a class="btn ghost" href="shop-all.html"><i class="fa-solid fa-shop"></i>&nbsp; Shop</a>
-          </div>
-        </aside>
-      </div>
+          <aside>
+            <h2>Membership</h2>
+            <p class="mini" id="memberSince">Member since —</p>
+            <h2 style="margin-top:16px">Shortcuts</h2>
+            <div class="bar shortcuts-bar">
+              <a class="btn ghost" href="wishlist.html"><i class="fa-regular fa-heart"></i>&nbsp; Wishlist</a>
+              <a class="btn ghost" href="shop-all.html"><i class="fa-solid fa-shop"></i>&nbsp; Shop</a>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ORDERS -->
+      <section id="sec-orders" class="section" role="tabpanel" aria-labelledby="orders">
+        <h2>Your Orders</h2>
+        <p class="mini" id="ordersTip">Recent orders appear here.</p>
+        <div id="ordersList" class="orders-list"></div>
+        <div id="ordersEmpty" class="empty" hidden>
+          No orders yet. <a href="shop-all.html"><strong>Start shopping</strong></a>.
+        </div>
+        <div id="ordersError" class="empty" hidden>
+          Can’t load orders. If you haven’t created tables yet, see the note in code for the
+          expected schema (<code>orders</code>, <code>order_items</code>). Everything else will still work.
+        </div>
+      </section>
+
+      <!-- ADDRESSES -->
+      <section id="sec-addresses" class="section" role="tabpanel" aria-labelledby="addresses">
+        <div class="grid">
+          <form id="shipForm">
+            <h2>Shipping Address</h2>
+            <div class="row">
+              <div>
+                <label for="ship_name">Full name</label>
+                <input id="ship_name" />
+              </div>
+              <div>
+                <label for="ship_phone">Phone</label>
+                <input id="ship_phone" />
+              </div>
+            </div>
+            <label for="ship_line1">Address line 1</label>
+            <input id="ship_line1" />
+            <label for="ship_line2">Address line 2</label>
+            <input id="ship_line2" />
+            <div class="row">
+              <div><label for="ship_city">City</label><input id="ship_city" /></div>
+              <div><label for="ship_state">State/Province</label><input id="ship_state" /></div>
+            </div>
+            <div class="row">
+              <div><label for="ship_zip">Postal Code</label><input id="ship_zip" /></div>
+              <div><label for="ship_country">Country</label><input id="ship_country" value="Philippines" /></div>
+            </div>
+            <div class="bar">
+              <button class="btn" type="submit">Save Shipping</button>
+            </div>
+            <div id="shipStatus" class="status"></div>
+          </form>
+
+          <form id="billForm">
+            <h2>Billing Address</h2>
+            <div class="row">
+              <div>
+                <label for="bill_name">Full name</label>
+                <input id="bill_name" />
+              </div>
+              <div>
+                <label for="bill_phone">Phone</label>
+                <input id="bill_phone" />
+              </div>
+            </div>
+            <label for="bill_line1">Address line 1</label>
+            <input id="bill_line1" />
+            <label for="bill_line2">Address line 2</label>
+            <input id="bill_line2" />
+            <div class="row">
+              <div><label for="bill_city">City</label><input id="bill_city" /></div>
+              <div><label for="bill_state">State/Province</label><input id="bill_state" /></div>
+            </div>
+            <div class="row">
+              <div><label for="bill_zip">Postal Code</label><input id="bill_zip" /></div>
+              <div><label for="bill_country">Country</label><input id="bill_country" value="Philippines" /></div>
+            </div>
+            <div class="bar">
+              <button class="btn" type="submit">Save Billing</button>
+            </div>
+            <div id="billStatus" class="status"></div>
+          </form>
+        </div>
+      </section>
+
+      <!-- SECURITY -->
+      <section id="sec-security" class="section" role="tabpanel" aria-labelledby="security">
+        <h2>Security</h2>
+        <p class="mini">You can request a password-reset email anytime.</p>
+        <div class="bar" style="justify-content:flex-start">
+          <button id="resetBtn" class="btn"><i class="fa-solid fa-envelope"></i>&nbsp; Send password reset email</button>
+        </div>
+        <div id="secStatus" class="status"></div>
+      </section>
     </div>
   </main>
+
+  <!-- Order details modal -->
+  <div id="orderModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+      <div class="m-head">
+        <h3 id="mTitle" class="m-title">Order</h3>
+        <button class="m-close" aria-label="Close" id="mClose">×</button>
+      </div>
+      <div class="m-body">
+        <div id="mMeta" class="mini" style="margin-bottom:10px"></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr></thead>
+            <tbody id="mItems"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Supabase client then your project client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
   <script>
   (function(){
+    /* ========= Helpers ========= */
     const $ = s => document.querySelector(s);
-    const status = $('#status');
-
-    function setMsg(text, ok=false){
-      status.textContent = text || '';
-      status.className = 'status ' + (text ? (ok ? 'ok' : 'err') : '');
+    const $$ = s => Array.from(document.querySelectorAll(s));
+    const money = n => '₱' + (Number(n||0)).toFixed(2);
+    function setMsg(el, text, ok=false){
+      if (!el) return;
+      el.textContent = text || '';
+      el.className = 'status ' + (text ? (ok ? 'ok' : 'err') : '');
     }
+    const profileStatus = $('#status');
+    const shipStatus = $('#shipStatus');
+    const billStatus = $('#billStatus');
+    const secStatus = $('#secStatus');
 
-    async function ensureSession(){
-      const { data: { session } } = await sb.auth.getSession();
-      if (!session) {
-        const red = encodeURIComponent('user.html');
-        location.href = `login.html?redirect=${red}`;
+    /* ========= Tabs ========= */
+    function showTab(id){
+      $$('.tab').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab===id)));
+      $$('.section').forEach(s => s.classList.toggle('active', s.id === 'sec-'+id));
+    }
+    $$('.tab').forEach(btn => btn.addEventListener('click', () => showTab(btn.dataset.tab)));
+
+    /* ========= Guard: require session ========= */
+    async function sessionOrRedirect(){
+      const { data:{ session } } = await sb.auth.getSession();
+      if (!session){
+        sessionStorage.setItem('lokalJustSignedOut','1');
+        location.href = 'index.html?signedout=1';
         return null;
       }
       return session;
     }
 
+    /* ========= Load profile ========= */
     async function loadProfile(user){
-      // Fill email/uid
       $('#email').value = user.email || '';
       $('#uid').value   = user.id;
-
-      // Email verification banner
       const verified = !!(user.email_confirmed_at || user.confirmed_at);
       $('#verifyBanner').hidden = verified;
 
-      // Load profile row
+      // profiles table: id (uuid PK), first_name, last_name, created_at
       const { data, error } = await sb
         .from('profiles')
         .select('first_name,last_name,created_at')
         .eq('id', user.id)
         .maybeSingle();
 
-      if (error) { setMsg('Load error: ' + error.message); return; }
-
+      if (error){
+        setMsg(profileStatus, 'Could not load profile: ' + error.message);
+        return;
+      }
       if (data){
         $('#first').value = data.first_name || '';
         $('#last').value  = data.last_name  || '';
-        // nice “member since”
         try{
           const dt = data.created_at ? new Date(data.created_at) : null;
           $('#memberSince').textContent = 'Member since ' + (dt ? dt.toLocaleDateString() : '—');
-        }catch(_){ /* ignore */ }
+        }catch(_){}
+      } else {
+        $('#memberSince').textContent = 'Member since —';
       }
     }
 
-    // Resend verify email
-    $('#resendBtn').addEventListener('click', async ()=>{
-      setMsg('');
-      const { data: { session } } = await sb.auth.getSession();
-      if (!session) return;
-      const email = session.user.email;
-      const { error } = await sb.auth.resend({
-        type: 'signup',
-        email
-      });
-      if (error) setMsg('Could not resend: ' + error.message);
-      else setMsg('Verification email sent.', true);
-    });
-
-    // Save profile
+    /* ========= Save profile ========= */
     $('#profileForm').addEventListener('submit', async (e)=>{
       e.preventDefault();
-      setMsg('');
-      const { data: { session } } = await sb.auth.getSession();
+      setMsg(profileStatus,'');
+      const { data:{ session } } = await sb.auth.getSession();
       if (!session) return;
       const id = session.user.id;
       const first = $('#first').value.trim();
@@ -192,25 +395,207 @@
         .from('profiles')
         .upsert({ id, first_name:first, last_name:last }, { onConflict:'id' });
 
-      if (error) setMsg('Save error: ' + error.message);
-      else setMsg('Profile saved.', true);
+      if (error) setMsg(profileStatus, 'Save error: ' + error.message);
+      else setMsg(profileStatus, 'Profile saved.', true);
     });
 
-    // Sign out
+    /* ========= Resend verification ========= */
+    $('#resendBtn').addEventListener('click', async ()=>{
+      setMsg(profileStatus,'');
+      const { data:{ session } } = await sb.auth.getSession();
+      if (!session) return;
+      const email = session.user.email;
+      const { error } = await sb.auth.resend({ type:'signup', email });
+      if (error) setMsg(profileStatus, 'Could not resend: ' + error.message);
+      else setMsg(profileStatus, 'Verification email sent.', true);
+    });
+
+    /* ========= Sign out (go home with toast) ========= */
     $('#signOutBtn').addEventListener('click', async ()=>{
       await sb.auth.signOut();
-      location.href = 'login.html';
+      sessionStorage.setItem('lokalJustSignedOut','1');
+      location.href = 'index.html?signedout=1';
     });
 
-    // Bootstrap
-    (async ()=>{
-      const session = await ensureSession();
-      if (!session) return; // redirected
-      await loadProfile(session.user);
+    /* ========= Orders ========= */
+    async function loadOrders(user){
+      const list = $('#ordersList'), empty = $('#ordersEmpty'), errBox = $('#ordersError');
+      list.innerHTML = ''; empty.hidden = true; errBox.hidden = true;
 
-      // Also react to auth state changes (e.g., token refresh/signout)
+      try{
+        const { data, error } = await sb
+          .from('orders')
+          .select('id, number, status, total, created_at')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending:false })
+          .limit(50);
+
+        if (error) throw error;
+        if (!data || !data.length){
+          empty.hidden = false;
+          return;
+        }
+        data.forEach(o=>{
+          const row = document.createElement('div');
+          row.className = 'order';
+          const when = new Date(o.created_at).toLocaleDateString();
+          row.innerHTML = `
+            <div>
+              <div class="meta">
+                <span class="mini"><strong>Order #</strong>${o.number || o.id}</span>
+                <span class="mini">${when}</span>
+                <span class="badge"><i class="fa-solid fa-circle-dot"></i> ${o.status || 'Processing'}</span>
+              </div>
+            </div>
+            <div class="order-actions">
+              <div class="total">${money(o.total)}</div>
+              <button class="btn ghost view-order" data-id="${o.id}">View</button>
+            </div>`;
+          list.appendChild(row);
+        });
+      } catch(err){
+        console.warn('Orders load error:', err);
+        errBox.hidden = false;
+      }
+    }
+
+    // Order modal
+    const modal = $('#orderModal'), mClose = $('#mClose');
+    function openModal(){ modal.setAttribute('aria-hidden','false'); }
+    function closeModal(){ modal.setAttribute('aria-hidden','true'); }
+    mClose.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e)=>{ if (e.target===modal) closeModal(); });
+
+    document.addEventListener('click', async (e)=>{
+      const btn = e.target.closest('.view-order');
+      if (!btn) return;
+      const id = btn.dataset.id;
+      $('#mTitle').textContent = 'Order ' + id.slice(0,8) + '…';
+      $('#mMeta').textContent = 'Loading…';
+      $('#mItems').innerHTML = '';
+      openModal();
+      try{
+        const { data, error } = await sb
+          .from('order_items')
+          .select('name, qty, price')
+          .eq('order_id', id);
+
+        if (error) throw error;
+        let rows = '';
+        let total = 0;
+        (data||[]).forEach(it=>{
+          const sub = (Number(it.qty)||0) * (Number(it.price)||0);
+          total += sub;
+          rows += `<tr><td>${it.name}</td><td>${it.qty}</td><td>${money(it.price)}</td><td>${money(sub)}</td></tr>`;
+        });
+        if (!rows) rows = `<tr><td colspan="4">No line items.</td></tr>`;
+        $('#mItems').innerHTML = rows;
+        $('#mMeta').textContent = 'Total (computed from items): ' + money(total);
+      }catch(err){
+        $('#mMeta').textContent = 'Could not load items.';
+      }
+    });
+
+    /* ========= Addresses ========= */
+    function readAddr(prefix){
+      return {
+        name:  $(`#${prefix}_name`).value.trim(),
+        phone: $(`#${prefix}_phone`).value.trim(),
+        line1: $(`#${prefix}_line1`).value.trim(),
+        line2: $(`#${prefix}_line2`).value.trim(),
+        city:  $(`#${prefix}_city`).value.trim(),
+        state: $(`#${prefix}_state`).value.trim(),
+        zip:   $(`#${prefix}_zip`).value.trim(),
+        country:$(`#${prefix}_country`).value.trim(),
+      };
+    }
+    function fillAddr(prefix, obj){
+      $(`#${prefix}_name`).value  = obj?.name  || '';
+      $(`#${prefix}_phone`).value = obj?.phone || '';
+      $(`#${prefix}_line1`).value = obj?.line1 || '';
+      $(`#${prefix}_line2`).value = obj?.line2 || '';
+      $(`#${prefix}_city`).value  = obj?.city  || '';
+      $(`#${prefix}_state`).value = obj?.state || '';
+      $(`#${prefix}_zip`).value   = obj?.zip   || '';
+      $(`#${prefix}_country`).value = obj?.country || '';
+    }
+
+    async function loadAddresses(user){
+      try{
+        const { data, error } = await sb
+          .from('addresses')
+          .select('type,name,phone,line1,line2,city,state,zip,country')
+          .eq('user_id', user.id);
+
+        if (error) throw error;
+        const ship = (data||[]).find(r=>r.type==='shipping');
+        const bill = (data||[]).find(r=>r.type==='billing');
+        fillAddr('ship', ship);
+        fillAddr('bill', bill);
+      } catch(err){
+        // If table doesn't exist yet, just stay empty.
+        console.info('Addresses not loaded (maybe no table yet):', err?.message || err);
+      }
+    }
+
+    async function saveAddress(user, type, payload, statusEl){
+      setMsg(statusEl,'');
+      try{
+        const up = { user_id:user.id, type, ...payload };
+        const { error } = await sb.from('addresses').upsert(up, { onConflict:'user_id,type' });
+        if (error) throw error;
+        setMsg(statusEl, (type==='shipping'?'Shipping':'Billing') + ' saved.', true);
+      }catch(err){
+        setMsg(statusEl, 'Save failed: ' + (err?.message || err));
+      }
+    }
+
+    $('#shipForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const { data:{ session } } = await sb.auth.getSession();
+      if (!session) return;
+      await saveAddress(session.user, 'shipping', readAddr('ship'), shipStatus);
+    });
+    $('#billForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const { data:{ session } } = await sb.auth.getSession();
+      if (!session) return;
+      await saveAddress(session.user, 'billing', readAddr('bill'), billStatus);
+    });
+
+    /* ========= Security: reset password email ========= */
+    $('#resetBtn').addEventListener('click', async ()=>{
+      setMsg(secStatus,'');
+      const { data:{ session } } = await sb.auth.getSession();
+      if (!session) return;
+      const email = session.user.email;
+      try{
+        const { error } = await sb.auth.resetPasswordForEmail(email, {
+          redirectTo: new URL(location.href, location.origin).href
+        });
+        if (error) throw error;
+        setMsg(secStatus, 'Reset email sent.', true);
+      }catch(err){
+        setMsg(secStatus, 'Could not send: ' + (err?.message || err));
+      }
+    });
+
+    /* ========= Bootstrap ========= */
+    (async ()=>{
+      const session = await sessionOrRedirect();
+      if (!session) return;
+      const user = session.user;
+
+      await loadProfile(user);
+      await loadOrders(user);
+      await loadAddresses(user);
+
+      // Keep page in sync with auth changes
       sb.auth.onAuthStateChange((evt, sess)=>{
-        if (!sess) location.href = 'login.html';
+        if (!sess){
+          sessionStorage.setItem('lokalJustSignedOut','1');
+          location.href = 'index.html?signedout=1';
+        }
       });
     })();
   })();

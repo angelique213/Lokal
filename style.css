@@ -45,7 +45,6 @@
 .featured-box-2-box-1:hover img, .featured-box-2-box-2:hover img, .featured-box-2-box-3:hover img{ transform:scale(1.1); }
 .overlay{ position:absolute; inset:0; display:flex; padding:5%; align-items:flex-end; justify-content:center; }
 
-
 /* ========== PRODUCT GRIDS ========== */
 .products{ width:100%; padding:30px 20%; background:var(--chip); display:flex; flex-direction:column; row-gap:20px; align-items:center; }
 .section-title{ font-family:'Montserrat'; }
@@ -123,7 +122,10 @@ button:hover{ background:#000; }
 .site-search button:hover{ background:#6d6a33; }
 
 /* Header utilities (icons) */
-.utils{ grid-column:3; display:flex; justify-content:flex-end; align-items:center; }
+.utils{
+  grid-column:3; display:flex; justify-content:flex-end; align-items:center;
+  position: relative; /* <-- added to anchor the greeting under the icons */
+}
 .utils .nav-links{ display:flex; align-items:center; gap:28px; list-style:none; margin:0; padding:0; }
 .utils .nav-links > li{ position:relative; display:flex; }
 .utils .nav-links a{ display:inline-flex; align-items:center; position:relative; text-decoration:none; color:#fff; line-height:1; }
@@ -203,6 +205,7 @@ button:hover{ background:#000; }
   .slide-details{ width:80%; padding:10px; }
   .slide{ padding-left:10%; }
 }
+
 /* wishlist heart button */
 .wl-btn{
   position:absolute; top:12px; right:12px;
@@ -214,3 +217,46 @@ button:hover{ background:#000; }
 .wl-btn:hover{ transform:translateY(-1px); box-shadow:0 8px 16px rgba(0,0,0,.08); }
 .wl-btn.wl-active{ color:#e74c3c; border-color:#e9c0bc; }
 .wl-btn i{ pointer-events:none; }
+
+/* ===== (existing) below-header greeting box; we keep it but will hide it when inline is shown ===== */
+.home-greeting{
+  max-width: 1200px;
+  margin: 10px auto 0;
+  padding: 6px 12px;
+  font: 600 0.95rem/1.4 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color:#2b1f1a;
+}
+/* make the icons container a positioning context */
+.utils { position: relative; }
+
+/* inline greeting under the icons */
+.inline-greeting.anchored{
+  position: absolute;
+  right: 0;          /* keep it aligned with the icons on the right */
+  bottom: -25px;     /* move it lower; tweak -10 to -18 as you like */
+  font: 600 0.92rem/1.2 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color:#2b1f1a;
+  white-space: nowrap;
+}
+
+/* only hide on very small screens */
+@media (max-width: 480px){
+  .inline-greeting.anchored{ display:none; }
+}
+.toast-signout {
+  position: fixed;
+  top: 76px;
+  right: 12px;
+  z-index: 3000;
+  background:#fff;
+  border:1px solid #e8e3da;
+  border-radius:12px;
+  padding:10px 14px;
+  box-shadow:0 16px 40px rgba(0,0,0,.12);
+  font:600 0.92rem/1.3 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color:#2b1f1a;
+}
+.toast-signout button {
+  background:none; border:0; cursor:pointer; font-size:18px; line-height:1;
+  padding:0 4px; margin-left:10px; color:#2b1f1a;
+}

@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Your Favorites | Lokal</title>
 
+  <!-- GH Pages/project base (used by cart.js image resolver) -->
+  <meta name="site-base" content="/Lokal/">
+
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
 
@@ -14,9 +17,7 @@
   <link rel="stylesheet" href="wishlist.css">
 
   <style>
-    :root{
-      --ink:#2b1f1a; --ink-2:#7a6f68; --line:#e8e3da; --card:#fff; --tone:#6d6a33;
-    }
+    :root{ --ink:#2b1f1a; --ink-2:#7a6f68; --line:#e8e3da; --card:#fff; --tone:#6d6a33; }
     .fav-wrap{ max-width:1200px; margin:24px auto 80px; padding:0 20px; }
     .fav-head{ display:flex; justify-content:space-between; align-items:end; gap:16px; margin:8px 0 18px; }
     .fav-head h1{ margin:0; color:var(--ink); font-size:2.2rem; }
@@ -46,9 +47,6 @@
     .empty a{ color:var(--tone); font-weight:800; }
   </style>
 </head>
-
-<!-- ===== Optional Auth Popup (unchanged) ===== -->
-<link href="https://fonts.googleapis.com/css2?family=Helvetica:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <body>
   <!-- ===== HEADER ===== -->
@@ -92,7 +90,7 @@
 
     <nav class="utils">
       <ul class="nav-links">
-        <li><a href="login.html" aria-label="Account"><i class="fa-solid fa-user"></i></a></li>
+        <li><a href="login.html" id="accountLink" aria-label="Account"><i class="fa-solid fa-user"></i></a></li>
         <li class="cart-icon">
           <a href="#" id="openCart" aria-label="Open cart">
             <i class="fa-solid fa-cart-shopping"></i>
@@ -190,13 +188,21 @@
     </div>
   </footer>
 
-  <!-- ===== SCRIPTS ===== -->
-  <script src="wishlist.js"></script>
+  <!-- ===== SCRIPTS (ORDER MATTERS) ===== -->
+  <!-- 1) Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- 2) Your Supabase client (uses your URL/key) -->
+  <script src="supabase.js"></script>
+  <!-- 3) Shared site glue (greeting, toast, helpers) -->
+  <script src="lokal.js"></script>
+  <!-- 4) Cart logic (drawer + header badge) -->
   <script src="cart.js"></script>
+  <!-- 5) Wishlist logic with cloud sync -->
+  <script src="wishlist.js"></script>
 
   <!-- Lock body scroll when cart drawer toggles -->
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', () => {
       const drawer = document.getElementById('cdDrawer');
       const toggleLock = () => {
         document.body.classList.toggle('lock-scroll', drawer.classList.contains('active'));
@@ -204,9 +210,5 @@
       new MutationObserver(toggleLock).observe(drawer, { attributes: true, attributeFilter: ['class'] });
     });
   </script>
-
-  <!-- (Optional) Supabase if you add cloud sync later -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase.js"></script>
 </body>
 </html>
