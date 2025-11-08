@@ -15,15 +15,15 @@
 <link rel="stylesheet" href="wishlist.css">
 <script src="wishlist.js" defer></script>
 
-<!-- ===== GitHub Pages base (adjust if not using GH Pages) ===== -->
+<!-- GitHub Pages base (adjust if not using GH Pages) -->
 <meta name="site-base" content="/Lokal/">
 
-<!-- ===== Image / asset resolver (works local + GH Pages) ===== -->
+<!-- Asset helpers -->
 <script>
   (function(){
     const SITE_BASE = (document.querySelector('meta[name="site-base"]')?.content || "/").replace(/\/+$/, "/");
     const ORIGIN_BASE = location.origin + SITE_BASE;
-    window.resolveAsset = function resolveAsset(p){
+    window.resolveAsset = function(p){
       if (!p) return "";
       if (/^https?:\/\//i.test(p)) return p;
       const cleaned = String(p).replace(/^\/+/, "");
@@ -31,104 +31,82 @@
       const tail = hit ? hit[1] : cleaned;
       try { return new URL(tail, ORIGIN_BASE).href; } catch { return p; }
     };
-    // A tiny helper to build safe relative links that work on GH Pages subpaths:
-    window.siteHref = function siteHref(rel){
+    window.siteHref = function(rel){
       rel = String(rel || "").replace(/^\//,"");
       return SITE_BASE.replace(/\/$/,"/") + rel;
     };
   })();
 </script>
 
-<!-- small fixes so labels stay visible + tidy mega menu columns -->
+<!-- Minimal extra styles for popup + toast + greeting only (index page) -->
 <style>
-.featured .overlay { z-index: 2; pointer-events: none; }
-.featured .overlay .button { pointer-events: auto; }
-.featured .bg-image { position: relative; z-index: 1; }
-
-.has-megamenu { position: relative; }
-.has-megamenu .mega{
-  position: absolute; left: 50%; top: 100%;
-  transform: translate(-50%, 12px);
-  width: min(860px, 92vw);
-  background: #fff; border: 1px solid #e8e3da; border-radius: 14px;
-  box-shadow: 0 24px 60px rgba(0,0,0,.12);
-  padding: 22px 26px;
-  opacity: 0; visibility: hidden;
-  transition: opacity .15s, transform .15s, visibility .15s;
-  z-index: 1000;
-}
-@media (hover:hover) and (pointer:fine){
-  .has-megamenu:hover > .mega{ opacity:1; visibility:visible; transform:translate(-50%, 16px); }
-}
-.has-megamenu.open > .mega{ opacity:1; visibility:visible; transform:translate(-50%, 16px); }
-.has-megamenu .mega a{ color:#2b1f1a; text-shadow:none; font-weight:800; text-decoration:none; }
-
-.cat-heading{ margin:0 0 10px; font: 800 0.9rem/1 'Montserrat', system-ui; letter-spacing:.08em; text-transform:uppercase; color:#6d6a33; }
-.cat-list{
-  list-style:none; margin:0; padding:0;
-  display:grid;
-  grid-auto-flow: column;
-  grid-template-rows: repeat(4, auto);
-  grid-auto-columns: minmax(240px, 1fr);
-  gap: 14px 32px;
-}
-.cat-list a{
-  display:inline-flex; align-items:center; gap:10px;
-  padding:10px 12px; border-radius:10px;
-}
-.cat-list a:hover{ background:#f8f6f2; box-shadow: inset 0 0 0 1px #e8e3da; color:#6d6a33; }
-@media (max-width: 720px){
-  .has-megamenu .mega{ width:min(600px,96vw); }
-  .cat-list{ grid-template-rows: repeat(7,auto); }
-}
-@media (max-width: 560px){
-  .cat-list{ grid-auto-flow: row; grid-template-rows:none; grid-template-columns:1fr; }
-}
-
-.product .product-image { position: relative; }
-
-/* ===== AUTH POPUP ===== */
-.lokal-auth{
-  --la-ink: #222;
-  --la-primary: #6A6932;
-  --la-primary-hover: #8A8841;
-  --la-focus: #A9A74F;
-  --la-line: #D7D6AA;
-  --la-bg: #fff;
-}
+/* ——— Auth popup ——— */
 .lokal-auth.la-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;place-items:center;z-index:3000}
 .lokal-auth.la-overlay[aria-hidden="false"]{display:grid}
 .lokal-auth .la-modal{
-  width:min(440px,92vw);background:var(--la-bg);border-radius:6px;border:1px solid var(--la-line);
-  box-shadow:0 16px 50px rgba(0,0,0,.25);font-family:"Helvetica","Arial",sans-serif;animation:fadeIn .25s ease;
+  width:min(440px,92vw);background:#fff;border-radius:6px;border:1px solid #D7D6AA;
+  box-shadow:0 16px 50px rgba(0,0,0,.25);font-family:system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  animation:fadeIn .25s ease;
 }
 @keyframes fadeIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
 .lokal-auth .la-head{display:flex;align-items:center;justify-content:space-between;padding:22px 26px 14px 26px;}
-.lokal-auth .la-title{font-size:1.05rem;font-weight:700;letter-spacing:.02em;margin:0;color:var(--la-ink);}
-.lokal-auth .la-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--la-ink)}
+.lokal-auth .la-title{font-size:1.05rem;font-weight:700;margin:0;color:#222;}
+.lokal-auth .la-close{background:none;border:none;font-size:22px;cursor:pointer;color:#222}
 .lokal-auth .la-body{padding:0 26px 20px 26px;}
-.lokal-auth .la-intro{font-weight:600;color:var(--la-ink);margin-bottom:20px;}
-.lokal-auth .la-label{display:block;font-size:.9rem;font-weight:600;margin-bottom:6px;color:var(--la-ink);}
-.lokal-auth .la-input{width:100%;padding:13px 12px;border:1px solid var(--la-ink);border-radius:4px;font-size:.9rem;color:var(--la-ink);font-weight:500;outline:none;}
-.lokal-auth .la-input:focus{border-color:var(--la-focus);box-shadow:0 0 0 2px rgba(169,167,79,.3);}
-.lokal-auth .la-btn{width:100%;padding:14px;border:none;border-radius:4px;background:var(--la-primary);color:#fff;font-weight:600;letter-spacing:.05em;cursor:pointer;margin-top:16px;font-size:.95rem;}
-.lokal-auth .la-btn:hover{background:var(--la-primary-hover);}
-.lokal-auth .la-btn:active{transform:translateY(1px);}
+.lokal-auth .la-intro{font-weight:600;color:#222;margin-bottom:20px;}
+.lokal-auth .la-label{display:block;font-size:.9rem;font-weight:600;margin-bottom:6px;color:#222;}
+.lokal-auth .la-input{width:100%;padding:13px 12px;border:1px solid #222;border-radius:4px;font-size:.9rem;color:#222;outline:none;}
+.lokal-auth .la-input:focus{border-color:#A9A74F;box-shadow:0 0 0 2px rgba(169,167,79,.3);}
+.lokal-auth .la-btn{width:100%;padding:14px;border:none;border-radius:4px;background:#6A6932;color:#fff;font-weight:600;cursor:pointer;margin-top:16px;font-size:.95rem;}
+.lokal-auth .la-btn:hover{background:#8A8841;}
 .lokal-auth .la-sub{text-align:center;margin-top:8px;}
-.lokal-auth .la-sub a{color:var(--la-ink);text-decoration:underline;font-size:.88rem;}
-.lokal-auth .la-foot{text-align:center;border-top:1px solid var(--la-line);padding:18px 0 20px 0;}
+.lokal-auth .la-sub a{color:#222;text-decoration:underline;font-size:.88rem;}
+.lokal-auth .la-foot{text-align:center;border-top:1px solid #D7D6AA;padding:18px 0 20px 0;}
 .lokal-auth .la-mini{display:flex;justify-content:center;align-items:center;gap:6px;font-size:.85rem;color:#555;}
 .lokal-auth .la-mini i{font-size:14px;}
-.lokal-auth .la-mlink{color:var(--la-ink);text-decoration:underline;font-weight:600;display:inline-block;margin-top:10px;font-size:.9rem;}
-</style>
 
-<!-- Auth popup font -->
-<link href="https://fonts.googleapis.com/css2?family=Helvetica:wght@400;500;600;700&display=swap" rel="stylesheet">
+/* ——— Signed-out toast ——— */
+.toast-signout {
+  position: fixed;
+  top: 76px;
+  right: 12px;
+  z-index: 3000;
+  background:#fff;
+  border:1px solid #e8e3da;
+  border-radius:12px;
+  padding:10px 14px;
+  box-shadow:0 16px 40px rgba(0,0,0,.12);
+  font:600 0.92rem/1.3 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color:#2b1f1a;
+}
+.toast-signout button {
+  background:none; border:0; cursor:pointer; font-size:18px; line-height:1;
+  padding:0 4px; margin-left:10px; color:#2b1f1a;
+}
+
+/* ——— Greeting chip (index only) ——— */
+.header{ position: relative; } /* anchor area */
+.hi-tag{
+  position:absolute;
+  top:6px;
+  right:14px;              /* TOP-RIGHT like you asked */
+  font: 800 0.92rem/1 'Montserrat', system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color:#2b1f1a;
+  pointer-events:none;     /* NEVER blocks clicks */
+  z-index:2;
+  white-space:nowrap;
+}
+@media (max-width: 640px){ .hi-tag{ display:none; } }
+
+/* ——— Kill any legacy inline greeting injected by lokal.js ——— */
+.inline-greeting { display:none !important; }
+#homeGreeting { display:none !important; }
+</style>
 </head>
 
 <body>
 
-<!-- ========== LOKAL AUTH POPUP ========== -->
+<!-- ========== LOKAL AUTH POPUP (include on every page) ========== -->
 <div class="lokal-auth la-overlay" id="lokalAuthOverlay" aria-hidden="true">
   <div class="la-modal" role="dialog" aria-modal="true" aria-labelledby="laTitle">
     <div class="la-head">
@@ -205,8 +183,8 @@
 
   <nav class="utils">
     <ul class="nav-links">
-      <!-- IMPORTANT: id for script control -->
-      <li><a href="login.html" id="accountLink" aria-label="Account"><i class="fa-solid fa-user"></i></a></li>
+      <!-- IMPORTANT: use # so clicks are JS-handled on every page -->
+      <li><a href="#" id="accountLink" aria-label="Account"><i class="fa-solid fa-user"></i></a></li>
       <li>
         <a href="#" id="openCart" aria-label="Open cart">
           <i class="fa-solid fa-cart-shopping"></i>
@@ -222,9 +200,10 @@
       <li><a href="support.html" aria-label="Support"><i class="fa-solid fa-headset"></i></a></li>
     </ul>
   </nav>
+
+  <!-- Top-right greeting (index only) -->
+  <div id="hiTag" class="hi-tag" hidden></div>
 </header>
-<!-- HOMEPAGE GREETING -->
-<div id="homeGreeting" class="home-greeting" aria-live="polite" hidden></div>
 
 <!-- BANNER -->
 <section class="banner">
@@ -303,6 +282,7 @@
 <section class="products">
   <h1 class="section-title">Top products of the Season</h1>
   <div class="products-list">
+    <!-- sample cards (unchanged) -->
     <div class="product" data-name="Santa Ornament" data-price="₱479.00" data-img="images/main-image.png" data-desc="Festive Santa ornament for your tree.">
       <div class="product-image">
         <div class="main-image"><img src="images/main-image.png" alt="Santa Ornament"></div>
@@ -443,40 +423,11 @@
 <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
 <script>AOS.init();</script>
 
-<!-- Supabase (SDK first, then your client) -->
+<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 
-<!-- Ask once for first name and store it (metadata + localStorage) -->
-<script>
-function capName(s){
-  s = String(s || "").trim();
-  return s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
-}
-async function ensureFirstName(){
-  try{
-    if (!window.sb || !sb.auth) return;
-    const { data } = await sb.auth.getUser();
-    const user = data?.user;
-    if (!user) return;
-
-    const md = user.user_metadata || {};
-    let first = md.first_name || md.given_name || (md.full_name || md.name || "").split(/\s+/)[0];
-
-    if (!first && user.email){
-      // fallback: use the part before @ (capitalized)
-      const guess = (user.email.split("@")[0] || "").split(/[._-]/)[0];
-      first = guess.charAt(0).toUpperCase() + guess.slice(1);
-      await sb.auth.updateUser({ data: { first_name: first } });
-    }
-
-    if (first) localStorage.setItem("lokalFirstName", first);
-  } catch(_){}
-}
-
-</script>
-
-<!-- Account link controller (unchanged except we call ensureFirstName() after login) -->
+<!-- Account link controller + Greeting + Sign-out toast -->
 <script>
 (function(){
   const $ = (s)=>document.querySelector(s);
@@ -484,17 +435,29 @@ async function ensureFirstName(){
   const emailForm = $('#laEmailForm'), passForm = $('#laPassForm');
   const emailInput = $('#laEmail'),  passInput = $('#laPass');
   const accountLink = $('#accountLink');
-  let sessionReady = false;
-  let isAuthed = false;
+  const hiTag = $('#hiTag');
 
-  // Open/close auth popup
+  // ---------- helpers ----------
+  const cap = s => { s = String(s||'').trim(); return s ? s[0].toUpperCase()+s.slice(1) : ''; };
+  function firstFromUser(user){
+    const md = (user && user.user_metadata) || {};
+    return md.first_name || md.given_name || (md.full_name||md.name||'').split(/\s+/)[0] || '';
+  }
+  function showGreeting(name){
+    if (!name){ hiTag.hidden = true; return; }
+    hiTag.textContent = 'Hi, ' + cap(name);
+    hiTag.hidden = false;
+  }
+  function hideGreeting(){ hiTag.hidden = true; }
+
+  // ---------- open/close popup ----------
   const openAuth = ()=>{ overlay?.setAttribute('aria-hidden','false'); emailForm.hidden=false; passForm.hidden=true; setTimeout(()=>emailInput?.focus(),50); };
   const closeAuth = ()=> overlay?.setAttribute('aria-hidden','true');
-  $('#laClose')?.addEventListener('click',closeAuth);
-  overlay?.addEventListener('click',e=>{ if(e.target===overlay) closeAuth(); });
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeAuth(); });
+  $('#laClose')?.addEventListener('click', closeAuth);
+  overlay?.addEventListener('click', e=>{ if(e.target===overlay) closeAuth(); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeAuth(); });
 
-  // Email step
+  // flow: email -> password
   emailForm?.addEventListener('submit', (e)=>{
     e.preventDefault();
     const email=(emailInput.value||'').trim().toLowerCase();
@@ -506,7 +469,7 @@ async function ensureFirstName(){
   });
   $('#laBackEmail')?.addEventListener('click', (e)=>{ e.preventDefault(); emailForm.hidden=false; passForm.hidden=true; emailInput.focus(); });
 
-  // Password step → Supabase sign-in (or offer sign-up)
+  // sign in
   passForm?.addEventListener('submit', async (e)=>{
     e.preventDefault();
     const email = passForm.dataset.email || '';
@@ -515,17 +478,11 @@ async function ensureFirstName(){
     try{
       if (!window.sb || !sb.auth) throw new Error('Supabase client missing. Check supabase.js');
       const { data, error } = await sb.auth.signInWithPassword({ email, password });
-      if (!error && data?.user) {
-        isAuthed = true;
-        await ensureFirstName();     // <-- collect & save first name here
-        closeAuth();
-        return;
-      }
       if (error) {
         const msg = (error.message || '').toLowerCase();
         if (msg.includes('confirm')) { alert('Please confirm your email first.'); return; }
         if (msg.includes('invalid') || msg.includes('password')) { alert('Incorrect email or password.'); return; }
-        const create = confirm('No account found for this email. Create a new one?');
+        const create = confirm('No account found. Create one?');
         if (!create) return;
         const { error: signUpError } = await sb.auth.signUp({
           email, password,
@@ -534,55 +491,93 @@ async function ensureFirstName(){
         if (signUpError) { alert(signUpError.message || 'Sign up failed.'); return; }
         alert('Check your email to verify, then sign in.');
         closeAuth();
+        return;
       }
+      // success
+      sessionStorage.setItem('hadSession','1');
+      const user = data?.user;
+      const first = firstFromUser(user);
+      if (first) localStorage.setItem('lokalFirstName', first);
+      closeAuth();
+      showGreeting(first || localStorage.getItem('lokalFirstName') || '');
     } catch (err){
       alert((err && err.message) || 'Network error. Check your Supabase setup.');
     }
   });
 
-  // Session check + live updates
-  async function refreshSessionUI(){
-    try{
-      if (!window.sb || !sb.auth) return;
-      const { data } = await sb.auth.getSession();
-      isAuthed = !!data?.session;
-    }catch(_){}
-    sessionReady = true;
-  }
-
-  // Click handler for the user icon
+  // user icon: popup if signed out, go profile if signed in
   accountLink?.addEventListener('click', async (e)=>{
     e.preventDefault();
-    if (!sessionReady) await refreshSessionUI();
-
-    if (isAuthed){
-      try{
-        const resp = await fetch('user.html', { method:'HEAD' });
-        if (resp.ok) location.href = 'user.html';
-        else alert('Profile page (user.html) not found. Please add it to your repo.');
-      } catch { location.href = 'user.html'; }
-    } else {
+    try{
+      const { data:{ session } } = await sb.auth.getSession();
+      if (session) location.href = 'user.html';
+      else openAuth();
+    }catch{
       openAuth();
     }
   });
 
-  // Initialize live session sync
-  (async function init(){
-    await refreshSessionUI();
-    if (window.sb && sb.auth && sb.auth.onAuthStateChange){
-      sb.auth.onAuthStateChange((_event, session)=>{
-        isAuthed = !!session;
-        if (session) ensureFirstName();
-      });
-    }
-  })();
+  // show/hide greeting on load based on session
+  document.addEventListener('DOMContentLoaded', async ()=>{
+    try{
+      const { data:{ session } } = await sb.auth.getSession();
+      if (session){
+        const first = firstFromUser(session.user) || localStorage.getItem('lokalFirstName') || '';
+        showGreeting(first);
+      } else {
+        hideGreeting();
+      }
+    }catch{ hideGreeting(); }
+  });
+
+  // react to auth changes (keep greeting + toast flags correct)
+  if (window.sb?.auth?.onAuthStateChange){
+    sb.auth.onAuthStateChange((evt, session)=>{
+      if (evt === 'SIGNED_IN' || (session && session.user)){
+        sessionStorage.setItem('hadSession','1');
+        const first = firstFromUser(session?.user) || localStorage.getItem('lokalFirstName') || '';
+        if (first) localStorage.setItem('lokalFirstName', first);
+        showGreeting(first);
+      }
+      if (evt === 'SIGNED_OUT'){
+        if (sessionStorage.getItem('hadSession') === '1'){
+          sessionStorage.setItem('justSignedOut','1');
+        }
+        hideGreeting();
+      }
+    });
+  }
 })();
 </script>
 
-<!-- NOW load lokal.js so it can see Supabase immediately -->
-<script src="lokal.js"></script>
+<!-- Logout toast (shows only right after a real sign-out) -->
+<script>
+(function(){
+  function showToast(msg){
+    if (document.getElementById('signedOutToast')) return;
+    const box = document.createElement('div');
+    box.id = 'signedOutToast';
+    box.className = 'toast-signout';
+    box.setAttribute('role','status');
+    box.setAttribute('aria-live','polite');
+    box.innerHTML = `<span>${msg}</span><button aria-label="Dismiss">×</button>`;
+    document.body.appendChild(box);
+    const close = () => box.remove();
+    box.querySelector('button')?.addEventListener('click', close);
+    setTimeout(close, 5000);
+  }
+  document.addEventListener('DOMContentLoaded', ()=>{
+    if (sessionStorage.getItem('justSignedOut') === '1'){
+      showToast("You’re signed out.");
+      sessionStorage.removeItem('justSignedOut');
+      sessionStorage.removeItem('hadSession');
+    }
+  });
+})();
+</script>
 
-<!-- Your cart logic (deferred is fine) -->
+<!-- Storefront glue and cart -->
+<script src="lokal.js"></script>
 <script src="cart.js" defer></script>
 </body>
 </html>

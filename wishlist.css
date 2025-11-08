@@ -73,25 +73,38 @@
   object-fit: contain;
 }
 
-/* Heart inside wishlist card */
+/* ===== FIXED HEART POSITION (moved slightly left and down) ===== */
 .wish-card .like-btn {
   position: absolute;
-  right: 12px;
-  bottom: 12px;
-  background: none;
-  border: none;
-  font-size: 1.8rem;
-  color: #fff;
+  top: 14px;         /* distance from top edge */
+  right: 18px;       /* distance from right edge */
+  background: none !important;
+  border: none !important;
+  font-size: 1.9rem;
   cursor: pointer;
-  transition: transform 0.15s ease, color 0.2s ease;
+  transition: transform 0.15s ease, color 0.25s ease;
+  z-index: 5;
 }
-.wish-card .like-btn:hover {
+
+/* Default (already favorited → solid red) */
+.wish-card .like-btn i {
+  color: #e11d48; /* solid red */
+}
+
+/* Hover tint effect */
+.wish-card .like-btn:hover i {
   transform: scale(1.15);
-  color: #ff9db0;
+  color: #ff5e7c; /* lighter red on hover */
 }
-.wish-card .like-btn.active,
-.wish-card .like-btn:active {
-  color: #e11d48;
+
+/* Optional pulse on click */
+.wish-card .like-btn.pulse {
+  animation: wlPulse 0.25s ease;
+}
+@keyframes wlPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.25); }
+  100% { transform: scale(1); }
 }
 
 /* Info section */
@@ -145,14 +158,14 @@
 /* Default: pure white heart */
 .wishlist-btn i {
   font-size: 28px;
-  color: #ffffff; /* fully white */
-  text-shadow: 0 0 1px rgba(0,0,0,0.15); /* soft visibility */
+  color: #ffffff;
+  text-shadow: 0 0 1px rgba(0,0,0,0.15);
   transition: color 0.25s ease, transform 0.25s ease;
 }
 
 /* Hover tint */
 .wishlist-btn:hover i {
-  color: #ff9db0; /* light pink on hover */
+  color: #ff9db0;
 }
 
 /* When active/favorited → solid red */
@@ -160,7 +173,7 @@
 .wishlist-btn.is-active i,
 .wishlist-btn.wl-active i,
 .wishlist-btn i.fa-solid {
-  color: #e11d48; /* solid red */
+  color: #e11d48;
   text-shadow: none;
 }
 
@@ -181,38 +194,4 @@
   background: none !important;
   outline: none !important;
   box-shadow: none !important;
-}
-/* ===== WISHLIST PAGE HEART FIX ===== */
-
-/* Heart inside each wishlist product card */
-.wish-card .like-btn {
-  position: absolute;
-  right: 12px;
-  bottom: 12px;
-  background: none !important;
-  border: none !important;
-  font-size: 1.9rem;
-  cursor: pointer;
-  transition: transform 0.15s ease, color 0.25s ease;
-}
-
-/* Default (already favorited → solid red) */
-.wish-card .like-btn i {
-  color: #e11d48; /* solid red */
-}
-
-/* Hover tint effect */
-.wish-card .like-btn:hover i {
-  transform: scale(1.15);
-  color: #ff5e7c; /* lighter red on hover */
-}
-
-/* Optional pulse on click */
-.wish-card .like-btn.pulse {
-  animation: wlPulse 0.25s ease;
-}
-@keyframes wlPulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.25); }
-  100% { transform: scale(1); }
 }

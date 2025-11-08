@@ -226,37 +226,33 @@ button:hover{ background:#000; }
   font: 600 0.95rem/1.4 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   color:#2b1f1a;
 }
-/* make the icons container a positioning context */
-.utils { position: relative; }
 
-/* inline greeting under the icons */
-.inline-greeting.anchored{
-  position: absolute;
-  right: 0;          /* keep it aligned with the icons on the right */
-  bottom: -25px;     /* move it lower; tweak -10 to -18 as you like */
+/* ===== Inline greeting styles ===== */
+/* small inline text (legacy position if ever used) */
+.inline-greeting{
   font: 600 0.92rem/1.2 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   color:#2b1f1a;
   white-space: nowrap;
+  margin-left: 12px;
 }
 
-/* only hide on very small screens */
-@media (max-width: 480px){
+/* anchored variant: sits UNDER the icons, right-aligned */
+.inline-greeting.anchored{
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);  /* drop it a bit lower below the icons row */
+}
+
+/* hide on very small screens to avoid wrapping */
+@media (max-width: 720px){
+  .inline-greeting,
   .inline-greeting.anchored{ display:none; }
 }
-.toast-signout {
-  position: fixed;
-  top: 76px;
-  right: 12px;
-  z-index: 3000;
-  background:#fff;
-  border:1px solid #e8e3da;
-  border-radius:12px;
-  padding:10px 14px;
-  box-shadow:0 16px 40px rgba(0,0,0,.12);
-  font:600 0.92rem/1.3 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  color:#2b1f1a;
-}
-.toast-signout button {
-  background:none; border:0; cursor:pointer; font-size:18px; line-height:1;
-  padding:0 4px; margin-left:10px; color:#2b1f1a;
+.inline-greeting.anchored {
+  position: absolute;
+  right: 0;
+  bottom: -14px;   /* move lower: increase or decrease as you like */
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #2b1f1a;
 }
