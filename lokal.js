@@ -326,3 +326,14 @@ document.addEventListener("click", (e) => {
   sb.auth.onAuthStateChange((_evt, session)=>{ session ? onSignIn() : onSignOut(); });
 })();
 window.updateCartCount = updateCartCount;
+/* ------------------ Account Link fallback for GitHub Pages ------------------ */
+(function(){
+  const link = document.getElementById('accountLink');
+  if (!link) return;
+
+  // Make sure it's always clickable even if JS loads late or Supabase fails
+  const ret = encodeURIComponent(location.href);
+  if (!link.getAttribute('href') || link.getAttribute('href') === '#') {
+    link.setAttribute('href', `login.html?return=${ret}`);
+  }
+})();

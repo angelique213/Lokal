@@ -46,6 +46,21 @@
     .empty{ color:var(--ink-2); text-align:center; margin:30px 0 10px; }
     .empty a{ color:var(--tone); font-weight:800; }
   </style>
+  <style>
+    /* Safety net so overlays never block the header when "hidden" */
+    #cdOverlay[aria-hidden="true"]{
+      display: none !important;
+      pointer-events: none !important;
+    }
+    #cdDrawer[aria-hidden="true"]{
+      display: none !important;
+      pointer-events: none !important;
+    }
+  
+    /* Your greeting tag should never block clicks */
+    .hi-tag{ pointer-events: none; }
+  </style>
+  
 </head>
 
 <body>

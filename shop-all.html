@@ -234,6 +234,21 @@
     .lokal-auth .la-mini i{font-size:14px;}
     .lokal-auth .la-mlink{color:var(--la-ink);text-decoration:underline;font-weight:600;display:inline-block;margin-top:10px;font-size:.9rem;}
   </style>
+  <style>
+    /* Safety net so overlays never block the header when "hidden" */
+    #cdOverlay[aria-hidden="true"]{
+      display: none !important;
+      pointer-events: none !important;
+    }
+    #cdDrawer[aria-hidden="true"]{
+      display: none !important;
+      pointer-events: none !important;
+    }
+  
+    /* Your greeting tag should never block clicks */
+    .hi-tag{ pointer-events: none; }
+  </style>
+  
 </head>
 <body>
 

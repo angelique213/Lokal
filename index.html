@@ -102,6 +102,21 @@
 .inline-greeting { display:none !important; }
 #homeGreeting { display:none !important; }
 </style>
+<style>
+  /* Safety net so overlays never block the header when "hidden" */
+  #cdOverlay[aria-hidden="true"]{
+    display: none !important;
+    pointer-events: none !important;
+  }
+  #cdDrawer[aria-hidden="true"]{
+    display: none !important;
+    pointer-events: none !important;
+  }
+
+  /* Your greeting tag should never block clicks */
+  .hi-tag{ pointer-events: none; }
+</style>
+
 </head>
 
 <body>
