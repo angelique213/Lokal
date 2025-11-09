@@ -155,11 +155,20 @@
       </ul>
     </div>
   </footer>
+  <!-- Footer or last sections above -->
 
-  <!-- SCRIPTS: order matters -->
+  <!-- Supabase client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
-  <script src="lokal.js"></script>
-  <script src="cart.js"></script>
+
+  <!-- NEW: cloud persistence layer (this must come before your site scripts) -->
+  <script src="persist-sync.js"></script>
+
+  <!-- your existing scripts -->
+  <script src="cart.js" defer></script>
+  <script src="wishlist.js" defer></script>
+</body>
+</html>
+
 </body>
 </html>

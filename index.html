@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Lokal</title>
+<link rel="icon" href="images/favicon.jpg" type="image/x-icon">
 
 <!-- libs -->
 <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css">
@@ -438,10 +439,6 @@
 <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
 <script>AOS.init();</script>
 
-<!-- Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
-
 <!-- Account link controller + Greeting + Sign-out toast -->
 <script>
 (function(){
@@ -591,8 +588,16 @@
 })();
 </script>
 
-<!-- Storefront glue and cart -->
-<script src="lokal.js"></script>
+<!-- Supabase client -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+
+<!-- NEW: cloud persistence layer (leave your current code untouched) -->
+<script src="persist-sync.js"></script>
+
+<!-- your existing scripts -->
 <script src="cart.js" defer></script>
+<script src="wishlist.js" defer></script>
+
 </body>
 </html>

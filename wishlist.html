@@ -202,20 +202,6 @@
       </ul>
     </div>
   </footer>
-
-  <!-- ===== SCRIPTS (ORDER MATTERS) ===== -->
-  <!-- 1) Supabase SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- 2) Your Supabase client (uses your URL/key) -->
-  <script src="supabase.js"></script>
-  <!-- 3) Shared site glue (greeting, toast, helpers, addToCart) -->
-  <script src="lokal.js"></script>
-  <!-- 4) Cart logic (drawer + header badge) -->
-  <script src="cart.js"></script>
-  <!-- 5) Wishlist logic with cloud sync -->
-  <script src="wishlist.js"></script>
-
-  <!-- Lock body scroll when cart drawer toggles -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const drawer = document.getElementById('cdDrawer');
@@ -225,5 +211,20 @@
       new MutationObserver(toggleLock).observe(drawer, { attributes: true, attributeFilter: ['class'] });
     });
   </script>
+    <!-- Footer or last sections above -->
+
+  <!-- Supabase client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+
+  <!-- NEW: cloud persistence layer (this must come before your site scripts) -->
+  <script src="persist-sync.js"></script>
+
+  <!-- your existing scripts -->
+  <script src="cart.js" defer></script>
+  <script src="wishlist.js" defer></script>
+</body>
+</html>
+
 </body>
 </html>
