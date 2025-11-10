@@ -60,36 +60,16 @@
   input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(169,167,79,.22)}
   .bar{display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
 
-  /* ==== CENTER the Shortcuts buttons ==== */
-/* Center the Shortcuts row */
-.bar.shortcuts-bar{
-  justify-content: center !important;
-  gap: 22px;
-}
-
-/* Make each Shortcut button center its icon + label */
-.bar.shortcuts-bar .btn.ghost{
-  display: flex;                 /* turn the <a> into a flex box */
-  align-items: center;           /* vertical center */
-  justify-content: center;       /* horizontal center */
-  gap: 10px;                     /* space between icon and text */
-  min-width: 280px;              /* wide pill */
-  height: 68px;                  /* taller pill to feel “cardy” */
-  padding: 0 18px;               /* remove side bias */
-  text-align: center;            /* redundant but harmless */
-}
-
-/* optional: shrink nicely on mobile */
-@media (max-width: 600px){
-  .bar.shortcuts-bar{
-    flex-direction: column;
-    gap: 12px;
-  }
+  /* Center the Shortcuts row */
+  .bar.shortcuts-bar{ justify-content: center !important; gap: 22px; }
   .bar.shortcuts-bar .btn.ghost{
-    min-width: 100%;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    min-width:280px; height:68px; padding:0 18px; text-align:center;
   }
-}
-
+  @media (max-width: 600px){
+    .bar.shortcuts-bar{ flex-direction: column; gap: 12px; }
+    .bar.shortcuts-bar .btn.ghost{ min-width: 100%; }
+  }
 
   .btn{
     height:46px;padding:0 18px;border-radius:10px;border:0;background:var(--brand);
@@ -143,7 +123,6 @@
         <div class="crumb mini"><a href="index.html">← Back to Home</a></div>
       </div>
       
-
       <!-- Tabs -->
       <nav class="tabs" role="tablist" aria-label="Account sections">
         <button class="tab" role="tab" aria-selected="true"  data-tab="profile"><i class="fa-solid fa-id-card"></i>&nbsp; Profile</button>
@@ -345,7 +324,8 @@
     async function sessionOrRedirect(){
       const { data:{ session } } = await sb.auth.getSession();
       if (!session){
-        sessionStorage.setItem('lokalJustSignedOut','1');
+        // set toast flag and bounce home
+        sessionStorage.setItem('justSignedOut','1');
         location.href = 'index.html?signedout=1';
         return null;
       }
@@ -413,9 +393,13 @@
 
     /* ========= Sign out (go home with toast) ========= */
     $('#signOutBtn').addEventListener('click', async ()=>{
-      await sb.auth.signOut();
-      sessionStorage.setItem('lokalJustSignedOut','1');
-      location.href = 'index.html?signedout=1';
+      try{
+        await sb.auth.signOut();
+      }finally{
+        // flag for toast & redirect; persist-sync.js will clear locals on SIGNED_OUT
+        sessionStorage.setItem('justSignedOut','1');
+        location.href = 'index.html?signedout=1';
+      }
     });
 
     /* ========= Orders ========= */
@@ -529,8 +513,8 @@
           .eq('user_id', user.id);
 
         if (error) throw error;
-        const ship = (data||[]).find(r=>r.type==='shipping');
-        const bill = (data||[]).find(r=>r.type==='billing');
+        const ship = (data||[]).find(r => r.type === 'shipping');
+        const bill = (data||[]).find(r => r.type === 'billing');
         fillAddr('ship', ship);
         fillAddr('bill', bill);
       } catch(err){
@@ -594,7 +578,7 @@
       // Keep page in sync with auth changes
       sb.auth.onAuthStateChange((evt, sess)=>{
         if (!sess){
-          sessionStorage.setItem('lokalJustSignedOut','1');
+          sessionStorage.setItem('justSignedOut','1');
           location.href = 'index.html?signedout=1';
         }
       });

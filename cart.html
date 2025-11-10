@@ -14,10 +14,16 @@
   <!-- Site Styles -->
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="cart.css">
+
+  <style>
+    /* Ensure hidden overlays never block clicks when "hidden" */
+    #cdOverlay[aria-hidden="true"]{ display:none!important; pointer-events:none!important; }
+    #cdDrawer[aria-hidden="true"]{ display:none!important; pointer-events:none!important; }
+  </style>
 </head>
 
 <body>
-  <!-- HEADER -->
+  <!-- ===== HEADER ===== -->
   <header class="header">
     <div class="logo">
       <a href="index.html" aria-label="Home">
@@ -39,7 +45,20 @@
           <li><a href="best-pick/best-picks.html">Best Picks</a></li>
           <li><a href="shop-all.html">Shop All</a></li>
           <li class="has-megamenu">
-            <a href="shop-all.html?cat=flavors" class="catmenu-toggle">Shop by Category</a>
+            <a href="#" class="catmenu-toggle" aria-expanded="false">
+              Shop by Category <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+            </a>
+            <div class="mega" id="catMega" role="menu" aria-label="Shop by Category">
+              <ul class="cat-list">
+                <li><a href="shop-all.html?cat=flavors"><i class="fa-solid fa-cookie-bite"></i> Flavors</a></li>
+                <li><a href="shop-all.html?cat=accessories"><i class="fa-solid fa-gear"></i> Accessories</a></li>
+                <li><a href="shop-all.html?cat=bags"><i class="fa-solid fa-bag-shopping"></i> Bags</a></li>
+                <li><a href="shop-all.html?cat=clothing"><i class="fa-solid fa-shirt"></i> Clothing</a></li>
+                <li><a href="shop-all.html?cat=home"><i class="fa-solid fa-mug-hot"></i> Home</a></li>
+                <li><a href="shop-all.html?cat=crafts"><i class="fa-solid fa-scissors"></i> Crafts</a></li>
+                <li><a href="shop-all.html?cat=christmas"><i class="fa-solid fa-snowflake"></i> Christmas</a></li>
+              </ul>
+            </div>
           </li>
         </ul>
       </nav>
@@ -48,9 +67,9 @@
     <!-- Utilities -->
     <nav class="utils">
       <ul class="nav-links">
-        <li><a href="login.html" id="accountLink" aria-label="Account"><i class="fa-solid fa-user"></i></a></li>
+        <li><a href="#" id="accountLink" aria-label="Account"><i class="fa-solid fa-user"></i></a></li>
         <li class="cart-icon">
-          <a href="cart.html" aria-label="Cart">
+          <a href="#" id="openCart" aria-label="Cart">
             <i class="fa-solid fa-cart-shopping"></i>
             <span class="cart-count">0</span>
           </a>
@@ -66,7 +85,7 @@
     </nav>
   </header>
 
-  <!-- (Optional) CART DRAWER — kept so the drawer works here too -->
+  <!-- ===== CART DRAWER (kept so drawer works on this page) ===== -->
   <div class="cd-overlay" id="cdOverlay" aria-hidden="true"></div>
   <aside class="cd-drawer" id="cdDrawer" aria-hidden="true" role="dialog" aria-label="Cart drawer">
     <div class="cd-header">
@@ -90,7 +109,7 @@
     </div>
   </aside>
 
-  <!-- CART PAGE -->
+  <!-- ===== CART PAGE ===== -->
   <main class="cart-page" aria-live="polite">
     <h1>Your Cart</h1>
 
@@ -114,61 +133,319 @@
         <button class="checkout-btn" id="checkoutBtn">Proceed to Checkout</button>
         <button class="button" id="clearCart" type="button" style="background:#fff;border:1px solid #ddd;color:#2b1f1a;">Clear Cart</button>
       </div>
+      <label class="cd-terms" style="display:block;margin-top:10px;">
+        <input id="pageAgree" type="checkbox">
+        <span>I agree with the <a href="terms.html" target="_blank" rel="noopener">terms and conditions</a></span>
+      </label>
     </div>
   </main>
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div class="footer-section">
-      <h1>Contact Us</h1>
-      <ul class="footer-list">
-        <li>lokal@info.com</li>
-        <li>lokal@admin.com</li>
-        <li>Manila, Philippines</li>
-        <li class="border-list"></li>
-        <li class="socials">
-          <i class="fa-brands fa-square-instagram"></i>
-          <i class="fa-brands fa-square-facebook"></i>
-          <i class="fa-brands fa-tiktok"></i>
-        </li>
-      </ul>
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer-grid" aria-label="Site footer">
+      <section class="footer-section" aria-labelledby="ft-contact-title">
+        <h2 id="ft-contact-title" class="ft-title">Contact Us</h2>
+        <ul class="footer-list">
+          <li>
+            <a href="mailto:shoplokalphilippines@gmail.com?subject=Lokal%20Support%20Request&body=Hi%20Lokal%20Team%2C%0A%0AIssue%3A%20%0AOrder%20%23%3A%20%0ABrowser%2FDevice%3A%20%0A%0AThanks%2C%0A"
+              aria-label="Email shoplokalphilippines at gmail dot com">
+              shoplokalphilippines@gmail.com
+            </a>
+          </li>
+          <li><address style="font-style:normal">Manila, Philippines</address></li>
+          <li class="border-list" aria-hidden="true"></li>
+          <li class="socials" aria-label="Social links">
+            <a href="#" aria-label="Instagram"><i class="fa-brands fa-square-instagram" aria-hidden="true"></i></a>
+            <a href="#" aria-label="Facebook"><i class="fa-brands fa-square-facebook" aria-hidden="true"></i></a>
+            <a href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok" aria-hidden="true"></i></a>
+          </li>
+        </ul>
+        <p class="ft-note" style="margin-top:8px">
+          Need help? Visit our <a href="support.html">Support</a> page or email us.
+        </p>
+      </section>
+
+      <nav class="footer-section" aria-labelledby="ft-links-title">
+        <h2 id="ft-links-title" class="ft-title">Quick Links</h2>
+        <ul class="footer-list">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="shop-all.html">Shop All</a></li>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="terms.html">Terms &amp; Conditions</a></li>
+          <li><a href="support.html">Support</a></li>
+        </ul>
+      </nav>
+
+      <section class="footer-section" aria-labelledby="ft-news-title">
+        <h2 id="ft-news-title" class="ft-title">Subscribe to Newsletter</h2>
+        <p class="ft-subcopy">Get product drops, deals, and stories from local makers—straight to your inbox.</p>
+        <form id="newsletterForm" class="ft-news-form" novalidate>
+          <label class="sr-only" for="newsletterEmail">Email address</label>
+          <input id="newsletterEmail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="Your email" required aria-describedby="newsletterNote" />
+          <button class="button" id="newsletterBtn" type="submit" aria-label="Subscribe to newsletter">Subscribe</button>
+          <div class="ft-consent">
+            <input id="newsletterConsent" name="consent" type="checkbox" required />
+            <label for="newsletterConsent">I agree to the <a href="terms.html">Terms &amp; Conditions</a> and <a href="terms.html#privacy">Privacy Policy</a>.</label>
+          </div>
+          <p id="newsletterNote" class="ft-note">We never share your email. Unsubscribe anytime.</p>
+          <div id="newsletterMsg" class="ft-msg" role="status" aria-live="polite"></div>
+        </form>
+      </section>
     </div>
 
-    <div class="footer-section">
-      <h1>Quick Links</h1>
-      <ul class="footer-list">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="shop-all.html">Shop All</a></li>
-        <li><a href="about.html">About Us</a></li>
-        <li><a href="terms.html">Terms & Conditions</a></li>
-      </ul>
-    </div>
-
-    <div class="footer-section">
-      <h1>Subscribe to Newsletter</h1>
-      <ul class="footer-list">
-        <li>A local marketplace is a community hub where people buy, sell, or trade goods and services within their area.</li>
-        <li class="sub">
-          <input type="text" placeholder="Your email" />
-          <button class="button">Subscribe</button>
-        </li>
-      </ul>
+    <div class="ft-legal">
+      <small>&copy; <span id="yearNow"></span> Lokal. All rights reserved.</small>
     </div>
   </footer>
-  <!-- Footer or last sections above -->
 
-  <!-- Supabase client -->
+  <!-- ===== CORE / LIBS ===== -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
 
-  <!-- NEW: cloud persistence layer (this must come before your site scripts) -->
+  <!-- Optional cloud sync (before site scripts so it can hydrate first) -->
   <script src="persist-sync.js"></script>
 
-  <!-- your existing scripts -->
+  <!-- Your global site scripts -->
   <script src="cart.js" defer></script>
   <script src="wishlist.js" defer></script>
-</body>
-</html>
+  <script src="newsletter.js" defer></script>
 
+  <!-- ===== CART PAGE LOGIC ===== -->
+  <script>
+    (function(){
+      const SITE_BASE = (document.querySelector('meta[name="site-base"]')?.content || "/").replace(/\/+$/,'/') ;
+      const toAbs = (p) => {
+        try { new URL(p); return p; } catch {}
+        try { return new URL(p.replace(/^\/+/,''),
+                  location.origin + SITE_BASE).href; } catch { return p; }
+      };
+      const $ = (s) => document.querySelector(s);
+
+      const cartItemsEl   = $('#cartItems');
+      const cartEmptyEl   = $('#cart-empty');
+      const cartSummaryEl = $('#cartSummary');
+      const totalEl       = $('#cart-total');
+
+      const pageAgree     = $('#pageAgree');
+      const checkoutBtn   = $('#checkoutBtn');
+
+      // Drawer helpers kept consistent across pages
+      window.openCartDrawer = window.openCartDrawer || function(){
+        document.getElementById('cdDrawer')?.classList.add('active');
+        document.getElementById('cdOverlay')?.classList.add('active');
+        document.body.classList.add('lock-scroll');
+      };
+      function closeCart(){
+        document.getElementById('cdDrawer')?.classList.remove('active');
+        document.getElementById('cdOverlay')?.classList.remove('active');
+        document.body.classList.remove('lock-scroll');
+      }
+      document.getElementById('cdClose')?.addEventListener('click', closeCart);
+      document.getElementById('cdOverlay')?.addEventListener('click', closeCart);
+      document.addEventListener('click', (e)=>{
+        const btn = e.target.closest('#openCart');
+        if (!btn) return;
+        e.preventDefault();
+        window.openCartDrawer();
+      });
+      // Lock body when drawer toggles
+      const drawer = document.getElementById('cdDrawer');
+      if (drawer){
+        new MutationObserver(() => {
+          document.body.classList.toggle('lock-scroll', drawer.classList.contains('active'));
+        }).observe(drawer, { attributes: true, attributeFilter: ['class'] });
+      }
+
+      // Footer year
+      document.addEventListener('DOMContentLoaded', ()=>{
+        const y = document.getElementById('yearNow');
+        if (y) y.textContent = new Date().getFullYear();
+      });
+
+      // Storage helpers (align with cart.js)
+      function loadCart(){
+        try{
+          const raw = localStorage.getItem('cart');
+          const data = raw ? JSON.parse(raw) : [];
+          return Array.isArray(data) ? data : [];
+        }catch{ return []; }
+      }
+      function saveCart(items){
+        localStorage.setItem('cart', JSON.stringify(items));
+        // Allow header bubble / other listeners to update
+        window.dispatchEvent(new Event('cart:updated'));
+      }
+
+      function pesoToNumber(p){ // "₱1,234" -> 1234
+        if (typeof p === 'number') return p;
+        const s = String(p||'').replace(/[^\d.]/g,'');
+        return parseFloat(s || '0');
+      }
+      function formatPeso(n){
+        try { return n.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+        catch { return (Math.round(n*100)/100).toFixed(2); }
+      }
+
+      function lineTotal(item){
+        const price = pesoToNumber(item.price);
+        const qty   = Math.max(1, parseInt(item.quantity || 1));
+        return price * qty;
+      }
+
+      function itemTemplate(item){
+        const id   = item.id || 'item';
+        const name = item.name || item.baseName || 'Item';
+        const img  = toAbs(item.img || '');
+        const price = item.price || '₱0';
+        const qty   = Math.max(1, parseInt(item.quantity || 1));
+        const size  = item.size ? ` <span class="muted">• Size: ${item.size}</span>` : '';
+
+        const wrap = document.createElement('article');
+        wrap.className = 'cart-item';
+        wrap.setAttribute('data-id', id);
+        wrap.innerHTML = `
+          <div class="ci-media">
+            <img src="${img}" alt="${name}" loading="lazy">
+          </div>
+          <div class="ci-info">
+            <h3 class="ci-name">${name}${size}</h3>
+            <p class="ci-price">${price}</p>
+
+            <div class="ci-qty">
+              <button class="ci-dec" aria-label="Decrease quantity">−</button>
+              <input class="ci-input" type="number" min="1" value="${qty}" aria-label="Quantity for ${name}">
+              <button class="ci-inc" aria-label="Increase quantity">+</button>
+            </div>
+          </div>
+          <div class="ci-side">
+            <p class="ci-line">₱<span class="ci-lineval">${formatPeso(lineTotal(item))}</span></p>
+            <button class="ci-remove" aria-label="Remove ${name}">Remove</button>
+          </div>
+        `;
+        return wrap;
+      }
+
+      function render(){
+        const items = loadCart();
+        cartItemsEl.innerHTML = '';
+
+        if (!items.length){
+          cartEmptyEl.style.display = '';
+          cartSummaryEl.style.display = 'none';
+          totalEl.textContent = '0.00';
+          updateDrawerSubtotal(0);
+          return;
+        }
+
+        cartEmptyEl.style.display = 'none';
+        cartSummaryEl.style.display = '';
+
+        let grand = 0;
+        items.forEach(it => {
+          grand += lineTotal(it);
+          cartItemsEl.appendChild(itemTemplate(it));
+        });
+        totalEl.textContent = formatPeso(grand);
+        updateDrawerSubtotal(grand);
+      }
+
+      function updateDrawerSubtotal(n){
+        const el = document.getElementById('cdSubtotal');
+        if (el) el.textContent = '₱' + formatPeso(n);
+      }
+
+      function updateHeaderBubble(){
+        const items = loadCart();
+        const count = items.reduce((s,i)=> s + Math.max(1, parseInt(i.quantity||1)), 0);
+        document.querySelectorAll('.cart-count').forEach(el => el.textContent = count);
+      }
+
+      // Event delegation for qty +/−, input, remove
+      document.addEventListener('click', (e)=>{
+        const itemEl = e.target.closest('.cart-item');
+        if (!itemEl) return;
+
+        const id = itemEl.dataset.id;
+        let cart = loadCart();
+        const idx = cart.findIndex(x => x.id === id);
+        if (idx === -1) return;
+
+        if (e.target.classList.contains('ci-dec')){
+          cart[idx].quantity = Math.max(1, (parseInt(cart[idx].quantity||1) - 1));
+          saveCart(cart); render(); updateHeaderBubble();
+        }
+        if (e.target.classList.contains('ci-inc')){
+          cart[idx].quantity = Math.max(1, (parseInt(cart[idx].quantity||1) + 1));
+          saveCart(cart); render(); updateHeaderBubble();
+        }
+        if (e.target.classList.contains('ci-remove')){
+          cart = cart.filter(x => x.id !== id);
+          saveCart(cart); render(); updateHeaderBubble();
+        }
+      });
+
+      document.addEventListener('input', (e)=>{
+        if (!e.target.classList.contains('ci-input')) return;
+        const itemEl = e.target.closest('.cart-item');
+        const id = itemEl?.dataset.id;
+        let cart = loadCart();
+        const idx = cart.findIndex(x => x.id === id);
+        if (idx === -1) return;
+        const v = Math.max(1, parseInt(e.target.value || '1'));
+        cart[idx].quantity = v;
+        saveCart(cart); render(); updateHeaderBubble();
+      });
+
+      // Clear cart
+      document.getElementById('clearCart')?.addEventListener('click', ()=>{
+        if (!confirm('Clear all items from your cart?')) return;
+        saveCart([]); render(); updateHeaderBubble();
+      });
+
+      // Terms gating for checkout
+      function syncCheckoutState(){
+        checkoutBtn.disabled = !pageAgree.checked;
+      }
+      pageAgree?.addEventListener('change', syncCheckoutState);
+      syncCheckoutState();
+
+      // Fake checkout (you can replace with your flow)
+      checkoutBtn?.addEventListener('click', ()=>{
+        if (!pageAgree?.checked) return;
+        // Optionally verify session with Supabase here
+        // Redirect to your checkout page or summary
+        alert('Proceeding to checkout (demo).');
+      });
+
+      // Keep drawer checkbox and page checkbox in sync (optional)
+      const cdAgree = document.getElementById('cdAgree');
+      cdAgree?.addEventListener('change', ()=> {
+        if (cdAgree.checked && pageAgree) pageAgree.checked = true, syncCheckoutState();
+      });
+
+      // Repaint when cart changes in other tabs/pages
+      window.addEventListener('storage', (ev)=>{
+        if (ev.key === 'cart'){ render(); updateHeaderBubble(); }
+      });
+      window.addEventListener('cart:updated', ()=>{ render(); updateHeaderBubble(); });
+
+      // Account icon -> open auth or user page (Supabase)
+      document.addEventListener('click', async (e) => {
+        const a = e.target.closest('#accountLink,[aria-label="Account"]');
+        if (!a) return;
+        e.preventDefault();
+        try {
+          const { data: { session } } = await sb.auth.getSession();
+          if (session) location.href = 'user.html';
+          else location.href = 'login.html'; // or open your inline modal if you prefer
+        } catch {
+          location.href = 'login.html';
+        }
+      });
+
+      // Initial paint
+      render(); updateHeaderBubble();
+    })();
+  </script>
 </body>
 </html>

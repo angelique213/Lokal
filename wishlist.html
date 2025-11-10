@@ -37,7 +37,7 @@
     .wish-card:hover{ transform:translateY(-3px); box-shadow:0 10px 20px rgba(0,0,0,.08); }
     .img-wrap{ aspect-ratio:1/1; background:#f6f5ef; display:grid; place-items:center; overflow:hidden; position:relative; }
     .img-wrap img{ width:100%; height:100%; object-fit:cover; }
-    .like-btn{ position:absolute; top:10px; right:10px; width:36px; height:36px; border-radius:999px; border:1px solid #d8d2c8; background:#fff; color:#b33; cursor:pointer; }
+    .like-btn{ position:absolute; top:10px; right:10px; width:36px; height:36px; border-radius:999px; border:1px solid #d8d2c8; background:#fff; color:#b33; cursor:pointer; display:grid; place-items:center; }
     .info{ padding:14px 16px 16px; }
     .name{ margin:0 0 4px; color:var(--ink); font-weight:800; text-decoration:none; display:inline-block; }
     .price{ margin:0 0 10px; color:var(--ink); font-weight:800; }
@@ -56,14 +56,39 @@
       display: none !important;
       pointer-events: none !important;
     }
-  
-    /* Your greeting tag should never block clicks */
     .hi-tag{ pointer-events: none; }
   </style>
-  
 </head>
 
 <body>
+  <!-- ===== SIMPLE AUTH POPUP (keep consistent across pages) ===== -->
+  <div class="lokal-auth la-overlay" id="lokalAuthOverlay" aria-hidden="true">
+    <div class="la-modal" role="dialog" aria-modal="true" aria-labelledby="laTitle" style="width:min(440px,92vw);background:#fff;border-radius:6px;border:1px solid #D7D6AA;box-shadow:0 16px 50px rgba(0,0,0,.25);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;">
+      <div class="la-head" style="display:flex;align-items:center;justify-content:space-between;padding:22px 26px 14px">
+        <h3 id="laTitle" class="la-title" style="margin:0;font-weight:700">SIGN IN</h3>
+        <button class="la-close" id="laClose" aria-label="Close" style="background:none;border:0;font-size:22px;cursor:pointer">×</button>
+      </div>
+      <div class="la-body" style="padding:0 26px 20px">
+        <p class="la-intro" style="font-weight:600;margin-bottom:16px">Sign in with your email or sign up to become a Lokal Member.</p>
+        <form id="laEmailForm" novalidate>
+          <label class="la-label" for="laEmail" style="display:block;font-weight:600;margin-bottom:6px">Email <span style="color:#b02a37">*</span></label>
+          <input class="la-input" id="laEmail" type="email" placeholder="Email" required style="width:100%;padding:12px;border:1px solid #222;border-radius:4px"/>
+          <button class="la-btn" type="submit" style="width:100%;padding:12px;border:0;border-radius:4px;background:#6A6932;color:#fff;font-weight:700;margin-top:12px">CONTINUE</button>
+        </form>
+        <form id="laPassForm" hidden novalidate>
+          <label class="la-label" for="laPass" style="display:block;font-weight:600;margin:14px 0 6px">Password</label>
+          <input class="la-input" id="laPass" type="password" placeholder="••••••" required minlength="6" style="width:100%;padding:12px;border:1px solid #222;border-radius:4px"/>
+          <button class="la-btn" type="submit" style="width:100%;padding:12px;border:0;border-radius:4px;background:#6A6932;color:#fff;font-weight:700;margin-top:12px">SIGN IN</button>
+          <p class="la-sub" style="text-align:center;margin-top:8px"><a href="#" id="laBackEmail">Use another email</a></p>
+        </form>
+      </div>
+      <div class="la-foot" style="text-align:center;border-top:1px solid #D7D6AA;padding:18px 0 20px">
+        <div class="la-mini" style="font-size:.9rem;color:#555"><i class="fa-solid fa-lock"></i>&nbsp; All data is kept secure (demo)</div>
+        <a class="la-mlink" href="membership.html" style="display:inline-block;margin-top:10px">Lokal Membership</a>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== HEADER ===== -->
   <header class="header">
     <div class="logo">
@@ -148,7 +173,7 @@
   </aside>
 
   <!-- ===== CONTENT ===== -->
-  <main class="fav-wrap">
+  <main class="fav-wrap" id="favMain">
     <div class="fav-head">
       <div>
         <h1>Your Favorites</h1>
@@ -167,64 +192,320 @@
   </main>
 
   <!-- ===== FOOTER ===== -->
-  <footer class="footer">
-    <div class="footer-section">
-      <h1>Contact Us</h1>
-      <ul class="footer-list">
-        <li>lokal@info.com</li>
-        <li>lokal@admin.com</li>
-        <li>Manila Philippines</li>
-        <li class="border-list"></li>
-        <li class="socials">
-          <i class="fa-brands fa-square-instagram"></i>
-          <i class="fa-brands fa-square-facebook"></i>
-          <i class="fa-brands fa-tiktok"></i>
-        </li>
-      </ul>
+  <footer class="footer" role="contentinfo">
+    <div class="footer-grid" aria-label="Site footer">
+      <section class="footer-section" aria-labelledby="ft-contact-title">
+        <h2 id="ft-contact-title" class="ft-title">Contact Us</h2>
+        <ul class="footer-list">
+          <li>
+            <a href="mailto:shoplokalphilippines@gmail.com?subject=Lokal%20Support%20Request&body=Hi%20Lokal%20Team%2C%0A%0AIssue%3A%20%0AOrder%20%23%3A%20%0ABrowser%2FDevice%3A%20%0A%0AThanks%2C%0A">shoplokalphilippines@gmail.com</a>
+          </li>
+          <li><address style="font-style:normal">Manila, Philippines</address></li>
+          <li class="border-list" aria-hidden="true"></li>
+          <li class="socials" aria-label="Social links">
+            <a href="#" aria-label="Instagram"><i class="fa-brands fa-square-instagram" aria-hidden="true"></i></a>
+            <a href="#" aria-label="Facebook"><i class="fa-brands fa-square-facebook" aria-hidden="true"></i></a>
+            <a href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok" aria-hidden="true"></i></a>
+          </li>
+        </ul>
+        <p class="ft-note" style="margin-top:8px">
+          Need help? Visit our <a href="support.html">Support</a> page or email us.
+        </p>
+      </section>
+
+      <nav class="footer-section" aria-labelledby="ft-links-title">
+        <h2 id="ft-links-title" class="ft-title">Quick Links</h2>
+        <ul class="footer-list">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="shop-all.html">Shop All</a></li>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="terms.html">Terms &amp; Conditions</a></li>
+          <li><a href="support.html">Support</a></li>
+        </ul>
+      </nav>
+
+      <section class="footer-section" aria-labelledby="ft-news-title">
+        <h2 id="ft-news-title" class="ft-title">Subscribe to Newsletter</h2>
+        <p class="ft-subcopy">Get product drops, deals, and stories from local makers—straight to your inbox.</p>
+        <form id="newsletterForm" class="ft-news-form" novalidate>
+          <label class="sr-only" for="newsletterEmail">Email address</label>
+          <input id="newsletterEmail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="Your email" required aria-describedby="newsletterNote" />
+          <button class="button" id="newsletterBtn" type="submit" aria-label="Subscribe to newsletter">Subscribe</button>
+          <div class="ft-consent">
+            <input id="newsletterConsent" name="consent" type="checkbox" required />
+            <label for="newsletterConsent">I agree to the <a href="terms.html">Terms &amp; Conditions</a> and <a href="terms.html#privacy">Privacy Policy</a>.</label>
+          </div>
+          <p id="newsletterNote" class="ft-note">We never share your email. Unsubscribe anytime.</p>
+          <div id="newsletterMsg" class="ft-msg" role="status" aria-live="polite"></div>
+        </form>
+      </section>
     </div>
-    <div class="footer-section">
-      <h1>Quick Links</h1>
-      <ul class="footer-list">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="shop-all.html">Shop All</a></li>
-        <li><a href="about.html">About Us</a></li>
-        <li><a href="terms.html">Terms & Conditions</a></li>
-      </ul>
-    </div>
-    <div class="footer-section">
-      <h1>Subscribe to Newsletter</h1>
-      <ul class="footer-list">
-        <li>A local marketplace is a community hub where people buy, sell, or trade goods and services within their area.</li>
-        <li class="sub">
-          <input type="text" placeholder="Your email">
-          <button class="button">Subscribe</button>
-        </li>
-      </ul>
+    <div class="ft-legal">
+      <small>&copy; <span id="yearNow"></span> Lokal. All rights reserved.</small>
     </div>
   </footer>
+
+  <!-- ===== CORE SCRIPTS ===== -->
   <script>
+    // Body lock when cart drawer toggles
     document.addEventListener('DOMContentLoaded', () => {
       const drawer = document.getElementById('cdDrawer');
       const toggleLock = () => {
         document.body.classList.toggle('lock-scroll', drawer.classList.contains('active'));
       };
       new MutationObserver(toggleLock).observe(drawer, { attributes: true, attributeFilter: ['class'] });
+
+      const y = document.getElementById('yearNow');
+      if (y) y.textContent = new Date().getFullYear();
     });
   </script>
-    <!-- Footer or last sections above -->
 
-  <!-- Supabase client -->
+  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
 
-  <!-- NEW: cloud persistence layer (this must come before your site scripts) -->
+  <!-- Optional: your cloud sync (kept before wishlist/cart so it can hydrate) -->
   <script src="persist-sync.js"></script>
 
-  <!-- your existing scripts -->
+  <!-- Global cart API and wishlist helpers -->
   <script src="cart.js" defer></script>
   <script src="wishlist.js" defer></script>
-</body>
-</html>
 
+  <!-- Wishlist page renderer (robust to different storage shapes) -->
+  <script>
+    (function(){
+      const SITE_BASE = (document.querySelector('meta[name="site-base"]')?.content || "/").replace(/\/+$/,'/') ;
+      const toAbs = (p) => {
+        try {
+          // If already absolute, return as-is
+          new URL(p);
+          return p;
+        } catch {}
+        try {
+          return new URL(p.replace(/^\/+/,''), location.origin + SITE_BASE).href;
+        } catch {
+          return p;
+        }
+      };
+      const $ = (s) => document.querySelector(s);
+      const favGrid = $('#favGrid');
+      const favCount = $('#favCount');
+      const emptyMsg = $('#wlEmpty');
+
+      function loadWishlist(){
+        // Expected format saved by wishlist.js: array of {id,name,price,img,desc,url}
+        // Also tolerate object keyed by id, etc.
+        try{
+          const raw = localStorage.getItem('wishlist');
+          if (!raw) return [];
+          const data = JSON.parse(raw);
+          if (Array.isArray(data)) return data;
+          if (data && typeof data === 'object') return Object.values(data);
+          return [];
+        }catch{ return []; }
+      }
+
+      function saveWishlist(items){
+        localStorage.setItem('wishlist', JSON.stringify(items));
+        // If your wishlist.js updates header bubble, dispatch a custom event
+        window.dispatchEvent(new Event('wishlist:updated'));
+      }
+
+      function removeItem(id){
+        const items = loadWishlist().filter(x => (x.id || x.data?.id || x.dataId) !== id);
+        saveWishlist(items);
+        render();
+      }
+
+      function clearAll(){
+        saveWishlist([]);
+        render();
+      }
+
+      function addToCartItem(item){
+        // fall back if fields are nested or named differently
+        const id   = item.id || item.dataId || (item.data && item.data.id) || (item.name && item.name.toLowerCase().replace(/[^a-z0-9]+/g,'-')) || 'item';
+        const name = item.name || item.title || 'Item';
+        const price = item.price || '₱0';
+        const img = toAbs(item.img || item.image || '');
+        const desc = item.desc || item.description || '';
+        window.addToCart?.({
+          id, baseName: name, name,
+          img, price, desc, size: null,
+          quantity: 1
+        });
+        window.openCartDrawer?.();
+      }
+
+      function cardTemplate(item){
+        const id   = item.id || item.dataId || (item.data && item.data.id) || 'item';
+        const name = item.name || item.title || 'Item';
+        const price = item.price || '₱0';
+        const img = toAbs(item.img || item.image || '');
+        const url = item.url || '#';
+        const desc = item.desc || item.description || '';
+
+        const art = document.createElement('article');
+        art.className = 'wish-card';
+        art.innerHTML = `
+          <div class="img-wrap">
+            <img src="${img}" alt="${name}">
+            <button class="like-btn" type="button" aria-label="Remove from favorites" data-id="${id}">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <div class="info">
+            <a class="name" href="${url}" title="${name}">${name}</a>
+            <p class="price">${price}</p>
+            <button class="cta" type="button" data-id="${id}">Add to Cart</button>
+            <p class="sr-only">${desc ? desc.replace(/</g,'&lt;') : ''}</p>
+          </div>
+        `;
+        return art;
+      }
+
+      function render(){
+        const items = loadWishlist();
+        favGrid.innerHTML = '';
+        if (!items.length){
+          emptyMsg.hidden = false;
+          favCount.textContent = '0 ITEMS';
+          return;
+        }
+        emptyMsg.hidden = true;
+        items.forEach(it => favGrid.appendChild(cardTemplate(it)));
+        favCount.textContent = `${items.length} ${items.length === 1 ? 'ITEM' : 'ITEMS'}`;
+      }
+
+      // Events
+      document.addEventListener('click', (e)=>{
+        const removeBtn = e.target.closest('.like-btn');
+        if (removeBtn){
+          e.preventDefault();
+          removeItem(removeBtn.dataset.id);
+          return;
+        }
+        const addBtn = e.target.closest('.cta');
+        if (addBtn){
+          e.preventDefault();
+          const id = addBtn.dataset.id;
+          const item = loadWishlist().find(x => (x.id || x.data?.id || x.dataId) === id);
+          if (item) addToCartItem(item);
+        }
+      });
+
+      $('#btnClear')?.addEventListener('click', ()=>{
+        if (confirm('Remove all items from Favorites?')) clearAll();
+      });
+
+      $('#btnContinue')?.addEventListener('click', ()=>{
+        // If user came from somewhere, go back; else go to Shop All
+        if (document.referrer) history.back();
+        else location.href = 'shop-all.html';
+      });
+
+      // Open cart drawer from header icon
+      document.addEventListener('click', function (e) {
+        const btn = e.target.closest('#openCart');
+        if (!btn) return;
+        e.preventDefault();
+        window.openCartDrawer?.();
+      });
+
+      // Initial paint
+      render();
+
+      // Repaint when other tabs/pages modify wishlist
+      window.addEventListener('storage', (ev)=>{
+        if (ev.key === 'wishlist') render();
+      });
+
+      // Account icon -> Auth modal or user page (Supabase)
+      (function authHook(){
+        window.openAuthPopup = () => {
+          const overlay = document.getElementById('lokalAuthOverlay');
+          const emailForm = document.getElementById('laEmailForm');
+          const passForm  = document.getElementById('laPassForm');
+          const emailIn   = document.getElementById('laEmail');
+          if (!overlay || !emailForm || !passForm || !emailIn) return;
+          overlay.setAttribute('aria-hidden','false');
+          emailForm.hidden = false;
+          passForm.hidden  = true;
+          setTimeout(()=> emailIn.focus(), 50);
+        };
+
+        document.addEventListener('click', async (e) => {
+          const a = e.target.closest('#accountLink,[aria-label="Account"]');
+          if (!a) return;
+          e.preventDefault();
+          try {
+            const { data: { session } } = await sb.auth.getSession();
+            if (session) {
+              location.href = 'user.html';
+            } else {
+              window.openAuthPopup();
+            }
+          } catch {
+            window.openAuthPopup();
+          }
+        });
+
+        const overlay = document.getElementById('lokalAuthOverlay');
+        const emailForm = document.getElementById('laEmailForm');
+        const passForm  = document.getElementById('laPassForm');
+        const emailIn   = document.getElementById('laEmail');
+        const passIn    = document.getElementById('laPass');
+        const closeAuth = () => overlay?.setAttribute('aria-hidden','true');
+
+        document.getElementById('laClose')?.addEventListener('click', closeAuth);
+        overlay?.addEventListener('click', e => { if (e.target === overlay) closeAuth(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAuth(); });
+
+        if (emailForm && passForm){
+          emailForm.onsubmit = (e) => {
+            e.preventDefault();
+            const email = (emailIn.value || '').trim().toLowerCase();
+            if (!email) { emailIn.focus(); return; }
+            passForm.dataset.email = email;
+            emailForm.hidden = true;
+            passForm.hidden  = false;
+            passIn?.focus();
+            document.getElementById('laBackEmail')?.addEventListener('click', ev => {
+              ev.preventDefault();
+              emailForm.hidden = false;
+              passForm.hidden  = true;
+              emailIn.focus();
+            }, { once: true });
+          };
+
+          passForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const email = passForm.dataset.email || '';
+            const password = passIn.value || '';
+            try {
+              const { data, error } = await sb.auth.signInWithPassword({ email, password });
+              if (!error && data?.user) { closeAuth(); location.href = 'user.html'; return; }
+              const code = error?.code || '';
+              if (code === 'invalid_credentials' || /invalid|password/i.test(error?.message||'')) { alert('Incorrect email or password.'); return; }
+              if (confirm('Account not found. Create a new one with this email?')) {
+                const { error: signUpError } = await sb.auth.signUp({
+                  email, password,
+                  options: { emailRedirectTo: 'https://angelique213.github.io/Lokal/user.html' }
+                });
+                if (signUpError) { alert(signUpError.message); return; }
+                alert('Check your email to verify, then sign in.');
+                closeAuth();
+              }
+            } catch (err) {
+              alert((err && err.message) || 'Network error. Please try again.');
+            }
+          };
+        }
+      })();
+    })();
+  </script>
+
+  <!-- Newsletter -->
+  <script src="newsletter.js" defer></script>
 </body>
 </html>

@@ -4,6 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Lokal</title>
+
+<!-- Favicon -->
 <link rel="icon" href="images/favicon.jpg" type="image/x-icon">
 
 <!-- libs -->
@@ -14,7 +16,6 @@
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="cart.css">
 <link rel="stylesheet" href="wishlist.css">
-<script src="wishlist.js" defer></script>
 
 <!-- GitHub Pages base (adjust if not using GH Pages) -->
 <meta name="site-base" content="/Lokal/">
@@ -86,14 +87,14 @@
 }
 
 /* ——— Greeting chip (index only) ——— */
-.header{ position: relative; } /* anchor area */
+.header{ position: relative; }
 .hi-tag{
   position:absolute;
   top:6px;
-  right:14px;              /* TOP-RIGHT like you asked */
+  right:14px;
   font: 800 0.92rem/1 'Montserrat', system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   color:#2b1f1a;
-  pointer-events:none;     /* NEVER blocks clicks */
+  pointer-events:none;
   z-index:2;
   white-space:nowrap;
 }
@@ -102,27 +103,17 @@
 /* ——— Kill any legacy inline greeting injected by lokal.js ——— */
 .inline-greeting { display:none !important; }
 #homeGreeting { display:none !important; }
-</style>
-<style>
-  /* Safety net so overlays never block the header when "hidden" */
-  #cdOverlay[aria-hidden="true"]{
-    display: none !important;
-    pointer-events: none !important;
-  }
-  #cdDrawer[aria-hidden="true"]{
-    display: none !important;
-    pointer-events: none !important;
-  }
 
-  /* Your greeting tag should never block clicks */
-  .hi-tag{ pointer-events: none; }
+/* Safety net so overlays never block the header when "hidden" */
+#cdOverlay[aria-hidden="true"]{ display:none !important; pointer-events:none !important; }
+#cdDrawer[aria-hidden="true"]{ display:none !important; pointer-events:none !important; }
+.hi-tag{ pointer-events:none; }
 </style>
-
 </head>
 
 <body>
 
-<!-- ========== LOKAL AUTH POPUP (include on every page) ========== -->
+<!-- ========== LOKAL AUTH POPUP ========== -->
 <div class="lokal-auth la-overlay" id="lokalAuthOverlay" aria-hidden="true">
   <div class="la-modal" role="dialog" aria-modal="true" aria-labelledby="laTitle">
     <div class="la-head">
@@ -298,7 +289,7 @@
 <section class="products">
   <h1 class="section-title">Top products of the Season</h1>
   <div class="products-list">
-    <!-- sample cards (unchanged) -->
+    <!-- sample cards -->
     <div class="product" data-name="Santa Ornament" data-price="₱479.00" data-img="images/main-image.png" data-desc="Festive Santa ornament for your tree.">
       <div class="product-image">
         <div class="main-image"><img src="images/main-image.png" alt="Santa Ornament"></div>
@@ -375,39 +366,87 @@
 </section>
 
 <!-- FOOTER -->
-<footer class="footer">
-  <div class="footer-section">
-    <h1>Contact Us</h1>
-    <ul class="footer-list">
-      <li>lokal@info.com</li>
-      <li>lokal@admin.com</li>
-      <li>Manila Philippines</li>
-      <li class="border-list"></li>
-      <li class="socials">
-        <i class="fa-brands fa-square-instagram"></i>
-        <i class="fa-brands fa-square-facebook"></i>
-        <i class="fa-brands fa-tiktok"></i>
-      </li>
-    </ul>
+<footer class="footer" role="contentinfo">
+  <div class="footer-grid" aria-label="Site footer">
+
+    <!-- Contact -->
+    <section class="footer-section" aria-labelledby="ft-contact-title">
+      <h2 id="ft-contact-title" class="ft-title">Contact Us</h2>
+      <ul class="footer-list">
+        <li>
+          <a
+            href="mailto:shoplokalphilippines@gmail.com?subject=Lokal%20Support%20Request&body=Hi%20Lokal%20Team%2C%0A%0AIssue%3A%20%0AOrder%20%23%3A%20%0ABrowser%2FDevice%3A%20%0A%0AThanks%2C%0A"
+            aria-label="Email shoplokalphilippines at gmail dot com"
+            title="Email us"
+          >
+            shoplokalphilippines@gmail.com
+          </a>
+        </li>
+        <li><address style="font-style:normal">Manila, Philippines</address></li>
+        <li class="border-list" aria-hidden="true"></li>
+        <li class="socials" aria-label="Social links">
+          <a href="#" aria-label="Instagram" title="Instagram"><i class="fa-brands fa-square-instagram" aria-hidden="true"></i></a>
+          <a href="#" aria-label="Facebook" title="Facebook"><i class="fa-brands fa-square-facebook" aria-hidden="true"></i></a>
+          <a href="#" aria-label="TikTok" title="TikTok"><i class="fa-brands fa-tiktok" aria-hidden="true"></i></a>
+        </li>
+      </ul>
+      <p class="ft-note" style="margin-top:8px">
+        Need help? Visit our <a href="support.html">Support</a> page or email us.
+      </p>
+    </section>
+
+    <!-- Quick Links -->
+    <nav class="footer-section" aria-labelledby="ft-links-title">
+      <h2 id="ft-links-title" class="ft-title">Quick Links</h2>
+      <ul class="footer-list">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="shop-all.html">Shop All</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="terms.html">Terms &amp; Conditions</a></li>
+        <li><a href="support.html">Support</a></li>
+      </ul>
+    </nav>
+
+    <!-- Newsletter -->
+    <section class="footer-section" aria-labelledby="ft-news-title">
+      <h2 id="ft-news-title" class="ft-title">Subscribe to Newsletter</h2>
+      <p class="ft-subcopy">
+        Get product drops, deals, and stories from local makers—straight to your inbox.
+      </p>
+
+      <form id="newsletterForm" class="ft-news-form" novalidate>
+        <label class="sr-only" for="newsletterEmail">Email address</label>
+        <input
+          id="newsletterEmail"
+          name="email"
+          type="email"
+          inputmode="email"
+          autocomplete="email"
+          placeholder="Your email"
+          required
+          aria-describedby="newsletterNote"
+        />
+        <button class="button" id="newsletterBtn" type="submit" aria-label="Subscribe to newsletter">
+          Subscribe
+        </button>
+
+        <div class="ft-consent">
+          <input id="newsletterConsent" name="consent" type="checkbox" required />
+          <label for="newsletterConsent">
+            I agree to the <a href="terms.html">Terms &amp; Conditions</a> and <a href="terms.html#privacy">Privacy Policy</a>.
+          </label>
+        </div>
+
+        <p id="newsletterNote" class="ft-note">
+          We never share your email. Unsubscribe anytime.
+        </p>
+        <div id="newsletterMsg" class="ft-msg" role="status" aria-live="polite"></div>
+      </form>
+    </section>
   </div>
-  <div class="footer-section">
-    <h1>Quick Links</h1>
-    <ul class="footer-list">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="shop-all.html">Shop All</a></li>
-      <li><a href="about.html">About Us</a></li>
-      <li><a href="terms.html">Terms & Conditions</a></li>
-    </ul>
-  </div>
-  <div class="footer-section">
-    <h1>Subscribe to Newsletter</h1>
-    <ul class="footer-list">
-      <li>A local marketplace is a community hub where people buy, sell, or trade goods and services within their area.</li>
-      <li class="sub">
-        <input type="text" placeholder="Your email">
-        <button class="button">Subscribe</button>
-      </li>
-    </ul>
+
+  <div class="ft-legal">
+    <small>&copy; <span id="yearNow"></span> Lokal. All rights reserved.</small>
   </div>
 </footer>
 
@@ -435,7 +474,7 @@
   </div>
 </aside>
 
-<!-- SCRIPTS -->
+<!-- LIB SCRIPTS -->
 <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
 <script>AOS.init();</script>
 
@@ -449,7 +488,6 @@
   const accountLink = $('#accountLink');
   const hiTag = $('#hiTag');
 
-  // ---------- helpers ----------
   const cap = s => { s = String(s||'').trim(); return s ? s[0].toUpperCase()+s.slice(1) : ''; };
   function firstFromUser(user){
     const md = (user && user.user_metadata) || {};
@@ -462,14 +500,12 @@
   }
   function hideGreeting(){ hiTag.hidden = true; }
 
-  // ---------- open/close popup ----------
   const openAuth = ()=>{ overlay?.setAttribute('aria-hidden','false'); emailForm.hidden=false; passForm.hidden=true; setTimeout(()=>emailInput?.focus(),50); };
   const closeAuth = ()=> overlay?.setAttribute('aria-hidden','true');
   $('#laClose')?.addEventListener('click', closeAuth);
   overlay?.addEventListener('click', e=>{ if(e.target===overlay) closeAuth(); });
   document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeAuth(); });
 
-  // flow: email -> password
   emailForm?.addEventListener('submit', (e)=>{
     e.preventDefault();
     const email=(emailInput.value||'').trim().toLowerCase();
@@ -481,7 +517,6 @@
   });
   $('#laBackEmail')?.addEventListener('click', (e)=>{ e.preventDefault(); emailForm.hidden=false; passForm.hidden=true; emailInput.focus(); });
 
-  // sign in
   passForm?.addEventListener('submit', async (e)=>{
     e.preventDefault();
     const email = passForm.dataset.email || '';
@@ -505,7 +540,6 @@
         closeAuth();
         return;
       }
-      // success
       sessionStorage.setItem('hadSession','1');
       const user = data?.user;
       const first = firstFromUser(user);
@@ -517,7 +551,6 @@
     }
   });
 
-  // user icon: popup if signed out, go profile if signed in
   accountLink?.addEventListener('click', async (e)=>{
     e.preventDefault();
     try{
@@ -529,7 +562,6 @@
     }
   });
 
-  // show/hide greeting on load based on session
   document.addEventListener('DOMContentLoaded', async ()=>{
     try{
       const { data:{ session } } = await sb.auth.getSession();
@@ -542,7 +574,6 @@
     }catch{ hideGreeting(); }
   });
 
-  // react to auth changes (keep greeting + toast flags correct)
   if (window.sb?.auth?.onAuthStateChange){
     sb.auth.onAuthStateChange((evt, session)=>{
       if (evt === 'SIGNED_IN' || (session && session.user)){
@@ -562,7 +593,7 @@
 })();
 </script>
 
-<!-- Logout toast (shows only right after a real sign-out) -->
+<!-- Logout toast -->
 <script>
 (function(){
   function showToast(msg){
@@ -588,14 +619,22 @@
 })();
 </script>
 
-<!-- Supabase client -->
+<!-- Year helper -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const y = document.getElementById('yearNow');
+    if (y) y.textContent = new Date().getFullYear();
+  });
+</script>
+
+<!-- Supabase + Newsletter -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
+<script src="newsletter.js" defer></script>
 
-<!-- NEW: cloud persistence layer (leave your current code untouched) -->
+<!-- App scripts -->
 <script src="persist-sync.js"></script>
-
-<!-- your existing scripts -->
+<script src="lokal.js"></script>
 <script src="cart.js" defer></script>
 <script src="wishlist.js" defer></script>
 

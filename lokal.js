@@ -1,8 +1,9 @@
-/* ===== Lokal storefront glue (cleaned) =====
+/* ===== Lokal storefront glue (UI only, cloud handled by persist-sync.js) =====
    - Works across ALL pages
-   - Account link: modal if present, else go to login.html?return=...
-   - ⛔️ No greeting injection here (index.html owns the greeting chip)
-========================================================= */
+   - Add-to-cart updates localStorage + badges
+   - If signed in, persist-sync.js mirrors to Supabase
+   - No greeting injection here
+============================================================================== */
 
 /* ------------------ Utilities ------------------ */
 function toAbs(p){ try{ return p ? new URL(p, location.href).href : p; }catch{ return p; } }
@@ -24,6 +25,7 @@ function updateWishlistCount(){
     el.style.display = n ? "inline-block" : "none";
   });
 }
+window.updateCartCount = updateCartCount; // used by persist-sync
 
 /* ------------------ Add to cart (exposed) ------------------ */
 window.addToCart = function(product){
@@ -41,32 +43,35 @@ window.addToCart = function(product){
   if (i>-1) cart[i].quantity += item.quantity; else cart.push(item);
   setCart(cart);
   updateCartCount();
+
+  // Optional UI: open drawer if you have one
   window.openCartDrawer?.();
-  window.syncCartIfAuthed?.(); // push to cloud if logged in
+
+  // Mirror to cloud if logged in (persist-sync.js exposes these)
+  window.syncCartIfAuthed?.();
 };
 
-/* ------------------ Boot counts ------------------ */
+/* ------------------ Boot badges ------------------ */
 document.addEventListener("DOMContentLoaded", ()=>{ updateCartCount(); updateWishlistCount(); });
 
-/* ------------------ Add from cards ------------------ */
+/* ------------------ Add from product cards (robust) ------------------ */
 document.addEventListener("click", (e) => {
-  const btn = e.target.closest(".best-product .button");
+  // catch any .button inside a .product OR .best-product card
+  const btn = e.target.closest(".product .button, .best-product .button");
   if (!btn) return;
-  const card = btn.closest(".best-product"); if (!card) return;
-  window.addToCart({
-    img: card.dataset.img, name: card.dataset.name, price: card.dataset.price,
-    desc: card.dataset.desc, quantity: 1
-  });
-});
-document.addEventListener("click", (e) => {
-  const btn = e.target.closest(".product .overlay-image .button");
-  if (!btn) return;
-  const card = btn.closest(".product"); if (!card) return;
+
+  const card = btn.closest(".product, .best-product");
+  if (!card) return;
+
   const name  = card.dataset.name || card.querySelector(".product-name")?.textContent?.trim() || "Product";
   const price = card.dataset.price || card.querySelector(".product-details p:last-child")?.textContent?.trim() || "₱0";
   const imgRel= card.dataset.img || card.querySelector(".main-image img")?.getAttribute("src") || "";
   const desc  = card.dataset.desc || "";
-  window.addToCart({ name, baseName:name, img: toAbs(imgRel), price, desc, quantity:1 });
+
+  window.addToCart({ name, baseName: name, img: imgRel, price, desc, quantity: 1 });
+
+  // prevent accidental <a> navigation if the button is an anchor
+  if (btn.tagName === "A") e.preventDefault();
 });
 
 /* ------------------ Quick View (optional) ------------------ */
@@ -105,15 +110,6 @@ document.addEventListener("click", (e) => {
     });
     modal.style.display = "none";
   });
-})();
-
-/* ------------------ Banner slider (optional) ------------------ */
-(function(){
-  const slides = document.querySelectorAll(".banner .slide"); if (!slides.length) return;
-  let current = 0; const interval = 5000;
-  const show = i => slides.forEach((s,idx)=> s.classList.toggle("active", idx===i));
-  const next = ()=>{ current = (current+1) % slides.length; show(current); };
-  show(current); setInterval(next, interval);
 })();
 
 /* ------------------ Search modal (optional) ------------------ */
@@ -157,7 +153,7 @@ document.addEventListener("click", (e) => {
   new MutationObserver(toggleLock).observe(drawer, { attributes:true, attributeFilter:["class"] });
 })();
 
-/* ------------------ ACCOUNT LINK (modal if present, else login.html) ------------------ */
+/* ------------------ Account link (modal if present, else login.html) ------------------ */
 (function accountLinkHandler(){
   const link = document.getElementById("accountLink");
   if (!link) return;
@@ -170,170 +166,29 @@ document.addEventListener("click", (e) => {
     } catch { return false; }
   }
 
-  // Keep a real href so it’s clickable even if JS is late
   (async () => {
     const signedIn = await hasSession();
-    if (signedIn) {
-      link.setAttribute("href", "user.html");
-    } else {
-      const ret = encodeURIComponent(location.href);
-      link.setAttribute("href", `login.html?return=${ret}`);
-    }
+    if (signedIn) link.setAttribute("href", "user.html");
+    else link.setAttribute("href", `login.html?return=${encodeURIComponent(location.href)}`);
   })();
 
   link.addEventListener("click", async (e)=>{
     const overlay = document.getElementById("lokalAuthOverlay");
     const signedIn = await hasSession();
-
-    if (signedIn) {
-      link.setAttribute("href", "user.html");
-      return; // allow natural navigation
-    }
-
+    if (signedIn) { link.setAttribute("href","user.html"); return; }
     if (overlay) {
       e.preventDefault();
       overlay.setAttribute("aria-hidden","false");
       document.getElementById("laEmailForm")?.removeAttribute("hidden");
       document.getElementById("laPassForm")?.setAttribute("hidden","");
       document.getElementById("laEmail")?.focus();
-    } else {
-      const ret = encodeURIComponent(location.href);
-      link.setAttribute("href", `login.html?return=${ret}`);
     }
   });
-})();
 
-/* ------------------ Signed-out toast (optional) ------------------ */
-(function(){
-  function showToast(msg){
-    if (document.getElementById('signedOutToast')) return;
-    const box = document.createElement('div');
-    box.id = 'signedOutToast';
-    box.className = 'toast-signout';
-    box.setAttribute('role','status');
-    box.setAttribute('aria-live','polite');
-    box.innerHTML = `<span>${msg}</span><button aria-label="Dismiss">×</button>`;
-    document.body.appendChild(box);
-    const close = () => box.remove();
-    box.querySelector('button')?.addEventListener('click', close);
-    setTimeout(close, 5000);
-  }
-  function clearMarkers(){
-    sessionStorage.removeItem('lokalJustSignedOut');
-    const url = new URL(location.href);
-    if (url.searchParams.has('signedout')){
-      url.searchParams.delete('signedout');
-      history.replaceState({}, '', url.pathname + (url.hash || ''));
-    }
-  }
-  document.addEventListener('DOMContentLoaded', ()=>{
-    const url = new URL(location.href);
-    const fromParam = url.searchParams.get('signedout') === '1';
-    const fromStorage = sessionStorage.getItem('lokalJustSignedOut') === '1';
-    if (fromParam || fromStorage){ showToast("You’re signed out."); clearMarkers(); }
-  });
-})();
-
-/* ------------------ Cloud sync (Supabase) ------------------ */
-(function persistSync(){
-  if (!window.sb?.auth) return;
-
-  const getLS = (k)=>getJSON(k,[]);
-  const setLS = (k,v)=>setJSON(k,v||[]);
-  const paint = ()=>{ updateCartCount(); updateWishlistCount(); };
-
-  async function pullCart(user){
-    const { data, error } = await sb.from("cart_items")
-      .select("name,size,price,img,quantity,base_name")
-      .eq("user_id", user.id);
-    if (!error && Array.isArray(data)){
-      const local = data.map(r => ({
-        baseName: r.base_name || r.name, name: r.name, size: r.size ?? null,
-        price: r.price != null ? `₱${Number(r.price).toFixed(2)}` : "₱0",
-        img: r.img || "", quantity: Number(r.quantity)||1, desc:""
-      }));
-      setLS("cart", local);
-    }
-  }
-  async function pullWL(user){
-    const { data, error } = await sb.from("wishlist_items")
-      .select("product_id,name,price,img,url")
-      .eq("user_id", user.id);
-    if (!error && Array.isArray(data)){
-      const local = data.map(r => ({
-        id: r.product_id, name: r.name,
-        price: r.price != null ? `₱${Number(r.price).toFixed(2)}` : "",
-        img: r.img || "", url: r.url || ""
-      }));
-      setLS("wishlist", local);
-    }
-  }
-
-  window.syncCartIfAuthed = async function(){
-    const { data:{ session } } = await sb.auth.getSession();
-    if (!session) return;
-    const user = session.user;
-    const cart = getLS("cart");
-    await sb.from("cart_items").delete().eq("user_id", user.id);
-    if (cart.length){
-      const rows = cart.map(it => ({
-        user_id: user.id,
-        base_name: it.baseName || it.name,
-        name: it.name,
-        size: it.size ?? null,
-        price: parseFloat(String(it.price||"0").replace(/[₱,]/g,"")) || 0,
-        img: it.img || "",
-        quantity: Number(it.quantity)||1
-      }));
-      await sb.from("cart_items").insert(rows);
-    }
-  };
-  window.syncWishlistIfAuthed = async function(){
-    const { data:{ session } } = await sb.auth.getSession();
-    if (!session) return;
-    const user = session.user;
-    const wl = getLS("wishlist");
-    await sb.from("wishlist_items").delete().eq("user_id", user.id);
-    if (wl.length){
-      const rows = wl.map(it => ({
-        user_id: user.id,
-        product_id: it.id || it.name,
-        name: it.name || "",
-        price: parseFloat(String(it.price||"0").replace(/[₱,]/g,"")) || null,
-        img: it.img || "",
-        url: it.url || ""
-      }));
-      await sb.from("wishlist_items").insert(rows);
-    }
-  };
-
-  async function onSignIn(){
-    const { data:{ session } } = await sb.auth.getSession();
-    if (!session) return;
-    await pullCart(session.user);
-    await pullWL(session.user);
-    paint();
-  }
-  function onSignOut(){ setLS("cart",[]); setLS("wishlist",[]); paint(); }
-
-  document.addEventListener("DOMContentLoaded", async ()=>{
-    try{
-      const { data:{ session } } = await sb.auth.getSession();
-      if (session) await onSignIn();
-    } finally { paint(); }
-  });
-
-  sb.auth.onAuthStateChange((_evt, session)=>{ session ? onSignIn() : onSignOut(); });
-})();
-window.updateCartCount = updateCartCount;
-/* ------------------ Account Link fallback for GitHub Pages ------------------ */
-(function(){
-  const link = document.getElementById('accountLink');
-  if (!link) return;
-
-  // Make sure it's always clickable even if JS loads late or Supabase fails
-  const ret = encodeURIComponent(location.href);
-  if (!link.getAttribute('href') || link.getAttribute('href') === '#') {
-    link.setAttribute('href', `login.html?return=${ret}`);
+  if (window.sb?.auth) {
+    sb.auth.onAuthStateChange((_evt, session)=>{
+      if (session) link.setAttribute("href","user.html");
+      else link.setAttribute("href", `login.html?return=${encodeURIComponent(location.href)}`);
+    });
   }
 })();

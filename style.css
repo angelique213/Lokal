@@ -35,15 +35,32 @@
 
 /* ========== FEATURED ========== */
 .featured{ width:100%; padding:10px 0; background:var(--chip); display:flex; justify-content:space-between; }
+
+/* Make boxes hover containers with overlay above image */
 .featured-box-1,.featured-box-3{ width:33%; height:700px; position:relative; }
 .featured-box-2{ width:33%; height:700px; display:flex; flex-wrap:wrap; justify-content:space-between; }
 .featured-box-2-box-1{ width:100%; height:340px; position:relative; }
 .featured-box-2-box-2,.featured-box-2-box-3{ width:49.5%; height:340px; position:relative; }
-.bg-image{ width:100%; height:100%; overflow:hidden; }
+
+.bg-image{ width:100%; height:100%; overflow:hidden; position:relative; z-index:1; }
 .bg-image > img{ width:100%; transition:.2s; }
 .featured-box-1:hover img, .featured-box-3:hover img,
 .featured-box-2-box-1:hover img, .featured-box-2-box-2:hover img, .featured-box-2-box-3:hover img{ transform:scale(1.1); }
-.overlay{ position:absolute; inset:0; display:flex; padding:5%; align-items:flex-end; justify-content:center; }
+
+/* Overlay: hidden by default, clickable on hover of card OR overlay itself */
+.overlay{
+  position:absolute; inset:0; display:flex; padding:5%;
+  align-items:flex-end; justify-content:center;
+  z-index:2; opacity:0; pointer-events:none; transition:opacity .25s ease;
+}
+.featured-box-1:hover .overlay,
+.featured-box-2:hover .overlay,
+.featured-box-2-box-1:hover .overlay,
+.featured-box-2-box-2:hover .overlay,
+.featured-box-2-box-3:hover .overlay,
+.overlay:hover{
+  opacity:1; pointer-events:auto;
+}
 
 /* ========== PRODUCT GRIDS ========== */
 .products{ width:100%; padding:30px 20%; background:var(--chip); display:flex; flex-direction:column; row-gap:20px; align-items:center; }
@@ -57,7 +74,15 @@
 .effect-image{ opacity:0; transform:scale(1.2); }
 .product:hover .main-image{ transform:scale(1.2); opacity:0; }
 .product:hover .effect-image{ opacity:1; transform:scale(1); }
-.overlay-image{ position:absolute; inset:0; display:flex; justify-content:center; align-items:flex-end; padding:10%; margin-top:100px; transition:.2s; }
+
+/* Show the add-to-cart overlay on hover and make it clickable */
+.overlay-image{
+  position:absolute; inset:0; display:flex; justify-content:center; align-items:flex-end;
+  padding:10%; margin-top:100px; transition:opacity .2s; z-index:3;
+  opacity:0; pointer-events:none;
+}
+.product:hover .overlay-image{ opacity:1; pointer-events:auto; }
+
 .product-details{ padding:10px; display:flex; justify-content:space-between; font-family:'Montserrat'; }
 
 /* ========== CATEGORY CARDS ========== */
@@ -75,21 +100,192 @@
 .post-image:hover img{ transform:scale(1.2); }
 .post-image i{ position:absolute; font-size:30px; margin-right:10px; margin-top:10px; z-index:20; }
 
-/* ========== FOOTER ========== */
+/* ========== FOOTER (Upgraded) ========== */
+/* Dark, classy footer that matches your brand, fully responsive + accessible */
 .footer{
-  width:100%; padding:40px 20px; background:var(--chip); font-family:'Montserrat',sans-serif;
-  display:flex; justify-content:space-between; flex-wrap:wrap; box-shadow:0 -2px 10px rgba(0,0,0,.05);
+  --ft-bg: #0f0f0f;
+  --ft-ink: #e9e7e4;
+  --ft-ink-2:#cfcac3;
+  --ft-line:#232323;
+  --ft-chip:#1a1a1a;
+
+  width:100%;
+  background:var(--ft-bg);
+  color:var(--ft-ink);
+  font-family:'Montserrat',sans-serif;
+  padding:48px 20px 22px;
+  box-shadow:0 -2px 18px rgba(0,0,0,.18);
 }
-.footer-section{ flex:1; min-width:250px; display:flex; flex-direction:column; row-gap:10px; margin-bottom:20px; }
-.footer h1{ font-size:18px; margin-bottom:10px; color:#333; }
-.footer-list{ list-style:none; padding:0; display:flex; flex-direction:column; row-gap:8px; }
-.footer-list li a{ text-decoration:none; color:#555; transition:color .3s; }
-.footer-list li a:hover{ color:#000; }
-.border-list{ margin-top:20px; border-top:1px solid #ccc; width:50%; }
-.socials{ padding-top:10px; margin-top:10px; display:flex; font-size:20px; column-gap:15px; }
-.socials a{ color:#555; transition:color .3s; }
-.socials a:hover{ color:#000; }
-.sub{ margin-top:20px; display:flex; align-items:center; gap:10px; }
+
+/* grid container that adapts to 1–3 columns */
+.footer-grid{
+  max-width:1200px;
+  margin:0 auto;
+  display:grid;
+  gap:28px;
+  grid-template-columns: repeat(12, minmax(0,1fr));
+}
+.footer-section{ grid-column: span 12; }
+@media (min-width: 800px){
+  .footer-section:nth-child(1){ grid-column: span 4; }
+  .footer-section:nth-child(2){ grid-column: span 4; }
+  .footer-section:nth-child(3){ grid-column: span 4; }
+}
+
+/* headings */
+.ft-title{
+  font-size:1.05rem;
+  letter-spacing:.3px;
+  font-weight:800;
+  margin:0 0 10px;
+  color:#fff;
+}
+
+/* lists & links */
+.footer-list{ list-style:none; margin:0; padding:0; }
+.footer-list li{ margin:8px 0; }
+.footer a{
+  color:var(--ft-ink);
+  text-decoration:none;
+  transition: color .2s ease, opacity .2s ease, text-decoration-color .2s ease;
+  text-decoration-color: transparent;
+}
+.footer a:hover,
+.footer a:focus{
+  color:#fff;
+  text-decoration:underline;
+  text-decoration-color:#6d6a33; /* brand accent */
+  outline: none;
+}
+
+/* subtle divider line */
+.border-list{
+  border-top:1px solid var(--ft-line);
+  margin:12px 0;
+  width:60%;
+}
+
+/* socials: soft squares that glow on hover */
+.socials{
+  display:flex; gap:10px; padding-top:6px;
+}
+.socials a{
+  width:38px; height:38px; border-radius:10px;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:var(--ft-chip);
+  border:1px solid var(--ft-line);
+  opacity:.95;
+  transition: transform .12s ease, box-shadow .2s ease, opacity .15s ease, border-color .2s ease;
+}
+.socials a:hover,
+.socials a:focus{
+  transform: translateY(-1px);
+  opacity:1;
+  border-color:#3a3a3a;
+  box-shadow:0 8px 24px rgba(109,106,51,.35);
+}
+.socials i{ font-size:18px; }
+
+/* newsletter area */
+.ft-subcopy{
+  margin:0 0 12px;
+  color:var(--ft-ink-2);
+  line-height:1.5;
+}
+
+.ft-news-form{
+  display:grid;
+  grid-template-columns: 1fr auto;
+  gap:10px;
+  align-items:center;
+}
+
+.footer input[type="email"]{
+  height:46px;
+  width:100%;
+  padding:0 14px;
+  border-radius:12px;
+  border:1px solid var(--ft-line);
+  background:#0a0a0a;
+  color:#fff;
+  transition: border-color .2s, box-shadow .2s;
+}
+.footer input[type="email"]::placeholder{ color:#7f7f7f; }
+.footer input[type="email"]:focus{
+  border-color:#6d6a33;
+  box-shadow:0 0 0 3px rgba(109,106,51,.28);
+  outline:none;
+}
+
+/* keep your .button look but tune it for the footer */
+.footer .button{
+  height:46px;
+  padding:0 16px;
+  border-radius:12px;
+  border:none;
+  background:var(--brand);
+  color:#fff;
+  font-weight:800;
+  letter-spacing:.2px;
+  transition: background .2s, transform .1s ease;
+}
+.footer .button:hover{ background:#8A8841; }
+.footer .button:active{ transform: translateY(1px); }
+
+/* consent + small notes */
+.ft-consent{
+  grid-column:1 / -1;
+  display:flex; gap:8px; align-items:flex-start;
+  color:var(--ft-ink-2);
+  font-size:.92rem;
+  line-height:1.4;
+}
+.ft-consent input{
+  width:18px; height:18px; border-radius:4px;
+  accent-color:#6d6a33;
+}
+.ft-note{
+  grid-column:1 / -1;
+  margin:2px 0 0;
+  color:#a7a29c;
+  font-size:.86rem;
+}
+.ft-msg{
+  grid-column:1 / -1;
+  min-height:1.2em;
+  font-weight:800;
+  margin-top:4px;
+}
+
+/* bottom legal strip */
+.ft-legal{
+  max-width:1200px;
+  margin:22px auto 0;
+  padding-top:16px;
+  border-top:1px solid var(--ft-line);
+  text-align:center;
+  color:#bdb7af;
+}
+.ft-legal small{ font-size:.9rem; }
+
+/* keyboard-focus ring on links inside footer for a11y */
+.footer a:focus-visible{
+  outline:2px solid #8A8841;
+  outline-offset:2px;
+  border-radius:6px;
+}
+
+/* respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .socials a,
+  .footer .button{ transition:none; }
+}
+
+/* mobile spacing tweaks */
+@media (max-width: 480px){
+  .footer{ padding:38px 16px 18px; }
+  .ft-title{ margin-bottom:8px; }
+}
 
 /* ========== FORM ELEMENTS (global) ========== */
 input{ height:40px; width:70%; padding:0 15px; border-radius:20px; border:1px solid #ccc; transition:border-color .3s; }
@@ -124,7 +320,7 @@ button:hover{ background:#000; }
 /* Header utilities (icons) */
 .utils{
   grid-column:3; display:flex; justify-content:flex-end; align-items:center;
-  position: relative; /* <-- added to anchor the greeting under the icons */
+  position: relative; /* anchor greeting under icons */
 }
 .utils .nav-links{ display:flex; align-items:center; gap:28px; list-style:none; margin:0; padding:0; }
 .utils .nav-links > li{ position:relative; display:flex; }
@@ -206,17 +402,18 @@ button:hover{ background:#000; }
   .slide{ padding-left:10%; }
 }
 
-/* wishlist heart button */
-.wl-btn{
+/* wishlist heart button (match your HTML .wishlist-btn) */
+.wishlist-btn{
   position:absolute; top:12px; right:12px;
   width:40px; height:40px; border-radius:999px;
   border:1px solid #e2ddd4; background:#fff; color:#2b1f1a;
   display:grid; place-items:center; cursor:pointer;
   transition:transform .12s, box-shadow .12s, border-color .12s;
+  z-index:4;
 }
-.wl-btn:hover{ transform:translateY(-1px); box-shadow:0 8px 16px rgba(0,0,0,.08); }
-.wl-btn.wl-active{ color:#e74c3c; border-color:#e9c0bc; }
-.wl-btn i{ pointer-events:none; }
+.wishlist-btn:hover{ transform:translateY(-1px); box-shadow:0 8px 16px rgba(0,0,0,.08); }
+.wishlist-btn.active{ color:#e74c3c; border-color:#e9c0bc; }
+.wishlist-btn i{ pointer-events:none; }
 
 /* ===== (existing) below-header greeting box; we keep it but will hide it when inline is shown ===== */
 .home-greeting{
@@ -228,19 +425,16 @@ button:hover{ background:#000; }
 }
 
 /* ===== Inline greeting styles ===== */
-/* small inline text (legacy position if ever used) */
 .inline-greeting{
   font: 600 0.92rem/1.2 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   color:#2b1f1a;
   white-space: nowrap;
   margin-left: 12px;
 }
-
-/* anchored variant: sits UNDER the icons, right-aligned */
 .inline-greeting.anchored{
   position: absolute;
   right: 0;
-  top: calc(100% + 6px);  /* drop it a bit lower below the icons row */
+  top: calc(100% + 6px);
 }
 
 /* hide on very small screens to avoid wrapping */
@@ -251,7 +445,7 @@ button:hover{ background:#000; }
 .inline-greeting.anchored {
   position: absolute;
   right: 0;
-  bottom: -14px;   /* move lower: increase or decrease as you like */
+  bottom: -14px;
   font-size: 0.92rem;
   font-weight: 600;
   color: #2b1f1a;

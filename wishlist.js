@@ -1,10 +1,10 @@
-
-/* ===== Wishlist — Lokal (enhanced) =====
-   - Preserves your classes/markup
-   - Absolute image URLs
-   - Hearts sync (solid when saved)
-   - Silent add-to-cart + optional open cart
-   - NEW: "Continue shopping" + "Clear all" buttons wired
+/* ===== Wishlist — Lokal (enhanced + cloud push + live repaint) =====
+   - Instant local toggle
+   - Pushes to Supabase when signed in (persist-sync handles auth)
+   - Live heart repaint on:
+       * your own toggles
+       * sign-in merge / sign-out clear (custom events)
+       * other tabs via 'storage' event
 ================================================== */
 (function () {
   const PRODUCT_PAGE = "best-pick/product.html";
@@ -28,6 +28,13 @@
     catch { return p; }
   }
 
+  // ---------- Cloud push helper ----------
+  async function pushIfAuthed(){
+    if (typeof window.syncWishlistIfAuthed === 'function'){
+      try{ await window.syncWishlistIfAuthed(); }catch{}
+    }
+  }
+
   const PRODUCTS = (() => {
     try { return JSON.parse(localStorage.getItem("PRODUCTS_CACHE") || "[]"); }
     catch { return []; }
@@ -36,7 +43,7 @@
   // Build a full product object; prefer cache match by slug(name)
   function fullProduct(item) {
     const id = item.id || slugify(item.name || "");
-    const found = PRODUCTS.find(
+       const found = PRODUCTS.find(
       (p) => slugify(p.name || "") === id || (item.name && p.name && p.name.trim() === item.name.trim())
     ) || {};
 
@@ -64,11 +71,28 @@
     return (data && data.id) ? String(data.id).trim() : slugify(data?.name || "");
   }
 
-  function isInWishlist(id) {
-    return read().some((x) => x.id === id);
+  function updateBadge() {
+    const el = $("#wishlistCount");
+    if (!el) return;
+    const n = read().length;
+    el.textContent = n ? String(n) : "";
+    el.style.display = n ? "inline-block" : "none";
   }
 
-  function toggleWishlist(rawItem) {
+  function syncHeartStates() {
+    const ids = new Set(read().map((x) => x.id));
+    $$(".wishlist-btn").forEach((btn) => {
+      const id = idFrom({ id: btn.dataset.id, name: btn.dataset.name });
+      const active = id && ids.has(id);
+      btn.classList.toggle("active", !!active);
+      const icon = btn.querySelector("i");
+      if (icon) icon.className = active ? "fa-solid fa-heart" : "fa-regular fa-heart";
+    });
+  }
+
+  function repaintHearts(){ updateBadge(); syncHeartStates(); }
+
+  async function toggleWishlist(rawItem) {
     const id = idFrom(rawItem);
     if (!id) return;
 
@@ -88,28 +112,9 @@
       });
     }
     write(list);
-    renderWishlist();   // keep page in sync if you're on it
-    updateBadge();
-  }
 
-  // ---------- Header badge + hearts ----------
-  function updateBadge() {
-    const el = $("#wishlistCount");
-    if (!el) return;
-    const n = read().length;
-    el.textContent = n ? String(n) : "";
-    el.style.display = n ? "inline-block" : "none";
-  }
-
-  function syncHeartStates() {
-    const ids = new Set(read().map((x) => x.id));
-    $$(".wishlist-btn").forEach((btn) => {
-      const id = idFrom({ id: btn.dataset.id, name: btn.dataset.name });
-      const active = id && ids.has(id);
-      btn.classList.toggle("active", !!active);
-      const icon = btn.querySelector("i");
-      if (icon) icon.className = active ? "fa-solid fa-heart" : "fa-regular fa-heart";
-    });
+    await pushIfAuthed();  // mirror to cloud if signed in
+    repaintHearts();
   }
 
   // ---------- Wishlist page rendering ----------
@@ -160,7 +165,6 @@
 
   // ---------- Clear & Continue ----------
   function smartContinue() {
-    // If came from a Lokal page on same origin, go back; else go to Shop All.
     try {
       const ref = document.referrer || "";
       if (ref && new URL(ref).origin === location.origin) {
@@ -171,27 +175,27 @@
     location.href = "shop-all.html";
   }
 
-  function clearAllWishlist() {
+  async function clearAllWishlist() {
     const list = read();
-    if (!list.length) return; // nothing to do
+    if (!list.length) return;
     const ok = confirm("Remove all favorites?");
     if (!ok) return;
 
-    write([]);                 // clear local
+    write([]);
+    await pushIfAuthed();
     renderWishlist();
-    updateBadge();
-    syncHeartStates();
+    repaintHearts();
   }
 
   // ---------- Events ----------
-  document.addEventListener("click", (e) => {
+  document.addEventListener("click", async (e) => {
     const t = e.target;
 
-    // Hearts on grids (Shop All / Best Picks / anywhere)
+    // Hearts on any grid/card (home, best picks, shop-all)
     const heart = t.closest(".wishlist-btn");
     if (heart) {
       e.preventDefault();
-      toggleWishlist({
+      await toggleWishlist({
         id: heart.dataset.id,
         name: heart.dataset.name,
         price: heart.dataset.price,
@@ -201,11 +205,10 @@
       });
       heart.classList.add("pulse");
       setTimeout(() => heart.classList.remove("pulse"), 300);
-      syncHeartStates();
       return;
     }
 
-    // View product (wishlist page)
+    // Wishlist page: open detail
     const detail = t.closest(".to-detail");
     if (detail) {
       e.preventDefault();
@@ -215,7 +218,7 @@
       return;
     }
 
-    // Remove single favorite (wishlist page)
+    // Wishlist page: remove one
     const rm = t.closest("[data-remove]");
     if (rm) {
       e.preventDefault();
@@ -223,51 +226,68 @@
       const list = read();
       list.splice(idx, 1);
       write(list);
+      await pushIfAuthed();
       renderWishlist();
-      updateBadge();
-      syncHeartStates();
+      repaintHearts();
       return;
     }
 
-    // Add to cart (from wishlist)
+    // Wishlist page: add to cart
     const addBtn = t.closest("[data-cart]");
     if (addBtn) {
       e.preventDefault();
       const idx = Number(addBtn.dataset.cart);
       const list = read();
       const p = fullProduct(list[idx]);
+
       const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-      const exist = cart.findIndex((x) => x.name === p.name);
+      const exist = cart.findIndex((x) => (x.baseName||x.name) === p.name);
       if (exist > -1) cart[exist].quantity += 1;
       else cart.push({
-        baseName: p.name,
-        name: p.name,
-        img: toAbs(p.img),
-        price: p.price,
-        desc: p.desc || "",
-        size: null,
-        quantity: 1
+        baseName: p.name, name: p.name, img: toAbs(p.img),
+        price: p.price, desc: p.desc || "", size: null, quantity: 1
       });
       localStorage.setItem("cart", JSON.stringify(cart));
 
       // optional: remove from wishlist after adding
       list.splice(idx, 1);
       write(list);
-      renderWishlist();
-      updateBadge();
-      syncHeartStates();
 
-      // open cart drawer if available
+      // cloud mirrors (cart via persist-sync, wishlist via pushIfAuthed)
+      window.syncCartIfAuthed?.();
+      await pushIfAuthed();
+
+      renderWishlist();
+      repaintHearts();
       window.openCartDrawer?.();
       return;
     }
   });
 
-  // Header buttons
+  // Header buttons on wishlist page
   document.addEventListener("DOMContentLoaded", () => {
     $("#btnContinue")?.addEventListener("click", smartContinue);
     $("#btnClear")?.addEventListener("click", clearAllWishlist);
   });
+
+  // ---------- Live repaint listeners ----------
+  // 1) repaint when *this* tab changes localStorage in any way
+  document.addEventListener("DOMContentLoaded", repaintHearts);
+
+  // 2) repaint when *other tabs* change wishlist
+  window.addEventListener("storage", (e)=>{
+    if (e.key === KEY) repaintHearts();
+  });
+
+  // 3) repaint when persist-sync merges on sign-in or clears on sign-out
+  window.addEventListener("wishlist:updated", repaintHearts);
+
+  // 4) if Supabase emits auth state (extra safety)
+  if (window.sb?.auth) {
+    sb.auth.onAuthStateChange((_evt, _session)=>{
+      repaintHearts();
+    });
+  }
 
   // ---------- Broken-image fallback ----------
   document.addEventListener("error", (e) => {
@@ -282,8 +302,6 @@
   // ---------- Init ----------
   document.addEventListener("DOMContentLoaded", () => {
     renderWishlist();   // paints only on wishlist.html
-    updateBadge();      // header count
-    syncHeartStates();  // hearts on any page
+    repaintHearts();    // hearts on any page
   });
 })();
-
