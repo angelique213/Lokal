@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>About Us | Lokal</title>
+
+<!-- Favicon -->
+<link rel="icon" href="images/favicon.jpg" type="image/x-icon">
+
+<!-- libs -->
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+
+<!-- your styles -->
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="cart.css">
+<link rel="stylesheet" href="wishlist.css">
+
+<!-- GitHub Pages base (adjust if not using GH Pages) -->
+<meta name="site-base" content="/Lokal/">
+
+<!-- Asset helpers (same as index) -->
+<script>
+  (function(){
+    const SITE_BASE = (document.querySelector('meta[name="site-base"]')?.content || "/").replace(/\/+$/, "/");
+    const ORIGIN_BASE = location.origin + SITE_BASE;
+    window.resolveAsset = function(p){
+      if (!p) return "";
+      if (/^https?:\/\//i.test(p)) return p;
+      const cleaned = String(p).replace(/^\/+/, "");
+      const hit = cleaned.match(/(?:^|\/)(images\/.+)$/i);
+      const tail = hit ? hit[1] : cleaned;
+      try { return new URL(tail, ORIGIN_BASE).href; } catch { return p; }
+    };
+    window.siteHref = function(rel){
+      rel = String(rel || "").replace(/^\//,"");
+      return SITE_BASE.replace(/\/$/,"/") + rel;
+    };
+  })();
+</script>
+
+<!-- Minimal extra styles for popup + toast + greeting (same as index) -->
+<style>
+/* ——— Auth popup ——— */
+.lokal-auth.la-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;place-items:center;z-index:3000}
+.lokal-auth.la-overlay[aria-hidden="false"]{display:grid}
+.lokal-auth .la-modal{
+  width:min(440px,92vw);background:#fff;border-radius:6px;border:1px solid #D7D6AA;
+  box-shadow:0 16px 50px rgba(0,0,0,.25);font-family:system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  animation:fadeIn .25s ease;
+}
+@keyframes fadeIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+.lokal-auth .la-head{display:flex;align-items:center;justify-content:space-between;padding:22px 26px 14px 26px;}
+.lokal-auth .la-title{font-size:1.05rem;font-weight:700;margin:0;color:#222;}
+.lokal-auth .la-close{background:none;border:none;font-size:22px;cursor:pointer;color:#222}
+.lokal-auth .la-body{padding:0 26px 20px 26px;}
+.lokal-auth .la-intro{font-weight:600;color:#222;margin-bottom:20px;}
+.lokal-auth .la-label{display:block;font-size:.9rem;font-weight:600;margin-bottom:6px;color:#222;}
+.lokal-auth .la-input{width:100%;padding:13px 12px;border:1px solid #222;border-radius:4px;font-size:.9rem;color:#222;outline:none;}
+.lokal-auth .la-input:focus{border-color:#A9A74F;box-shadow:0 0 0 2px rgba(169,167,79,.3);}
+.lokal-auth .la-btn{width:100%;padding:14px;border:none;border-radius:4px;background:#6A6932;color:#fff;font-weight:600;cursor:pointer;margin-top:16px;font-size:.95rem;}
+.lokal-auth .la-btn:hover{background:#8A8841;}
+.lokal-auth .la-sub{text-align:center;margin-top:8px;}
+.lokal-auth .la-sub a{color:#222;text-decoration:underline;font-size:.88rem;}
+.lokal-auth .la-foot{text-align:center;border-top:1px solid #D7D6AA;padding:18px 0 20px 0;}
+.lokal-auth .la-mini{display:flex;justify-content:center;align-items:center;gap:6px;font-size:.85rem;color:#555;}
+.lokal-auth .la-mini i{font-size:14px;}
+
+/* ——— Signed-out toast ——— */
+.toast-signout {
+  position: fixed;
+  top: 76px;
+  right: 12px;
+  z-index: 3000;
+  background:#fff;
+  border:1px solid #e8e3da;
+  border-radius:12px;
+  padding:10px 14px;
+  box-shadow:0 16px 40px rgba(0,0,0,.12);
+  font:600 0.92rem/1.3 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color:#2b1f1a;
+}
+.toast-signout button {
+  background:none; border:0; cursor:pointer; font-size:18px; line-height:1;
+  padding:0 4px; margin-left:10px; color:#2b1f1a;
+}
+
+/* ——— Greeting chip ——— */
+.header{ position: relative; }
+.hi-tag{
+  position:absolute;
+  top:6px;
+  right:14px;
+  font: 800 0.92rem/1 'Montserrat', system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color:#2b1f1a;
+  pointer-events:none;
+  z-index:2;
+  white-space:nowrap;
+}
+@media (max-width: 640px){ .hi-tag{ display:none; } }
+
+/* Kill any legacy inline greeting injected by lokal.js */
+.inline-greeting { display:none !important; }
+#homeGreeting { display:none !important; }
+
+/* Safety net so overlays never block the header when "hidden" */
+#cdOverlay[aria-hidden="true"]{ display:none !important; pointer-events:none !important; }
+#cdDrawer[aria-hidden="true"]{ display:none !important; pointer-events:none !important; }
+.hi-tag{ pointer-events:none; }
+</style>
+
+</head>
+<body>
+
+<!-- ========== LOKAL AUTH POPUP (same as index) ========== -->
+<div class="lokal-auth la-overlay" id="lokalAuthOverlay" aria-hidden="true">
+  <div class="la-modal" role="dialog" aria-modal="true" aria-labelledby="laTitle">
+    <div class="la-head">
+      <h3 id="laTitle" class="la-title">SIGN IN</h3>
+      <button class="la-close" id="laClose" aria-label="Close">×</button>
+    </div>
+
+    <div class="la-body">
+      <p class="la-intro">Sign in with your email or sign up to become a Lokal Member.</p>
+
+      <!-- Step 1: Email -->
+      <form id="laEmailForm" novalidate>
+        <label class="la-label" for="laEmail">Email <span style="color:#b02a37">*</span></label>
+        <input class="la-input" id="laEmail" type="email" placeholder="Email" required />
+        <button class="la-btn" type="submit">CONTINUE</button>
+      </form>
+
+      <!-- Step 2: Password -->
+      <form id="laPassForm" hidden novalidate>
+        <label class="la-label" for="laPass">Password</label>
+        <input class="la-input" id="laPass" type="password" placeholder="••••••" required minlength="6" />
+        <button class="la-btn" type="submit">SIGN IN</button>
+        <p class="la-sub"><a href="#" id="laBackEmail">Use another email</a></p>
+      </form>
+    </div>
+
+    <div class="la-foot">
+      <div class="la-mini"><i class="fa-solid fa-lock"></i> All data is kept secure</div>
+      <a class="la-mlink" href="membership.html">Lokal Membership</a>
+    </div>
+  </div>
+</div>
+<!-- ========== /LOKAL AUTH POPUP ========== -->
+
+<!-- ===== HEADER (same as index) ===== -->
+<header class="header">
+  <div class="logo">
+    <a href="index.html" aria-label="Home">
+      <img src="images/projectlogo.png" alt="logo">
+    </a>
+  </div>
+
+  <div class="nav-center">
+    <form class="site-search" action="search.html" method="GET">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="search" name="q" placeholder="Search products, categories..." autocomplete="off" />
+      <button type="submit">Search</button>
+    </form>
+
+    <nav class="main-links">
+      <ul>
+        <li><a href="best-pick/best-picks.html">Best Picks</a></li>
+        <li><a href="shop-all.html">Shop All</a></li>
+        <li class="has-megamenu">
+          <a href="#" class="catmenu-toggle" aria-expanded="false">
+            Shop by Category <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+          </a>
+          <div class="mega" id="catMega" role="menu" aria-label="Shop by Category">
+            <h3 class="cat-heading">All Categories</h3>
+            <ul class="cat-list">
+              <li><a href="shop-all.html?cat=flavors"><i class="fa-solid fa-cookie-bite"></i> Flavors</a></li>
+              <li><a href="shop-all.html?cat=accessories"><i class="fa-solid fa-gear"></i> Accessories</a></li>
+              <li><a href="shop-all.html?cat=bags"><i class="fa-solid fa-bag-shopping"></i> Bags</a></li>
+              <li><a href="shop-all.html?cat=clothing"><i class="fa-solid fa-shirt"></i> Clothing</a></li>
+              <li><a href="shop-all.html?cat=home"><i class="fa-solid fa-mug-hot"></i> Home</a></li>
+              <li><a href="shop-all.html?cat=crafts"><i class="fa-solid fa-scissors"></i> Crafts</a></li>
+              <li><a href="shop-all.html?cat=christmas"><i class="fa-solid fa-snowflake"></i> Christmas / Season</a></li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <nav class="utils">
+    <ul class="nav-links">
+      <li><a href="#" id="accountLink" aria-label="Account"><i class="fa-solid fa-user"></i></a></li>
+      <li>
+        <a href="#" id="openCart" aria-label="Open cart">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span class="cart-count">0</span>
+        </a>
+      </li>
+      <li style="position: relative;">
+        <a href="wishlist.html" aria-label="Favorites" id="wishlistLink">
+          <i class="fa-regular fa-heart"></i>
+          <span class="wishlist-count" id="wishlistCount">0</span>
+        </a>
+      </li>
+      <li><a href="support.html" aria-label="Support"><i class="fa-solid fa-headset"></i></a></li>
+    </ul>
+  </nav>
+
+  <!-- Top-right greeting -->
+  <div id="hiTag" class="hi-tag" hidden></div>
+</header>
+
+<!-- ===== ABOUT ===== -->
+<section class="about-lokal" aria-labelledby="about-title">
+  <div class="al-wrap">
+    <header class="al-hero">
+      <h1 id="about-title">About Us</h1>
+      <p class="al-kicker">Choose Lokal. Support Lokal. Be Lokal.</p>
+    </header>
+
+    <!-- Image Banner (less crop + hover zoom) -->
+    <div class="al-banner">
+      <figure class="al-frame">
+        <img src="images/about1.png" alt="Local artisan weaving traditional bag">
+      </figure>
+      <figure class="al-frame">
+        <img src="images/about2.png" alt="Filipino handmade crafts displayed">
+      </figure>
+      <figure class="al-frame">
+        <img src="images/about3.png" alt="Natural materials used by local makers">
+      </figure>
+    </div>
+
+    <article class="al-card al-story">
+      <h2>Our Story</h2>
+      <p>
+        Lokal was born from a simple dream—to bring the beauty of Filipino
+        craftsmanship closer to the world. Every woven bag, handcrafted
+        accessory, and locally made delicacy tells a story of culture,
+        creativity, and community.
+      </p>
+      <p>
+        We partner with small artisans and local entrepreneurs across the
+        Philippines. By connecting their work to a wider audience, we help
+        preserve traditions, empower livelihoods, and celebrate the heart of
+        Filipino artistry.
+      </p>
+    </article>
+
+    <div class="al-grid">
+      <section class="al-card">
+        <h3>Our Mission</h3>
+        <ul class="al-list">
+          <li>Showcase <strong>authentic Filipino craftsmanship</strong></li>
+          <li>Encourage <strong>sustainable &amp; ethical production</strong></li>
+          <li>Support <strong>communities &amp; small businesses</strong></li>
+        </ul>
+      </section>
+
+      <section class="al-card">
+        <h3>Our Vision</h3>
+        <p>
+          A world that proudly chooses <strong>local first</strong>—where Filipino
+          creativity stands tall on the global stage and every purchase uplifts
+          a community.
+        </p>
+      </section>
+    </div>
+
+    <section class="al-card">
+      <h3>What Makes Us Different</h3>
+      <div class="al-features">
+        <div class="al-feature">
+          <i class="fa-solid fa-leaf" aria-hidden="true"></i>
+          <div>
+            <h4>Sustainable Choices</h4>
+            <p>We favor natural, responsibly sourced materials.</p>
+          </div>
+        </div>
+        <div class="al-feature">
+          <i class="fa-solid fa-people-group" aria-hidden="true"></i>
+          <div>
+            <h4>Community Driven</h4>
+            <p>Every purchase supports families and preserves crafts.</p>
+          </div>
+        </div>
+        <div class="al-feature">
+          <i class="fa-solid fa-palette" aria-hidden="true"></i>
+          <div>
+            <h4>Authentic Designs</h4>
+            <p>Handwoven textiles and flavors that reflect our culture.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="al-cta al-card" role="complementary" aria-label="Join the movement">
+      <div class="al-cta-text">
+        <h3>Join the Movement</h3>
+        <p>
+          Every order is more than shopping—it’s a way to celebrate Filipino
+          pride and support local communities.
+        </p>
+      </div>
+      <a class="al-btn" href="shop-all.html">Shop Local</a>
+    </aside>
+  </div>
+</section>
+
+<!-- ===== FOOTER (same as index) ===== -->
+<footer class="footer" role="contentinfo">
+  <div class="footer-grid" aria-label="Site footer">
+
+    <!-- Contact -->
+    <section class="footer-section" aria-labelledby="ft-contact-title">
+      <h2 id="ft-contact-title" class="ft-title">Contact Us</h2>
+      <ul class="footer-list">
+        <li>
+          <a
+            href="mailto:shoplokalphilippines@gmail.com?subject=Lokal%20Support%20Request&body=Hi%20Lokal%20Team%2C%0A%0AIssue%3A%20%0AOrder%20%23%3A%20%0ABrowser%2FDevice%3A%20%0A%0AThanks%2C%0A"
+            aria-label="Email shoplokalphilippines at gmail dot com"
+            title="Email us"
+          >
+            shoplokalphilippines@gmail.com
+          </a>
+        </li>
+        <li><address style="font-style:normal">Manila, Philippines</address></li>
+        <li class="border-list" aria-hidden="true"></li>
+        <li class="socials" aria-label="Social links">
+          <a href="#" aria-label="Instagram" title="Instagram"><i class="fa-brands fa-square-instagram" aria-hidden="true"></i></a>
+          <a href="#" aria-label="Facebook" title="Facebook"><i class="fa-brands fa-square-facebook" aria-hidden="true"></i></a>
+          <a href="#" aria-label="TikTok" title="TikTok"><i class="fa-brands fa-tiktok" aria-hidden="true"></i></a>
+        </li>
+      </ul>
+      <p class="ft-note" style="margin-top:8px">
+        Need help? Visit our <a href="support.html">Support</a> page or email us.
+      </p>
+    </section>
+
+    <!-- Quick Links -->
+    <nav class="footer-section" aria-labelledby="ft-links-title">
+      <h2 id="ft-links-title" class="ft-title">Quick Links</h2>
+      <ul class="footer-list">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="shop-all.html">Shop All</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="terms.html">Terms &amp; Conditions</a></li>
+        <li><a href="support.html">Support</a></li>
+      </ul>
+    </nav>
+
+    <!-- Newsletter -->
+    <section class="footer-section" aria-labelledby="ft-news-title">
+      <h2 id="ft-news-title" class="ft-title">Subscribe to Newsletter</h2>
+      <p class="ft-subcopy">
+        Get product drops, deals, and stories from local makers—straight to your inbox.
+      </p>
+
+      <form id="newsletterForm" class="ft-news-form" novalidate>
+        <label class="sr-only" for="newsletterEmail">Email address</label>
+        <input
+          id="newsletterEmail"
+          name="email"
+          type="email"
+          inputmode="email"
+          autocomplete="email"
+          placeholder="Your email"
+          required
+          aria-describedby="newsletterNote"
+        />
+        <button class="button" id="newsletterBtn" type="submit" aria-label="Subscribe to newsletter">
+          Subscribe
+        </button>
+
+        <div class="ft-consent">
+          <input id="newsletterConsent" name="consent" type="checkbox" required />
+          <label for="newsletterConsent">
+            I agree to the <a href="terms.html">Terms &amp; Conditions</a> and <a href="terms.html#privacy">Privacy Policy</a>.
+          </label>
+        </div>
+
+        <p id="newsletterNote" class="ft-note">
+          We never share your email. Unsubscribe anytime.
+        </p>
+        <div id="newsletterMsg" class="ft-msg" role="status" aria-live="polite"></div>
+      </form>
+    </section>
+  </div>
+
+  <div class="ft-legal">
+    <small>&copy; <span id="yearNow"></span> Lokal. All rights reserved.</small>
+  </div>
+</footer>
+
+<!-- ===== CART DRAWER (same as index) ===== -->
+<div class="cd-overlay" id="cdOverlay" aria-hidden="true"></div>
+<aside class="cd-drawer" id="cdDrawer" aria-labelledby="cdTitle" aria-hidden="true" role="dialog">
+  <header class="cd-header">
+    <h2 id="cdTitle">Cart</h2>
+    <button class="cd-close" id="cdClose" aria-label="Close cart">&times;</button>
+  </header>
+  <div class="cd-body">
+    <div class="cd-items" id="cdItems"></div>
+    <div class="cd-summary">
+      <div class="cd-row">
+        <span>Subtotal</span>
+        <strong id="cdSubtotal">₱0.00</strong>
+      </div>
+      <p class="cd-note">Shipping, taxes, and discount codes calculated at checkout.</p>
+      <label class="cd-terms">
+        <input type="checkbox" id="cdAgree">
+        I agree with the <a href="terms.html" target="_blank" rel="noopener">terms and conditions</a>
+      </label>
+      <button class="cd-checkout" id="cdCheckout" disabled>Check Out</button>
+    </div>
+  </div>
+</aside>
+
+<!-- ===== Scoped ABOUT styles (crop fix + hover zoom) ===== -->
+<style>
+  .about-lokal { color: var(--ink); }
+  .about-lokal .al-wrap{
+    max-width: 1100px; margin: 0 auto; padding: 48px 20px; line-height: 1.6;
+    font-family: Montserrat, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  }
+  .about-lokal .al-hero{ text-align:center; margin-bottom:28px; }
+  .about-lokal .al-hero h1{ font-size:clamp(28px,3.2vw,44px); letter-spacing:.3px; margin-bottom:8px; }
+  .about-lokal .al-kicker{ color:var(--muted); font-size:1rem; }
+
+  /* Banner grid */
+  .about-lokal .al-banner{
+    display:grid; grid-template-columns:1fr; gap:12px; margin:20px 0 28px 0;
+  }
+  @media (min-width:780px){ .about-lokal .al-banner{ grid-template-columns:repeat(3,1fr); } }
+
+  /* Fixed-ratio frames reduce awkward cropping vs fixed height */
+  .about-lokal .al-frame{
+    border:1px solid var(--line); border-radius:16px; overflow:hidden;
+    aspect-ratio: 16 / 10;
+    background:#f4f2ec;
+  }
+  .about-lokal .al-frame img{
+    width:100%; height:100%; object-fit: cover; object-position: center;
+    transition: transform .35s ease; display:block;
+  }
+  /* Slightly shift focus on the middle image to show more faces/subjects */
+  .about-lokal .al-frame:nth-child(2) img{ object-position: 50% 35%; }
+
+  @media (hover:hover){
+    .about-lokal .al-frame:hover img{ transform: scale(1.035); }
+  }
+
+  .about-lokal .al-card{
+    background:#fff; border:1px solid var(--line); border-radius:16px;
+    padding:22px; box-shadow:0 6px 18px rgba(0,0,0,.04); margin-bottom:16px;
+  }
+  .about-lokal .al-grid{ display:grid; grid-template-columns:1fr; gap:16px; margin:16px 0; }
+  @media (min-width:820px){ .about-lokal .al-grid{ grid-template-columns:1fr 1fr; } }
+  .about-lokal .al-list{ padding-left:18px; }
+  .about-lokal .al-list li{ margin:6px 0; }
+
+  .about-lokal .al-features{ display:grid; grid-template-columns:1fr; gap:14px; }
+  @media (min-width:680px){ .about-lokal .al-features{ grid-template-columns:repeat(3,1fr); } }
+  .about-lokal .al-feature{
+    display:flex; gap:12px; align-items:flex-start; background:var(--chip);
+    border:1px solid var(--line); border-radius:14px; padding:14px;
+  }
+  .about-lokal .al-feature i{ font-size:22px; color:var(--brand); margin-top:2px; }
+  .about-lokal .al-feature h4{ font-size:1.05rem; margin-bottom:4px; }
+
+  .about-lokal .al-cta{
+    display:flex; flex-direction:column; gap:16px; align-items:center; text-align:center;
+    background:linear-gradient(180deg,#fff,#faf9f6);
+  }
+  @media (min-width:720px){
+    .about-lokal .al-cta{ flex-direction:row; justify-content:space-between; text-align:left; }
+  }
+  .about-lokal .al-btn{
+    display:inline-block; text-decoration:none; font-weight:600; border-radius:12px;
+    padding:12px 16px; border:1px solid var(--brand); color:var(--ink); background:#fff;
+    transition: transform .08s ease, box-shadow .2s ease;
+  }
+  .about-lokal .al-btn:hover{ box-shadow:0 8px 18px rgba(0,0,0,.06); }
+  .about-lokal .al-btn:active{ transform:translateY(1px); }
+
+  .about-lokal .al-frame:nth-child(2) img {
+  object-fit: cover;
+  transform: scale(1.20);   /* zoom in */
+  object-position: 50% 50%; /* adjust center focus */
+}
+/* Base zoom for the middle image so it fills the frame */
+.about-lokal .al-frame:nth-child(2) img{
+  object-fit: cover;
+  object-position: 50% 45%;  /* adjust focus if needed */
+  transform: scale(1.25);    /* default zoom-in */
+}
+
+/* Extra zoom on hover (desktop/trackpad only) */
+@media (hover:hover){
+  .about-lokal .al-frame:nth-child(2):hover img{
+    transform: scale(1.28);  /* a bit more than the base */
+  }
+}
+
+</style>
+
+<!-- ===== LIB SCRIPTS ===== -->
+<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script>AOS.init();</script>
+
+<!-- Account link controller + Greeting + Sign-out toast (same as index) -->
+<script>
+(function(){
+  const $ = (s)=>document.querySelector(s);
+  const overlay = $('#lokalAuthOverlay');
+  const emailForm = $('#laEmailForm'), passForm = $('#laPassForm');
+  const emailInput = $('#laEmail'),  passInput = $('#laPass');
+  const accountLink = $('#accountLink');
+  const hiTag = $('#hiTag');
+
+  const cap = s => { s = String(s||'').trim(); return s ? s[0].toUpperCase()+s.slice(1) : ''; };
+  function firstFromUser(user){
+    const md = (user && user.user_metadata) || {};
+    return md.first_name || md.given_name || (md.full_name||md.name||'').split(/\s+/)[0] || '';
+  }
+  function showGreeting(name){
+    if (!name){ hiTag.hidden = true; return; }
+    hiTag.textContent = 'Hi, ' + cap(name);
+    hiTag.hidden = false;
+  }
+  function hideGreeting(){ hiTag.hidden = true; }
+
+  const openAuth = ()=>{ overlay?.setAttribute('aria-hidden','false'); emailForm.hidden=false; passForm.hidden=true; setTimeout(()=>emailInput?.focus(),50); };
+  const closeAuth = ()=> overlay?.setAttribute('aria-hidden','true');
+  $('#laClose')?.addEventListener('click', closeAuth);
+  overlay?.addEventListener('click', e=>{ if(e.target===overlay) closeAuth(); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeAuth(); });
+
+  emailForm?.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const email=(emailInput.value||'').trim().toLowerCase();
+    if(!email){ emailInput.focus(); return; }
+    passForm.dataset.email = email;
+    emailForm.hidden = true;
+    passForm.hidden = false;
+    passInput.focus();
+  });
+  $('#laBackEmail')?.addEventListener('click', (e)=>{ e.preventDefault(); emailForm.hidden=false; passForm.hidden=true; emailInput.focus(); });
+
+  passForm?.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const email = passForm.dataset.email || '';
+    const password = passInput.value || '';
+    if (!email || !password) { alert('Please enter email and password.'); return; }
+    try{
+      if (!window.sb || !sb.auth) throw new Error('Supabase client missing. Check supabase.js');
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) {
+        const msg = (error.message || '').toLowerCase();
+        if (msg.includes('confirm')) { alert('Please confirm your email first.'); return; }
+        if (msg.includes('invalid') || msg.includes('password')) { alert('Incorrect email or password.'); return; }
+        const create = confirm('No account found. Create one?');
+        if (!create) return;
+        const { error: signUpError } = await sb.auth.signUp({
+          email, password,
+          options:{ emailRedirectTo: new URL('user.html', location.href).href }
+        });
+        if (signUpError) { alert(signUpError.message || 'Sign up failed.'); return; }
+        alert('Check your email to verify, then sign in.');
+        closeAuth();
+        return;
+      }
+      sessionStorage.setItem('hadSession','1');
+      const user = data?.user;
+      const first = firstFromUser(user);
+      if (first) localStorage.setItem('lokalFirstName', first);
+      closeAuth();
+      showGreeting(first || localStorage.getItem('lokalFirstName') || '');
+    } catch (err){
+      alert((err && err.message) || 'Network error. Check your Supabase setup.');
+    }
+  });
+
+  accountLink?.addEventListener('click', async (e)=>{
+    e.preventDefault();
+    try{
+      const { data:{ session } } = await sb.auth.getSession();
+      if (session) location.href = 'user.html';
+      else openAuth();
+    }catch{
+      openAuth();
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', async ()=>{
+    try{
+      const { data:{ session } } = await sb.auth.getSession();
+      if (session){
+        const first = firstFromUser(session.user) || localStorage.getItem('lokalFirstName') || '';
+        showGreeting(first);
+      } else {
+        hideGreeting();
+      }
+    }catch{ hideGreeting(); }
+  });
+
+  if (window.sb?.auth?.onAuthStateChange){
+    sb.auth.onAuthStateChange((evt, session)=>{
+      if (evt === 'SIGNED_IN' || (session && session.user)){
+        sessionStorage.setItem('hadSession','1');
+        const first = firstFromUser(session?.user) || localStorage.getItem('lokalFirstName') || '';
+        if (first) localStorage.setItem('lokalFirstName', first);
+        showGreeting(first);
+      }
+      if (evt === 'SIGNED_OUT'){
+        if (sessionStorage.getItem('hadSession') === '1'){
+          sessionStorage.setItem('justSignedOut','1');
+        }
+        hideGreeting();
+      }
+    });
+  }
+})();
+</script>
+
+<!-- Logout toast -->
+<script>
+(function(){
+  function showToast(msg){
+    if (document.getElementById('signedOutToast')) return;
+    const box = document.createElement('div');
+    box.id = 'signedOutToast';
+    box.className = 'toast-signout';
+    box.setAttribute('role','status');
+    box.setAttribute('aria-live','polite');
+    box.innerHTML = `<span>${msg}</span><button aria-label="Dismiss">×</button>`;
+    document.body.appendChild(box);
+    const close = () => box.remove();
+    box.querySelector('button')?.addEventListener('click', close);
+    setTimeout(close, 5000);
+  }
+  document.addEventListener('DOMContentLoaded', ()=>{
+    if (sessionStorage.getItem('justSignedOut') === '1'){
+      showToast("You’re signed out.");
+      sessionStorage.removeItem('justSignedOut');
+      sessionStorage.removeItem('hadSession');
+    }
+  });
+})();
+</script>
+
+<!-- Year helper -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const y = document.getElementById('yearNow');
+    if (y) y.textContent = new Date().getFullYear();
+  });
+</script>
+
+<!-- Supabase + Newsletter -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="newsletter.js" defer></script>
+
+<!-- App scripts -->
+<script src="persist-sync.js"></script>
+<script src="lokal.js"></script>
+<script src="cart.js" defer></script>
+<script src="wishlist.js" defer></script>
+
+</body>
+</html>
