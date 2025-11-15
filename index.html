@@ -190,7 +190,6 @@
 
   <nav class="utils">
     <ul class="nav-links">
-      <!-- IMPORTANT: use # so clicks are JS-handled on every page -->
       <li><a href="#" id="accountLink" aria-label="Account"><i class="fa-solid fa-user"></i></a></li>
       <li>
         <a href="#" id="openCart" aria-label="Open cart">
@@ -290,7 +289,7 @@
   <h1 class="section-title">Top products of the Season</h1>
   <div class="products-list">
     <!-- sample cards -->
-    <div class="product" data-name="Santa Ornament" data-price="₱479.00" data-img="images/main-image.png" data-desc="Festive Santa ornament for your tree.">
+    <div class="product" data-id="santa-ornament" data-name="Santa Ornament" data-price="₱479.00" data-img="images/main-image.png" data-desc="Festive Santa ornament for your tree.">
       <div class="product-image">
         <div class="main-image"><img src="images/main-image.png" alt="Santa Ornament"></div>
         <div class="effect-image"><img src="images/effect-image.png" alt="Santa Ornament Alt"></div>
@@ -305,7 +304,7 @@
       <div class="product-details"><p class="product-name">Santa Ornament</p><p>₱479.00</p></div>
     </div>
 
-    <div class="product" data-name="Christmas Parol" data-price="₱900.00" data-img="images/main-image2.png" data-desc="Classic parol to brighten your holidays.">
+    <div class="product" data-id="christmas-parol" data-name="Christmas Parol" data-price="₱900.00" data-img="images/main-image2.png" data-desc="Classic parol to brighten your holidays.">
       <div class="product-image">
         <div class="main-image"><img src="images/main-image2.png" alt="Christmas Parol"></div>
         <div class="effect-image"><img src="images/effect-image2.png" alt="Christmas Parol Alt"></div>
@@ -320,7 +319,7 @@
       <div class="product-details"><p class="product-name">Christmas Parol</p><p>₱900.00</p></div>
     </div>
 
-    <div class="product" data-name="Santa Stockings" data-price="₱295.00" data-img="images/main-image3.png" data-desc="Cozy stockings for gifts and treats.">
+    <div class="product" data-id="santa-stockings" data-name="Santa Stockings" data-price="₱295.00" data-img="images/main-image3.png" data-desc="Cozy stockings for gifts and treats.">
       <div class="product-image">
         <div class="main-image"><img src="images/main-image3.png" alt="Santa Stockings"></div>
         <div class="effect-image"><img src="images/effect-image3.png" alt="Santa Stockings Alt"></div>
@@ -335,7 +334,7 @@
       <div class="product-details"><p class="product-name">Santa Stockings</p><p>₱295.00</p></div>
     </div>
 
-    <div class="product" data-name="Queso de Bola" data-price="₱300.00" data-img="images/main-image4.png" data-desc="Holiday favorite cheese ball.">
+    <div class="product" data-id="queso-de-bola" data-name="Queso de Bola" data-price="₱300.00" data-img="images/main-image4.png" data-desc="Holiday favorite cheese ball.">
       <div class="product-image">
         <div class="main-image"><img src="images/main-image4.png" alt="Queso de Bola"></div>
         <div class="effect-image"><img src="images/effect-image4.png" alt="Queso de Bola Alt"></div>
@@ -633,9 +632,9 @@
 <script src="newsletter.js" defer></script>
 
 <!-- App scripts -->
-<script src="persist-sync.js"></script>
-<script src="lokal.js"></script>
+<!-- <script src="persist-sync.js"></script> -->
 <script src="cart.js" defer></script>
+<script src="lokal.js"></script>
 <script src="wishlist.js" defer></script>
 
 </body>

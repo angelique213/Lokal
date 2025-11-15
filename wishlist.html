@@ -16,18 +16,25 @@
   <link rel="stylesheet" href="cart.css">
   <link rel="stylesheet" href="wishlist.css">
 
+  <!-- Favorites + layout tweaks -->
   <style>
-    :root{ --ink:#2b1f1a; --ink-2:#7a6f68; --line:#e8e3da; --card:#fff; --tone:#6d6a33; }
+    :root{
+      --ink:#2b1f1a;
+      --ink-2:#7a6f68;
+      --line:#e8e3da;
+      --card:#fff;
+      --tone:#6d6a33;
+    }
     .fav-wrap{ max-width:1200px; margin:24px auto 80px; padding:0 20px; }
     .fav-head{ display:flex; justify-content:space-between; align-items:end; gap:16px; margin:8px 0 18px; }
     .fav-head h1{ margin:0; color:var(--ink); font-size:2.2rem; }
     .fav-count{ color:var(--ink-2); font-weight:700; }
     .fav-actions{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
     .btn-clear, .btn-continue{
-      height:38px; padding:0 14px; border-radius:10px; border:1px solid #cfc7c1; background:#fff; cursor:pointer; font-weight:700; color:var(--ink);
+      height:38px; padding:0 14px; border-radius:10px; border:1px solid #cfc7c1; background:#fff;
+      cursor:pointer; font-weight:700; color:var(--ink);
     }
     .btn-continue{ border-color:var(--tone); color:#fff; background:var(--tone); }
-
     .fav-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:22px; }
     @media (max-width: 992px){ .fav-grid{ grid-template-columns:repeat(3,1fr); } }
     @media (max-width: 768px){ .fav-grid{ grid-template-columns:repeat(2,1fr); } }
@@ -46,8 +53,9 @@
     .empty{ color:var(--ink-2); text-align:center; margin:30px 0 10px; }
     .empty a{ color:var(--tone); font-weight:800; }
   </style>
+
+  <!-- Safety net so overlays never block header when "hidden" -->
   <style>
-    /* Safety net so overlays never block the header when "hidden" */
     #cdOverlay[aria-hidden="true"]{
       display: none !important;
       pointer-events: none !important;
@@ -58,10 +66,42 @@
     }
     .hi-tag{ pointer-events: none; }
   </style>
+
+  <!-- Auth popup overlay styles (for this page) -->
+  <style>
+    .lokal-auth {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 80px 16px 24px;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 9999;
+      transition: opacity 0.2s ease;
+    }
+    .lokal-auth[aria-hidden="true"] {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .lokal-auth[aria-hidden="false"] {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .lokal-auth .la-modal {
+      margin: 0 auto;
+    }
+    @media (max-width: 480px) {
+      .lokal-auth {
+        align-items: flex-start;
+        padding-top: 60px;
+      }
+    }
+  </style>
 </head>
 
 <body>
-  <!-- ===== SIMPLE AUTH POPUP (keep consistent across pages) ===== -->
+  <!-- ===== SIMPLE AUTH POPUP ===== -->
   <div class="lokal-auth la-overlay" id="lokalAuthOverlay" aria-hidden="true">
     <div class="la-modal" role="dialog" aria-modal="true" aria-labelledby="laTitle" style="width:min(440px,92vw);background:#fff;border-radius:6px;border:1px solid #D7D6AA;box-shadow:0 16px 50px rgba(0,0,0,.25);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;">
       <div class="la-head" style="display:flex;align-items:center;justify-content:space-between;padding:22px 26px 14px">
@@ -245,9 +285,8 @@
     </div>
   </footer>
 
-  <!-- ===== CORE SCRIPTS ===== -->
+  <!-- ===== CORE SMALL SCRIPT: year + body lock ===== -->
   <script>
-    // Body lock when cart drawer toggles
     document.addEventListener('DOMContentLoaded', () => {
       const drawer = document.getElementById('cdDrawer');
       const toggleLock = () => {
@@ -264,248 +303,161 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
 
-  <!-- Optional: your cloud sync (kept before wishlist/cart so it can hydrate) -->
+  <!-- Optional: cloud sync -->
   <script src="persist-sync.js"></script>
 
   <!-- Global cart API and wishlist helpers -->
   <script src="cart.js" defer></script>
   <script src="wishlist.js" defer></script>
 
-  <!-- Wishlist page renderer (robust to different storage shapes) -->
-  <script>
-    (function(){
-      const SITE_BASE = (document.querySelector('meta[name="site-base"]')?.content || "/").replace(/\/+$/,'/') ;
-      const toAbs = (p) => {
-        try {
-          // If already absolute, return as-is
-          new URL(p);
-          return p;
-        } catch {}
-        try {
-          return new URL(p.replace(/^\/+/,''), location.origin + SITE_BASE).href;
-        } catch {
-          return p;
-        }
-      };
-      const $ = (s) => document.querySelector(s);
-      const favGrid = $('#favGrid');
-      const favCount = $('#favCount');
-      const emptyMsg = $('#wlEmpty');
-
-      function loadWishlist(){
-        // Expected format saved by wishlist.js: array of {id,name,price,img,desc,url}
-        // Also tolerate object keyed by id, etc.
-        try{
-          const raw = localStorage.getItem('wishlist');
-          if (!raw) return [];
-          const data = JSON.parse(raw);
-          if (Array.isArray(data)) return data;
-          if (data && typeof data === 'object') return Object.values(data);
-          return [];
-        }catch{ return []; }
-      }
-
-      function saveWishlist(items){
-        localStorage.setItem('wishlist', JSON.stringify(items));
-        // If your wishlist.js updates header bubble, dispatch a custom event
-        window.dispatchEvent(new Event('wishlist:updated'));
-      }
-
-      function removeItem(id){
-        const items = loadWishlist().filter(x => (x.id || x.data?.id || x.dataId) !== id);
-        saveWishlist(items);
-        render();
-      }
-
-      function clearAll(){
-        saveWishlist([]);
-        render();
-      }
-
-      function addToCartItem(item){
-        // fall back if fields are nested or named differently
-        const id   = item.id || item.dataId || (item.data && item.data.id) || (item.name && item.name.toLowerCase().replace(/[^a-z0-9]+/g,'-')) || 'item';
-        const name = item.name || item.title || 'Item';
-        const price = item.price || '₱0';
-        const img = toAbs(item.img || item.image || '');
-        const desc = item.desc || item.description || '';
-        window.addToCart?.({
-          id, baseName: name, name,
-          img, price, desc, size: null,
-          quantity: 1
-        });
-        window.openCartDrawer?.();
-      }
-
-      function cardTemplate(item){
-        const id   = item.id || item.dataId || (item.data && item.data.id) || 'item';
-        const name = item.name || item.title || 'Item';
-        const price = item.price || '₱0';
-        const img = toAbs(item.img || item.image || '');
-        const url = item.url || '#';
-        const desc = item.desc || item.description || '';
-
-        const art = document.createElement('article');
-        art.className = 'wish-card';
-        art.innerHTML = `
-          <div class="img-wrap">
-            <img src="${img}" alt="${name}">
-            <button class="like-btn" type="button" aria-label="Remove from favorites" data-id="${id}">
-              <i class="fa-solid fa-xmark"></i>
-            </button>
-          </div>
-          <div class="info">
-            <a class="name" href="${url}" title="${name}">${name}</a>
-            <p class="price">${price}</p>
-            <button class="cta" type="button" data-id="${id}">Add to Cart</button>
-            <p class="sr-only">${desc ? desc.replace(/</g,'&lt;') : ''}</p>
-          </div>
-        `;
-        return art;
-      }
-
-      function render(){
-        const items = loadWishlist();
-        favGrid.innerHTML = '';
-        if (!items.length){
-          emptyMsg.hidden = false;
-          favCount.textContent = '0 ITEMS';
-          return;
-        }
-        emptyMsg.hidden = true;
-        items.forEach(it => favGrid.appendChild(cardTemplate(it)));
-        favCount.textContent = `${items.length} ${items.length === 1 ? 'ITEM' : 'ITEMS'}`;
-      }
-
-      // Events
-      document.addEventListener('click', (e)=>{
-        const removeBtn = e.target.closest('.like-btn');
-        if (removeBtn){
-          e.preventDefault();
-          removeItem(removeBtn.dataset.id);
-          return;
-        }
-        const addBtn = e.target.closest('.cta');
-        if (addBtn){
-          e.preventDefault();
-          const id = addBtn.dataset.id;
-          const item = loadWishlist().find(x => (x.id || x.data?.id || x.dataId) === id);
-          if (item) addToCartItem(item);
-        }
-      });
-
-      $('#btnClear')?.addEventListener('click', ()=>{
-        if (confirm('Remove all items from Favorites?')) clearAll();
-      });
-
-      $('#btnContinue')?.addEventListener('click', ()=>{
-        // If user came from somewhere, go back; else go to Shop All
-        if (document.referrer) history.back();
-        else location.href = 'shop-all.html';
-      });
-
-      // Open cart drawer from header icon
-      document.addEventListener('click', function (e) {
-        const btn = e.target.closest('#openCart');
-        if (!btn) return;
-        e.preventDefault();
-        window.openCartDrawer?.();
-      });
-
-      // Initial paint
-      render();
-
-      // Repaint when other tabs/pages modify wishlist
-      window.addEventListener('storage', (ev)=>{
-        if (ev.key === 'wishlist') render();
-      });
-
-      // Account icon -> Auth modal or user page (Supabase)
-      (function authHook(){
-        window.openAuthPopup = () => {
-          const overlay = document.getElementById('lokalAuthOverlay');
-          const emailForm = document.getElementById('laEmailForm');
-          const passForm  = document.getElementById('laPassForm');
-          const emailIn   = document.getElementById('laEmail');
-          if (!overlay || !emailForm || !passForm || !emailIn) return;
-          overlay.setAttribute('aria-hidden','false');
-          emailForm.hidden = false;
-          passForm.hidden  = true;
-          setTimeout(()=> emailIn.focus(), 50);
-        };
-
-        document.addEventListener('click', async (e) => {
-          const a = e.target.closest('#accountLink,[aria-label="Account"]');
-          if (!a) return;
-          e.preventDefault();
-          try {
-            const { data: { session } } = await sb.auth.getSession();
-            if (session) {
-              location.href = 'user.html';
-            } else {
-              window.openAuthPopup();
-            }
-          } catch {
-            window.openAuthPopup();
-          }
-        });
-
-        const overlay = document.getElementById('lokalAuthOverlay');
-        const emailForm = document.getElementById('laEmailForm');
-        const passForm  = document.getElementById('laPassForm');
-        const emailIn   = document.getElementById('laEmail');
-        const passIn    = document.getElementById('laPass');
-        const closeAuth = () => overlay?.setAttribute('aria-hidden','true');
-
-        document.getElementById('laClose')?.addEventListener('click', closeAuth);
-        overlay?.addEventListener('click', e => { if (e.target === overlay) closeAuth(); });
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAuth(); });
-
-        if (emailForm && passForm){
-          emailForm.onsubmit = (e) => {
-            e.preventDefault();
-            const email = (emailIn.value || '').trim().toLowerCase();
-            if (!email) { emailIn.focus(); return; }
-            passForm.dataset.email = email;
-            emailForm.hidden = true;
-            passForm.hidden  = false;
-            passIn?.focus();
-            document.getElementById('laBackEmail')?.addEventListener('click', ev => {
-              ev.preventDefault();
-              emailForm.hidden = false;
-              passForm.hidden  = true;
-              emailIn.focus();
-            }, { once: true });
-          };
-
-          passForm.onsubmit = async (e) => {
-            e.preventDefault();
-            const email = passForm.dataset.email || '';
-            const password = passIn.value || '';
-            try {
-              const { data, error } = await sb.auth.signInWithPassword({ email, password });
-              if (!error && data?.user) { closeAuth(); location.href = 'user.html'; return; }
-              const code = error?.code || '';
-              if (code === 'invalid_credentials' || /invalid|password/i.test(error?.message||'')) { alert('Incorrect email or password.'); return; }
-              if (confirm('Account not found. Create a new one with this email?')) {
-                const { error: signUpError } = await sb.auth.signUp({
-                  email, password,
-                  options: { emailRedirectTo: 'https://angelique213.github.io/Lokal/user.html' }
-                });
-                if (signUpError) { alert(signUpError.message); return; }
-                alert('Check your email to verify, then sign in.');
-                closeAuth();
-              }
-            } catch (err) {
-              alert((err && err.message) || 'Network error. Please try again.');
-            }
-          };
-        }
-      })();
-    })();
-  </script>
-
   <!-- Newsletter -->
   <script src="newsletter.js" defer></script>
+
+  <!-- ===== Auth popup behavior (makes popup clickable + opens from user icon) ===== -->
+  <script>
+  (function(){
+    const overlay    = document.getElementById('lokalAuthOverlay');
+    const emailForm  = document.getElementById('laEmailForm');
+    const passForm   = document.getElementById('laPassForm');
+    const emailInput = document.getElementById('laEmail');
+    const passInput  = document.getElementById('laPass');
+    const closeBtn   = document.getElementById('laClose');
+    const backEmail  = document.getElementById('laBackEmail');
+    const accountLink= document.getElementById('accountLink');
+
+    if (!overlay || !accountLink) return;
+
+    function openAuth(){
+      overlay.setAttribute('aria-hidden','false');
+      emailForm.hidden = false;
+      passForm.hidden  = true;
+      setTimeout(() => emailInput && emailInput.focus(), 30);
+    }
+
+    function closeAuth(){
+      overlay.setAttribute('aria-hidden','true');
+    }
+
+    // Close handlers
+    closeBtn?.addEventListener('click', (e)=>{
+      e.preventDefault();
+      closeAuth();
+    });
+
+    overlay.addEventListener('click',(e)=>{
+      if (e.target === overlay) closeAuth();
+    });
+
+    document.addEventListener('keydown',(e)=>{
+      if (e.key === 'Escape') closeAuth();
+    });
+
+    // Step 1: email form
+    emailForm?.addEventListener('submit',(e)=>{
+      e.preventDefault();
+      const email = (emailInput.value || '').trim().toLowerCase();
+      if (!email){
+        emailInput.focus();
+        return;
+      }
+      passForm.dataset.email = email;
+      emailForm.hidden = true;
+      passForm.hidden = false;
+      passInput && passInput.focus();
+    });
+
+    // Back to email
+    backEmail?.addEventListener('click',(e)=>{
+      e.preventDefault();
+      emailForm.hidden = false;
+      passForm.hidden  = true;
+      emailInput && emailInput.focus();
+    });
+
+    // Step 2: password form (Supabase login + optional signup)
+    passForm?.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const email = passForm.dataset.email || '';
+      const password = passInput.value || '';
+      if (!email || !password){
+        alert('Please enter email and password.');
+        return;
+      }
+
+      try {
+        if (!window.sb || !sb.auth) throw new Error('Supabase client missing. Check supabase.js.');
+
+        const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+        if (error){
+          const msg = (error.message || '').toLowerCase();
+
+          if (msg.includes('confirm')){
+            alert('Please confirm your email first.');
+            return;
+          }
+          if (msg.includes('invalid') || msg.includes('password')){
+            alert('Incorrect email or password.');
+            return;
+          }
+
+          const create = confirm('No account found. Create one with this email?');
+          if (!create) return;
+
+          const { error: signUpError } = await sb.auth.signUp({
+            email,
+            password,
+            options:{ emailRedirectTo: new URL('user.html', location.href).href }
+          });
+          if (signUpError){
+            alert(signUpError.message || 'Sign up failed.');
+            return;
+          }
+          alert('Check your email to verify, then sign in.');
+          closeAuth();
+          return;
+        }
+
+        // success
+        sessionStorage.setItem('hadSession','1');
+        closeAuth();
+        location.href = 'user.html';
+
+      } catch(err){
+        alert((err && err.message) || 'Network error. Check your Supabase setup.');
+      }
+    });
+
+    // Helper to check auth
+    async function hasSession(){
+      try {
+        if (!window.sb?.auth) return false;
+        const { data: { session } } = await sb.auth.getSession();
+        return !!session;
+      } catch {
+        return false;
+      }
+    }
+
+    // Account icon click
+    accountLink.addEventListener('click', async (e)=>{
+      e.preventDefault();
+      const signedIn = await hasSession();
+      if (signedIn){
+        location.href = 'user.html';
+      } else {
+        openAuth();
+      }
+    });
+
+    if (window.sb?.auth){
+      sb.auth.onAuthStateChange((_evt, session)=>{
+        if (!session){
+          // signed out: next click will open popup
+        }
+      });
+    }
+  })();
+  </script>
 </body>
 </html>

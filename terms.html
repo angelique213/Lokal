@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Terms &amp; Conditions | Lokal</title>
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+
+  <!-- Site styles -->
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="cart.css">
+  <link rel="stylesheet" href="wishlist.css">
+  <script src="wishlist.js" defer></script>
+
+  <!-- Page-only styles -->
+  <style>
+    .legal-wrap {
+      max-width: 900px;
+      margin: 32px auto 72px;
+      padding: 0 20px;
+      color: var(--ink, #2b1f1a);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      line-height: 1.7;
+    }
+
+    .legal-hero {
+      margin-bottom: 28px;
+      text-align: left;
+    }
+
+    .legal-hero h1 {
+      font-size: clamp(2rem, 3vw, 2.6rem);
+      margin-bottom: 8px;
+      letter-spacing: 0.02em;
+    }
+
+    .legal-hero p {
+      color: var(--ink-2, #7a6f68);
+      font-size: 0.98rem;
+    }
+
+    .legal-section {
+      margin-top: 28px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line, #e8e3da);
+    }
+
+    .legal-section h2 {
+      font-size: 1.25rem;
+      margin-bottom: 8px;
+      letter-spacing: 0.01em;
+    }
+
+    .legal-section h3 {
+      font-size: 1.05rem;
+      margin: 14px 0 6px;
+    }
+
+    .legal-section p {
+      margin: 4px 0 10px;
+      font-size: 0.97rem;
+    }
+
+    .legal-section ul {
+      margin: 8px 0 12px 18px;
+      padding: 0;
+      font-size: 0.97rem;
+    }
+
+    .legal-section li {
+      margin-bottom: 4px;
+    }
+
+    @media (max-width: 640px) {
+      .legal-wrap {
+        margin-top: 20px;
+      }
+      .legal-section {
+        margin-top: 24px;
+      }
+    }
+
+    /* ---------- AUTH POPUP LAYOUT (make it a real modal) ---------- */
+    .lokal-auth.la-overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,.45);
+      z-index: 1400;
+      transition: opacity .2s ease, visibility .2s ease;
+    }
+    .lokal-auth[aria-hidden="true"] {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .la-modal {
+      width: min(420px, 95vw);
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 18px 45px rgba(0,0,0,.25);
+      padding: 20px 22px 18px;
+      position: relative;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    .la-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .la-title {
+      font-size: 0.95rem;
+      letter-spacing: .18em;
+      font-weight: 800;
+    }
+    .la-close {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,.18);
+      background:#fff;
+      cursor:pointer;
+      font-size: 18px;
+      line-height: 1;
+      display:grid;
+      place-items:center;
+    }
+
+    .la-body {
+      margin-top: 4px;
+      font-size: 0.95rem;
+    }
+    .la-intro {
+      color: #555;
+      margin-bottom: 14px;
+    }
+
+    .la-label {
+      display:block;
+      font-weight:600;
+      margin-bottom:6px;
+      font-size:0.9rem;
+    }
+    .la-input {
+      width:100%;
+      height:44px;
+      border-radius:999px;
+      border:1px solid #d0c7c0;
+      padding:0 15px;
+      font-size:0.95rem;
+      outline:none;
+    }
+    .la-input:focus {
+      border-color: var(--brand, #6d6a33);
+      box-shadow:0 0 0 3px rgba(109,106,51,.18);
+    }
+
+    .la-btn {
+      width:100%;
+      height:44px;
+      border-radius:999px;
+      border:0;
+      margin-top:12px;
+      background:var(--brand, #6d6a33);
+      color:#fff;
+      font-weight:700;
+      letter-spacing:.08em;
+      font-size:0.9rem;
+      cursor:pointer;
+    }
+
+    .la-sub {
+      text-align:center;
+      margin-top:8px;
+      font-size:0.88rem;
+    }
+    .la-sub a {
+      color:var(--ink, #2b1f1a);
+      text-decoration:underline;
+    }
+
+    .la-foot {
+      border-top:1px solid #eee;
+      margin-top:14px;
+      padding-top:10px;
+      font-size:0.82rem;
+      color:#555;
+    }
+    .la-mini {
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .la-mlink {
+      display:inline-block;
+      margin-top:6px;
+      font-weight:600;
+      text-decoration:underline;
+      color:var(--ink, #2b1f1a);
+    }
+
+    /* Safety net so overlays never block the header when "hidden" */
+    #cdOverlay[aria-hidden="true"]{ display: none !important; pointer-events: none !important; }
+    #cdDrawer[aria-hidden="true"]{ display: none !important; pointer-events: none !important; }
+
+    /* Greeting chip should not block clicks */
+    .hi-tag{ pointer-events:none; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo">
+      <a href="index.html" aria-label="Home">
+        <img src="images/projectlogo.png" alt="logo">
+      </a>
+    </div>
+
+    <div class="nav-center">
+      <form class="site-search" action="search.html" method="GET">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="search" name="q" placeholder="Search products, categories..." autocomplete="off"/>
+        <button type="submit">Search</button>
+      </form>
+
+      <nav class="main-links">
+        <ul>
+          <li><a href="best-pick/best-picks.html">Best Picks</a></li>
+          <li><a href="shop-all.html">Shop All</a></li>
+          <li class="has-megamenu">
+            <a href="#" class="catmenu-toggle" aria-expanded="false">
+              Shop by Category <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+            </a>
+            <div class="mega" id="catMega" role="menu" aria-label="Shop by Category">
+              <h3 class="cat-heading">All Categories</h3>
+              <ul class="cat-list">
+                <li><a href="shop-all.html?cat=flavors"><i class="fa-solid fa-cookie-bite"></i> Flavors</a></li>
+                <li><a href="shop-all.html?cat=accessories"><i class="fa-solid fa-gear"></i> Accessories</a></li>
+                <li><a href="shop-all.html?cat=bags"><i class="fa-solid fa-bag-shopping"></i> Bags</a></li>
+                <li><a href="shop-all.html?cat=clothing"><i class="fa-solid fa-shirt"></i> Clothing</a></li>
+                <li><a href="shop-all.html?cat=home"><i class="fa-solid fa-mug-hot"></i> Home</a></li>
+                <li><a href="shop-all.html?cat=crafts"><i class="fa-solid fa-scissors"></i> Crafts</a></li>
+                <li><a href="shop-all.html?cat=christmas"><i class="fa-solid fa-snowflake"></i> Christmas</a></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <nav class="utils">
+      <ul class="nav-links">
+        <!-- Account opens popup -->
+        <li><a href="#" aria-label="Account"><i class="fa-solid fa-user"></i></a></li>
+        <li class="cart-icon">
+          <a href="#" id="openCart" aria-label="Open cart">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span class="cart-count">0</span>
+          </a>
+        </li>
+        <li style="position: relative;">
+          <a href="wishlist.html" aria-label="Favorites" id="wishlistLink">
+            <i class="fa-regular fa-heart"></i>
+            <span class="wishlist-count" id="wishlistCount">0</span>
+          </a>
+        </li>
+        <li><a href="support.html"><i class="fa-solid fa-headset"></i></a></li>
+      </ul>
+      <div id="hiTag" class="hi-tag" hidden></div>
+    </nav>
+  </header>
+
+  <!-- CART DRAWER -->
+  <div class="cd-overlay" id="cdOverlay" aria-hidden="true"></div>
+  <aside class="cd-drawer" id="cdDrawer" aria-hidden="true" role="dialog" aria-label="Cart drawer">
+    <div class="cd-header">
+      <h2>Cart</h2>
+      <button id="cdClose" class="cd-close" aria-label="Close cart">×</button>
+    </div>
+    <div class="cd-body">
+      <div id="cdItems" class="cd-items"></div>
+      <div class="cd-summary">
+        <div class="cd-row">
+          <span>Subtotal</span>
+          <strong id="cdSubtotal">₱0.00</strong>
+        </div>
+        <p class="cd-note">Shipping, taxes, and discount codes calculated at checkout.</p>
+        <label class="cd-terms">
+          <input id="cdAgree" type="checkbox">
+          <span>I agree with the <a href="terms.html" target="_blank" rel="noopener">terms and conditions</a></span>
+        </label>
+        <button id="cdCheckout" class="cd-checkout" disabled>CHECK OUT</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN LEGAL CONTENT -->
+  <main class="legal-wrap">
+    <header class="legal-hero">
+      <h1>Terms &amp; Conditions</h1>
+      <p>
+        This page explains the terms that apply when you browse, shop, or create an account with Lokal.
+        Please review them carefully before placing any order or using our services.
+      </p>
+    </header>
+
+    <section class="legal-section" id="terms">
+      <h2>1. About Lokal</h2>
+      <p>
+        Lokal is an online concept store that highlights local and Filipino-inspired products,
+        including snacks, accessories, home items, clothing, and crafts. References to “we”, “us”,
+        or “our” refer to Lokal, and references to “you” refer to any visitor or customer using this site.
+      </p>
+      <p>
+        Our website is intended for personal, non-commercial use by individuals who are able to enter
+        into legally binding agreements under applicable law.
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2>2. Use of the Website</h2>
+      <p>When you use this site, you agree that you will:</p>
+      <ul>
+        <li>Use the website only for lawful purposes;</li>
+        <li>Provide accurate and current information where requested;</li>
+        <li>Respect the intellectual property, privacy, and other rights of others;</li>
+        <li>Not interfere with or disrupt the operation or security of the website.</li>
+      </ul>
+      <p>
+        We may update, suspend, or remove any part of the website at any time as we continue to improve
+        the experience and the products we present.
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2>3. Accounts &amp; Membership</h2>
+      <p>
+        You may be able to create a Lokal account or sign up as a member to access additional features,
+        such as saved favorites or order history. You are responsible for keeping your login details
+        confidential and for all activity that occurs under your account.
+      </p>
+      <p>We may, if needed, suspend or close accounts that:</p>
+      <ul>
+        <li>Provide false, misleading, or incomplete information;</li>
+        <li>Are used in a way that conflicts with these Terms &amp; Conditions;</li>
+        <li>Appear to misuse discounts, promos, or referral programs.</li>
+      </ul>
+    </section>
+
+    <section class="legal-section">
+      <h2>4. Orders, Pricing &amp; Payments</h2>
+      <p>
+        Product prices are displayed in Philippine Peso (₱) unless indicated otherwise.
+        Availability, descriptions, and pricing may change from time to time.
+      </p>
+      <p>
+        When you place an order, you are submitting a request to purchase products from us.
+        We reserve the right to accept or decline any order, for reasons such as:
+      </p>
+      <ul>
+        <li>Item out of stock or discontinued;</li>
+        <li>Payment cannot be authorized;</li>
+        <li>Errors in pricing or product information;</li>
+        <li>Orders that appear to be fraudulent or abusive.</li>
+      </ul>
+      <p>
+        If we discover an error in a product’s price or details after you place an order,
+        we may contact you for instructions or cancel the order and issue any applicable refund.
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2>5. Shipping, Delivery &amp; Risk</h2>
+      <p>
+        Any delivery estimates provided are for guidance and may vary due to courier schedules,
+        weather conditions, holidays, and other factors outside our control.
+      </p>
+      <p>
+        Once an order has been handed over to the courier, the risk of loss passes to the recipient
+        listed on the order. Please double-check your delivery information before confirming your order.
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2>6. Returns, Exchanges &amp; Cancellations</h2>
+      <p>
+        Our goal is for you to be happy with the items you receive. If you have a concern about a product,
+        please contact us using the details in the “Contact” section so we can review what happened and
+        discuss possible options such as a replacement, exchange, or refund, depending on the situation.
+      </p>
+      <p>
+        Any detailed return or cancellation rules (such as time limits, item condition requirements,
+        and who covers shipping costs) will be provided on this page or during checkout if they apply
+        to your order.
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2>7. Intellectual Property</h2>
+      <p>
+        All content on this site — including logos, product names, text, images, graphics, layouts,
+        and design elements — is owned by Lokal or used with permission from its respective owners.
+      </p>
+      <p>
+        You may not copy, reproduce, distribute, modify, or create derivative works from any content
+        on this site without our prior written consent or the consent of the appropriate rights holder.
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2>8. User Reviews &amp; Submissions</h2>
+      <p>
+        If the site allows you to leave reviews, comments, photos, or other content, you are responsible
+        for what you submit. You agree that your submissions:
+      </p>
+      <ul>
+        <li>Are based on your own experience and are honest and respectful;</li>
+        <li>Do not contain offensive, illegal, or misleading material;</li>
+        <li>Do not infringe on any copyright, trademark, or personal rights.</li>
+      </ul>
+      <p>
+        By submitting content, you grant Lokal a non-exclusive, royalty-free license to display, reproduce,
+        adapt, and share that content in connection with the site and our communications, in any media now
+        known or later developed.
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2>9. Prohibited Activities</h2>
+      <p>In using this website, you agree not to:</p>
+      <ul>
+        <li>Use the site for unlawful, deceptive, or harmful purposes;</li>
+        <li>Attempt to gain unauthorized access to systems, data, or accounts;</li>
+        <li>Introduce viruses, malware, or other harmful code;</li>
+        <li>Use automated tools to scrape or copy content in a way that disrupts the site.</li>
+      </ul>
+    </section>
+
+    <section class="legal-section">
+      <h2>10. Third-Party Links &amp; Services</h2>
+      <p>
+        This site may contain links to third-party websites or services such as social media platforms,
+        logistics partners, or payment providers. These are provided for convenience and informational
+        purposes only.
+      </p>
+      <p>
+        We do not control and are not responsible for the content, policies, or practices of these
+        external websites. When you leave Lokal’s site, please review the applicable terms and privacy
+        policies of any external site you visit.
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2>11. Disclaimer of Warranties</h2>
+      <p>
+        We aim to keep information on this site accurate and up to date, but we cannot guarantee that
+        all content will always be complete, current, or free from errors.
+      </p>
+      <p>
+        To the extent allowed by law, this website and its content are provided without warranties of
+        any kind, whether express or implied, including (but not limited to) warranties of merchantability
+        or fitness for a particular purpose.
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2>12. Limitation of Liability</h2>
+      <p>
+        To the maximum extent permitted by law, Lokal is not liable for any indirect, incidental, or
+        consequential damages arising out of or related to your use of the site, your ability or inability
+        to access the site, or any products obtained through it.
+      </p>
+      <p>
+        Where our liability cannot be fully excluded, it will be limited to the amount you paid for the
+        product or service that is connected to your claim.
+      </p>
+    </section>
+
+    <section class="legal-section" id="privacy">
+      <h2>13. Privacy Policy</h2>
+      <p>
+        We respect your privacy and aim to handle your information carefully. When you use Lokal, we may
+        collect information such as:
+      </p>
+      <ul>
+        <li>Basic contact details (for example, name and email address);</li>
+        <li>Account information, if you create an account or sign up for membership;</li>
+        <li>Order and preference details, such as items you view or add to your cart;</li>
+        <li>Technical data, such as browser type, device information, and usage patterns.</li>
+      </ul>
+      <p>We may use this information to:</p>
+      <ul>
+        <li>Provide and improve our services and website;</li>
+        <li>Communicate with you about orders, updates, or marketing (where allowed);</li>
+        <li>Maintain security and prevent fraud or misuse.</li>
+      </ul>
+      <p>
+        Some data may be stored or processed through third-party tools (for example, hosting providers,
+        analytics, or authentication services). Those providers have their own privacy practices and may
+        be located in other countries.
+      </p>
+      <p>
+        You can usually update your preferences, such as unsubscribing from marketing emails, through the
+        links provided in our messages or by contacting us directly.
+      </p>
+    </section>
+
+    <section class="legal-section" id="cookies">
+      <h2>14. Cookies &amp; Similar Technologies</h2>
+      <p>
+        This website may use cookies and similar tools to remember your preferences, keep items in your
+        cart or wishlist, and understand how visitors use the site.
+      </p>
+      <p>
+        Most browsers allow you to manage or disable cookies in the settings.
+        Some features of the site may work differently if cookies are turned off.
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2>15. Changes to These Terms</h2>
+      <p>
+        We may revise these Terms &amp; Conditions from time to time to reflect changes in our products,
+        services, or applicable laws. Updated versions will be posted on this page.
+      </p>
+      <p>
+        We encourage you to review this page periodically so you stay informed about how the terms apply
+        to your use of the site.
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2>16. Governing Law &amp; Contact</h2>
+      <p>
+        These Terms &amp; Conditions are governed by the laws of the Republic of the Philippines,
+        without regard to conflict-of-law principles.
+      </p>
+      <p>
+        If you have questions about these terms or how they apply, you can reach us at:
+      </p>
+      <p>
+        <strong>Email:</strong>
+        <a href="mailto:shoplokalphilippines@gmail.com">shoplokalphilippines@gmail.com</a><br>
+        <strong>Location:</strong> Manila, Philippines
+      </p>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer-grid" aria-label="Site footer">
+      <!-- Contact -->
+      <section class="footer-section" aria-labelledby="ft-contact-title">
+        <h2 id="ft-contact-title" class="ft-title">Contact Us</h2>
+        <ul class="footer-list">
+          <li>
+            <a
+              href="mailto:shoplokalphilippines@gmail.com?subject=Lokal%20Support%20Request&body=Hi%20Lokal%20Team%2C%0A%0AIssue%3A%20%0AOrder%20%23%3A%20%0ABrowser%2FDevice%3A%20%0A%0AThanks%2C%0A"
+              aria-label="Email shoplokalphilippines at gmail dot com"
+            >
+              shoplokalphilippines@gmail.com
+            </a>
+          </li>
+          <li><address style="font-style:normal">Manila, Philippines</address></li>
+          <li class="border-list" aria-hidden="true"></li>
+          <li class="socials" aria-label="Social links">
+            <a href="#" aria-label="Instagram"><i class="fa-brands fa-square-instagram" aria-hidden="true"></i></a>
+            <a href="#" aria-label="Facebook"><i class="fa-brands fa-square-facebook" aria-hidden="true"></i></a>
+            <a href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok" aria-hidden="true"></i></a>
+          </li>
+        </ul>
+        <p class="ft-note" style="margin-top:8px">
+          Need help? Visit our <a href="support.html">Support</a> page or email us.
+        </p>
+      </section>
+
+      <!-- Quick Links -->
+      <nav class="footer-section" aria-labelledby="ft-links-title">
+        <h2 id="ft-links-title" class="ft-title">Quick Links</h2>
+        <ul class="footer-list">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="shop-all.html">Shop All</a></li>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="terms.html">Terms &amp; Conditions</a></li>
+          <li><a href="support.html">Support</a></li>
+        </ul>
+      </nav>
+
+      <!-- Newsletter -->
+      <section class="footer-section" aria-labelledby="ft-news-title">
+        <h2 id="ft-news-title" class="ft-title">Subscribe to Newsletter</h2>
+        <p class="ft-subcopy">
+          Get product drops, deals, and stories from local makers—straight to your inbox.
+        </p>
+
+        <form id="newsletterForm" class="ft-news-form" novalidate>
+          <label class="sr-only" for="newsletterEmail">Email address</label>
+          <input
+            id="newsletterEmail"
+            name="email"
+            type="email"
+            inputmode="email"
+            autocomplete="email"
+            placeholder="Your email"
+            required
+            aria-describedby="newsletterNote"
+          />
+          <button class="button" id="newsletterBtn" type="submit" aria-label="Subscribe to newsletter">
+            Subscribe
+          </button>
+
+          <div class="ft-consent">
+            <input id="newsletterConsent" name="consent" type="checkbox" required />
+            <label for="newsletterConsent">
+              I agree to the <a href="terms.html">Terms &amp; Conditions</a> and
+              <a href="terms.html#privacy">Privacy Policy</a>.
+            </label>
+          </div>
+
+          <p id="newsletterNote" class="ft-note">
+            We never share your email. Unsubscribe anytime.
+          </p>
+          <div id="newsletterMsg" class="ft-msg" role="status" aria-live="polite"></div>
+        </form>
+      </section>
+    </div>
+
+    <div class="ft-legal">
+      <small>&copy; <span id="yearNow"></span> Lokal. All rights reserved.</small>
+    </div>
+  </footer>
+
+  <!-- Global cart API -->
+  <script src="cart.js"></script>
+
+  <!-- Lock page scroll when cart drawer toggles -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const drawer = document.getElementById('cdDrawer');
+      const toggleLock = () => {
+        document.body.classList.toggle('lock-scroll', drawer.classList.contains('active'));
+      };
+      new MutationObserver(toggleLock).observe(drawer, { attributes: true, attributeFilter: ['class'] });
+
+      const y = document.getElementById('yearNow');
+      if (y) y.textContent = new Date().getFullYear();
+    });
+  </script>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+
+  <!-- Account icon -> popup -->
+  <script>
+    (function(){
+      window.openAuthPopup = () => {
+        const overlay = document.getElementById('lokalAuthOverlay');
+        const emailForm = document.getElementById('laEmailForm');
+        const passForm  = document.getElementById('laPassForm');
+        const emailIn   = document.getElementById('laEmail');
+        if (!overlay || !emailForm || !passForm || !emailIn) return;
+        overlay.setAttribute('aria-hidden','false');
+        emailForm.hidden = false;
+        passForm.hidden  = true;
+        setTimeout(()=> emailIn.focus(), 50);
+      };
+
+      document.addEventListener('click', async (e) => {
+        const a = e.target.closest('a[aria-label="Account"]');
+        if (!a) return;
+        e.preventDefault();
+        try {
+          const { data: { session } } = await sb.auth.getSession();
+          if (session) {
+            location.href = 'user.html';
+          } else {
+            window.openAuthPopup();
+          }
+        } catch {
+          window.openAuthPopup();
+        }
+      });
+    })();
+  </script>
+
+  <!-- Auth popup HTML -->
+  <div class="lokal-auth la-overlay" id="lokalAuthOverlay" aria-hidden="true">
+    <div class="la-modal" role="dialog" aria-modal="true" aria-labelledby="laTitle">
+      <div class="la-head">
+        <h3 id="laTitle" class="la-title">SIGN IN</h3>
+        <button class="la-close" id="laClose" aria-label="Close">×</button>
+      </div>
+
+      <div class="la-body">
+        <p class="la-intro">Sign in with your email or sign up to become a Lokal Member.</p>
+
+        <!-- Step 1: Email -->
+        <form id="laEmailForm" novalidate>
+          <label class="la-label" for="laEmail">Email <span style="color:#b02a37">*</span></label>
+          <input class="la-input" id="laEmail" type="email" placeholder="Email" required />
+          <button class="la-btn" type="submit">CONTINUE</button>
+        </form>
+
+        <!-- Step 2: Password -->
+        <form id="laPassForm" hidden novalidate>
+          <label class="la-label" for="laPass">Password</label>
+          <input class="la-input" id="laPass" type="password" placeholder="••••••" required minlength="6" />
+          <button class="la-btn" type="submit">SIGN IN</button>
+          <p class="la-sub"><a href="#" id="laBackEmail">Use another email</a></p>
+        </form>
+      </div>
+
+      <div class="la-foot">
+        <div class="la-mini"><i class="fa-solid fa-lock"></i> All data is kept secure</div>
+        <a class="la-mlink" href="membership.html">Lokal Membership</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth popup controller -->
+  <script>
+    (function(){
+      const $ = s => document.querySelector(s);
+      const overlay   = $('#lokalAuthOverlay');
+      const emailForm = $('#laEmailForm');
+      const passForm  = $('#laPassForm');
+      const emailIn   = $('#laEmail');
+      const passIn    = $('#laPass');
+      if (!overlay || !emailForm || !passForm) return;
+
+      const closeAuth = () => overlay.setAttribute('aria-hidden','true');
+      $('#laClose')?.addEventListener('click', closeAuth);
+      overlay?.addEventListener('click', e => { if (e.target === overlay) closeAuth(); });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAuth(); });
+
+      emailForm.onsubmit = (e) => {
+        e.preventDefault();
+        const email = (emailIn.value || '').trim().toLowerCase();
+        if (!email) { emailIn.focus(); return; }
+        passForm.dataset.email = email;
+        emailForm.hidden = true;
+        passForm.hidden  = false;
+        passIn.focus();
+        $('#laBackEmail')?.addEventListener('click', ev => {
+          ev.preventDefault();
+          emailForm.hidden = false;
+          passForm.hidden  = true;
+          emailIn.focus();
+        }, { once: true });
+      };
+
+      passForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const email = passForm.dataset.email || '';
+        const password = passIn.value || '';
+        try {
+          const { data, error } = await sb.auth.signInWithPassword({ email, password });
+          if (!error && data?.user) {
+            closeAuth();
+            location.href = 'user.html';
+            return;
+          }
+          const code = error?.code || '';
+          if (code === 'invalid_credentials' || /invalid|password/i.test(error?.message||'')) {
+            alert('Incorrect email or password.');
+            return;
+          }
+          const make = confirm('Account not found. Create a new one with this email?');
+          if (!make) return;
+          const { error: signUpError } = await sb.auth.signUp({
+            email,
+            password,
+            options: { emailRedirectTo: 'https://angelique213.github.io/Lokal/user.html' }
+          });
+          if (signUpError) {
+            alert(signUpError.message);
+            return;
+          }
+          alert('Check your email to verify, then sign in.');
+          closeAuth();
+        } catch (err) {
+          alert((err && err.message) || 'Network error. Please try again.');
+        }
+      };
+    })();
+  </script>
+
+  <!-- Newsletter -->
+  <script src="newsletter.js" defer></script>
+</body>
+</html>

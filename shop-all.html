@@ -210,11 +210,136 @@
     #cdOverlay[aria-hidden="true"]{ display: none !important; pointer-events: none !important; }
     #cdDrawer[aria-hidden="true"]{ display: none !important; pointer-events: none !important; }
 
-    /* Your greeting chip should never block clicks */
+    /* Greeting chip should never block clicks */
     .hi-tag{ pointer-events:none; }
+  </style>
+
+  <!-- Auth popup + toast styles (same as index) -->
+  <style>
+    .lokal-auth.la-overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,.55);
+      display:none;place-items:center;z-index:3000;
+    }
+    .lokal-auth.la-overlay[aria-hidden="false"]{display:grid;}
+    .lokal-auth .la-modal{
+      width:min(440px,92vw);background:#fff;border-radius:6px;border:1px solid #D7D6AA;
+      box-shadow:0 16px 50px rgba(0,0,0,.25);
+      font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+      animation:fadeIn .25s ease;
+    }
+    @keyframes fadeIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+    .lokal-auth .la-head{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:22px 26px 14px 26px;
+    }
+    .lokal-auth .la-title{font-size:1.05rem;font-weight:700;margin:0;color:#222;}
+    .lokal-auth .la-close{
+      background:none;border:none;font-size:22px;cursor:pointer;color:#222;
+    }
+    .lokal-auth .la-body{padding:0 26px 20px 26px;}
+    .lokal-auth .la-intro{font-weight:600;color:#222;margin-bottom:20px;}
+    .lokal-auth .la-label{
+      display:block;font-size:.9rem;font-weight:600;margin-bottom:6px;color:#222;
+    }
+    .lokal-auth .la-input{
+      width:100%;padding:13px 12px;border:1px solid #222;border-radius:4px;
+      font-size:.9rem;color:#222;outline:none;
+    }
+    .lokal-auth .la-input:focus{
+      border-color:#A9A74F;box-shadow:0 0 0 2px rgba(169,167,79,.3);
+    }
+    .lokal-auth .la-btn{
+      width:100%;padding:14px;border:none;border-radius:4px;
+      background:#6A6932;color:#fff;font-weight:600;cursor:pointer;
+      margin-top:16px;font-size:.95rem;
+    }
+    .lokal-auth .la-btn:hover{background:#8A8841;}
+    .lokal-auth .la-sub{text-align:center;margin-top:8px;}
+    .lokal-auth .la-sub a{color:#222;text-decoration:underline;font-size:.88rem;}
+    .lokal-auth .la-foot{
+      text-align:center;border-top:1px solid #D7D6AA;padding:18px 0 20px 0;
+    }
+    .lokal-auth .la-mini{
+      display:flex;justify-content:center;align-items:center;gap:6px;
+      font-size:.85rem;color:#555;
+    }
+    .lokal-auth .la-mini i{font-size:14px;}
+    .lokal-auth .la-mlink{
+      color:#222;text-decoration:underline;font-weight:600;display:inline-block;
+      margin-top:10px;font-size:.9rem;
+    }
+
+    .toast-signout {
+      position: fixed;
+      top: 76px;
+      right: 12px;
+      z-index: 3000;
+      background:#fff;
+      border:1px solid #e8e3da;
+      border-radius:12px;
+      padding:10px 14px;
+      box-shadow:0 16px 40px rgba(0,0,0,.12);
+      font:600 0.92rem/1.3 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+      color:#2b1f1a;
+    }
+    .toast-signout button {
+      background:none; border:0; cursor:pointer; font-size:18px; line-height:1;
+      padding:0 4px; margin-left:10px; color:#2b1f1a;
+    }
+
+    .header{ position: relative; }
+    .hi-tag{
+      position:absolute;
+      top:6px;
+      right:14px;
+      font: 800 0.92rem/1 'Montserrat', system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      color:#2b1f1a;
+      pointer-events:none;
+      z-index:2;
+      white-space:nowrap;
+    }
+    @media (max-width: 640px){ .hi-tag{ display:none; } }
+
+    /* Kill any legacy inline greeting injected by lokal.js */
+    .inline-greeting { display:none !important; }
+    #homeGreeting { display:none !important; }
   </style>
 </head>
 <body>
+
+  <!-- AUTH POPUP (same markup as index) -->
+  <div class="lokal-auth la-overlay" id="lokalAuthOverlay" aria-hidden="true">
+    <div class="la-modal" role="dialog" aria-modal="true" aria-labelledby="laTitle">
+      <div class="la-head">
+        <h3 id="laTitle" class="la-title">SIGN IN</h3>
+        <button class="la-close" id="laClose" aria-label="Close">×</button>
+      </div>
+
+      <div class="la-body">
+        <p class="la-intro">Sign in with your email or sign up to become a Lokal Member.</p>
+
+        <!-- Step 1: Email -->
+        <form id="laEmailForm" novalidate>
+          <label class="la-label" for="laEmail">Email <span style="color:#b02a37">*</span></label>
+          <input class="la-input" id="laEmail" type="email" placeholder="Email" required />
+          <button class="la-btn" type="submit">CONTINUE</button>
+        </form>
+
+        <!-- Step 2: Password -->
+        <form id="laPassForm" hidden novalidate>
+          <label class="la-label" for="laPass">Password</label>
+          <input class="la-input" id="laPass" type="password" placeholder="••••••" required minlength="6" />
+          <button class="la-btn" type="submit">SIGN IN</button>
+          <p class="la-sub"><a href="#" id="laBackEmail">Use another email</a></p>
+        </form>
+      </div>
+
+      <div class="la-foot">
+        <div class="la-mini"><i class="fa-solid fa-lock"></i> All data is kept secure</div>
+        <a class="la-mlink" href="membership.html">Lokal Membership</a>
+      </div>
+    </div>
+  </div>
 
   <!-- HEADER -->
   <header class="header">
@@ -258,8 +383,8 @@
 
     <nav class="utils">
       <ul class="nav-links">
-        <!-- Account opens popup -->
-        <li><a href="#" aria-label="Account"><i class="fa-solid fa-user"></i></a></li>
+        <!-- Account opens popup (id matches index.js logic) -->
+        <li><a href="#" id="accountLink" aria-label="Account"><i class="fa-solid fa-user"></i></a></li>
         <li class="cart-icon">
           <a href="#" id="openCart" aria-label="Open cart">
             <i class="fa-solid fa-cart-shopping"></i>
@@ -274,7 +399,7 @@
         </li>
         <li><a href="support.html"><i class="fa-solid fa-headset"></i></a></li>
       </ul>
-      <!-- Greeting chip (same as index) -->
+      <!-- Greeting chip -->
       <div id="hiTag" class="hi-tag" hidden></div>
     </nav>
   </header>
@@ -897,8 +1022,8 @@
     paint();
   </script>
 
-  <!-- Global cart API -->
-  <script src="cart.js"></script>
+  <!-- Global cart API (new cart.js with localStorage sync) -->
+  <script src="cart.js" defer></script>
 
   <!-- Lock page scroll when cart drawer toggles -->
   <script>
@@ -929,123 +1054,148 @@
     })();
   </script>
 
-  <!-- Supabase -->
+  <!-- Supabase core + client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
 
-  <!-- Account icon -> popup -->
+  <!-- Account link controller + Greeting + Auth popup (same logic as index) -->
   <script>
     (function(){
-      window.openAuthPopup = () => {
-        const overlay = document.getElementById('lokalAuthOverlay');
-        const emailForm = document.getElementById('laEmailForm');
-        const passForm  = document.getElementById('laPassForm');
-        const emailIn   = document.getElementById('laEmail');
-        if (!overlay || !emailForm || !passForm || !emailIn) return;
-        overlay.setAttribute('aria-hidden','false');
-        emailForm.hidden = false;
-        passForm.hidden  = true;
-        setTimeout(()=> emailIn.focus(), 50);
-      };
+      const $ = (s)=>document.querySelector(s);
+      const overlay = $('#lokalAuthOverlay');
+      const emailForm = $('#laEmailForm'), passForm = $('#laPassForm');
+      const emailInput = $('#laEmail'),  passInput = $('#laPass');
+      const accountLink = $('#accountLink');
+      const hiTag = $('#hiTag');
 
-      document.addEventListener('click', async (e) => {
-        const a = e.target.closest('a[aria-label="Account"]');
-        if (!a) return;
+      const cap = s => { s = String(s||'').trim(); return s ? s[0].toUpperCase()+s.slice(1) : ''; };
+      function firstFromUser(user){
+        const md = (user && user.user_metadata) || {};
+        return md.first_name || md.given_name || (md.full_name||md.name||'').split(/\s+/)[0] || '';
+      }
+      function showGreeting(name){
+        if (!name){ hiTag.hidden = true; return; }
+        hiTag.textContent = 'Hi, ' + cap(name);
+        hiTag.hidden = false;
+      }
+      function hideGreeting(){ hiTag.hidden = true; }
+
+      const openAuth = ()=>{ overlay?.setAttribute('aria-hidden','false'); emailForm.hidden=false; passForm.hidden=true; setTimeout(()=>emailInput?.focus(),50); };
+      const closeAuth = ()=> overlay?.setAttribute('aria-hidden','true');
+      $('#laClose')?.addEventListener('click', closeAuth);
+      overlay?.addEventListener('click', e=>{ if(e.target===overlay) closeAuth(); });
+      document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeAuth(); });
+
+      emailForm?.addEventListener('submit', (e)=>{
         e.preventDefault();
-        const { data: { session } } = await sb.auth.getSession();
-        if (session) location.href = 'user.html';
-        else window.openAuthPopup();
+        const email=(emailInput.value||'').trim().toLowerCase();
+        if(!email){ emailInput.focus(); return; }
+        passForm.dataset.email = email;
+        emailForm.hidden = true;
+        passForm.hidden = false;
+        passInput.focus();
       });
+      $('#laBackEmail')?.addEventListener('click', (e)=>{ e.preventDefault(); emailForm.hidden=false; passForm.hidden=true; emailInput.focus(); });
+
+      passForm?.addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        const email = passForm.dataset.email || '';
+        const password = passInput.value || '';
+        if (!email || !password) { alert('Please enter email and password.'); return; }
+        try{
+          if (!window.sb || !sb.auth) throw new Error('Supabase client missing. Check supabase.js');
+          const { data, error } = await sb.auth.signInWithPassword({ email, password });
+          if (error) {
+            const msg = (error.message || '').toLowerCase();
+            if (msg.includes('confirm')) { alert('Please confirm your email first.'); return; }
+            if (msg.includes('invalid') || msg.includes('password')) { alert('Incorrect email or password.'); return; }
+            const create = confirm('No account found. Create one?');
+            if (!create) return;
+            const { error: signUpError } = await sb.auth.signUp({
+              email, password,
+              options:{ emailRedirectTo: new URL('user.html', location.href).href }
+            });
+            if (signUpError) { alert(signUpError.message || 'Sign up failed.'); return; }
+            alert('Check your email to verify, then sign in.');
+            closeAuth();
+            return;
+          }
+          sessionStorage.setItem('hadSession','1');
+          const user = data?.user;
+          const first = firstFromUser(user);
+          if (first) localStorage.setItem('lokalFirstName', first);
+          closeAuth();
+          showGreeting(first || localStorage.getItem('lokalFirstName') || '');
+        } catch (err){
+          alert((err && err.message) || 'Network error. Check your Supabase setup.');
+        }
+      });
+
+      accountLink?.addEventListener('click', async (e)=>{
+        e.preventDefault();
+        try{
+          const { data:{ session } } = await sb.auth.getSession();
+          if (session) location.href = 'user.html';
+          else openAuth();
+        }catch{
+          openAuth();
+        }
+      });
+
+      document.addEventListener('DOMContentLoaded', async ()=>{
+        try{
+          const { data:{ session } } = await sb.auth.getSession();
+          if (session){
+            const first = firstFromUser(session.user) || localStorage.getItem('lokalFirstName') || '';
+            showGreeting(first);
+          } else {
+            hideGreeting();
+          }
+        }catch{ hideGreeting(); }
+      });
+
+      if (window.sb?.auth?.onAuthStateChange){
+        sb.auth.onAuthStateChange((evt, session)=>{
+          if (evt === 'SIGNED_IN' || (session && session.user)){
+            sessionStorage.setItem('hadSession','1');
+            const first = firstFromUser(session?.user) || localStorage.getItem('lokalFirstName') || '';
+            if (first) localStorage.setItem('lokalFirstName', first);
+            showGreeting(first);
+          }
+          if (evt === 'SIGNED_OUT'){
+            if (sessionStorage.getItem('hadSession') === '1'){
+              sessionStorage.setItem('justSignedOut','1');
+            }
+            hideGreeting();
+          }
+        });
+      }
     })();
   </script>
 
-  <!-- Auth popup HTML -->
-  <div class="lokal-auth la-overlay" id="lokalAuthOverlay" aria-hidden="true">
-    <div class="la-modal" role="dialog" aria-modal="true" aria-labelledby="laTitle">
-      <div class="la-head">
-        <h3 id="laTitle" class="la-title">SIGN IN</h3>
-        <button class="la-close" id="laClose" aria-label="Close">×</button>
-      </div>
-
-      <div class="la-body">
-        <p class="la-intro">Sign in with your email or sign up to become a Lokal Member.</p>
-
-        <!-- Step 1: Email -->
-        <form id="laEmailForm" novalidate>
-          <label class="la-label" for="laEmail">Email <span style="color:#b02a37">*</span></label>
-          <input class="la-input" id="laEmail" type="email" placeholder="Email" required />
-          <button class="la-btn" type="submit">CONTINUE</button>
-        </form>
-
-        <!-- Step 2: Password -->
-        <form id="laPassForm" hidden novalidate>
-          <label class="la-label" for="laPass">Password</label>
-          <input class="la-input" id="laPass" type="password" placeholder="••••••" required minlength="6" />
-          <button class="la-btn" type="submit">SIGN IN</button>
-          <p class="la-sub"><a href="#" id="laBackEmail">Use another email</a></p>
-        </form>
-      </div>
-
-      <div class="la-foot">
-        <div class="la-mini"><i class="fa-solid fa-lock"></i> All data is kept secure (demo)</div>
-        <a class="la-mlink" href="membership.html">Lokal Membership</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- Auth popup controller -->
+  <!-- Logout toast -->
   <script>
     (function(){
-      const $ = s => document.querySelector(s);
-      const overlay   = $('#lokalAuthOverlay');
-      const emailForm = $('#laEmailForm');
-      const passForm  = $('#laPassForm');
-      const emailIn   = $('#laEmail');
-      const passIn    = $('#laPass');
-      if (!overlay || !emailForm || !passForm) return;
-
-      const closeAuth = () => overlay.setAttribute('aria-hidden','true');
-      $('#laClose')?.addEventListener('click', closeAuth);
-      overlay?.addEventListener('click', e => { if (e.target === overlay) closeAuth(); });
-      document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAuth(); });
-
-      emailForm.onsubmit = (e) => {
-        e.preventDefault();
-        const email = (emailIn.value || '').trim().toLowerCase();
-        if (!email) { emailIn.focus(); return; }
-        passForm.dataset.email = email;
-        emailForm.hidden = true;
-        passForm.hidden  = false;
-        passIn.focus();
-        $('#laBackEmail')?.addEventListener('click', ev => {
-          ev.preventDefault();
-          emailForm.hidden = false;
-          passForm.hidden  = true;
-          emailIn.focus();
-        }, { once: true });
-      };
-
-      passForm.onsubmit = async (e) => {
-        e.preventDefault();
-        const email = passForm.dataset.email || '';
-        const password = passIn.value || '';
-        try {
-          const { data, error } = await sb.auth.signInWithPassword({ email, password });
-          if (!error && data?.user) { closeAuth(); location.href = 'user.html'; return; }
-          const code = error?.code || '';
-          if (code === 'invalid_credentials' || /invalid|password/i.test(error?.message||'')) { alert('Incorrect email or password.'); return; }
-          const make = confirm('Account not found. Create a new one with this email?');
-          if (!make) return;
-          const { error: signUpError } = await sb.auth.signUp({
-            email, password, options: { emailRedirectTo: 'https://angelique213.github.io/Lokal/user.html' }
-          });
-          if (signUpError) { alert(signUpError.message); return; }
-          alert('Check your email to verify, then sign in.');
-          closeAuth();
-        } catch (err) {
-          alert((err && err.message) || 'Network error. Please try again.');
+      function showToast(msg){
+        if (document.getElementById('signedOutToast')) return;
+        const box = document.createElement('div');
+        box.id = 'signedOutToast';
+        box.className = 'toast-signout';
+        box.setAttribute('role','status');
+        box.setAttribute('aria-live','polite');
+        box.innerHTML = `<span>${msg}</span><button aria-label="Dismiss">×</button>`;
+        document.body.appendChild(box);
+        const close = () => box.remove();
+        box.querySelector('button')?.addEventListener('click', close);
+        setTimeout(close, 5000);
+      }
+      document.addEventListener('DOMContentLoaded', ()=>{
+        if (sessionStorage.getItem('justSignedOut') === '1'){
+          showToast("You’re signed out.");
+          sessionStorage.removeItem('justSignedOut');
+          sessionStorage.removeItem('hadSession');
         }
-      };
+      });
     })();
   </script>
 
