@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout | Lokal</title>
+
+  <!-- GH Pages base (used by cart.js image resolver, etc.) -->
+  <meta name="site-base" content="/Lokal/">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+
+  <!-- Site styles -->
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="cart.css">
+  <link rel="stylesheet" href="wishlist.css">
+
+
+  <style>
+    /* Safety net so drawer overlay never blocks clicks when hidden */
+    #cdOverlay[aria-hidden="true"]{
+      display:none !important;
+      pointer-events:none !important;
+    }
+    #cdDrawer[aria-hidden="true"]{
+      display:none !important;
+      pointer-events:none !important;
+    }
+
+    /* ====== CHECKOUT LAYOUT ====== */
+    .checkout-page {
+      max-width: 1120px;
+      margin: 56px auto 80px auto;
+      padding: 0 20px 40px;
+      font-family: Montserrat, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .checkout-page header {
+      margin-bottom: 18px;
+    }
+
+    .checkout-page h1 {
+      font-size: clamp(28px, 3.2vw, 34px);
+      margin-bottom: 6px;
+      color: var(--ink);
+    }
+
+    .checkout-kicker {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    /* two-column layout: LEFT items, RIGHT shipping/payment (sticky) */
+    .checkout-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      gap: 24px;
+      margin-top: 26px;
+      align-items: flex-start;
+    }
+
+    @media (max-width: 900px) {
+      .checkout-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .checkout-card {
+      background: #fff;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      padding: 22px 20px;
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.04);
+    }
+
+    /* right card (shipping & payment) stays visible when scrolling */
+    @media (min-width: 901px) {
+      .checkout-grid > .checkout-card:last-child {
+        position: sticky;
+        top: 104px;
+        align-self: flex-start;
+      }
+    }
+
+    .checkout-card h2 {
+      font-size: 1.15rem;
+      margin-bottom: 12px;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* icons in titles */
+    .checkout-card[aria-labelledby="order-summary-title"] h2::before {
+      content: "\f07a";
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      font-size: 0.95rem;
+      color: var(--brand);
+    }
+
+    .checkout-card[aria-labelledby="shipping-payment-title"] h2::before {
+      content: "\f0d1";
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      font-size: 0.95rem;
+      color: var(--brand);
+    }
+
+    /* ============ ITEM LIST (LEFT COLUMN) ============ */
+    .checkout-items {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 14px;
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    @media (min-width: 901px) {
+      .checkout-items {
+        max-height: 520px; /* only left side scrolls if lots of items */
+      }
+    }
+
+    .checkout-item-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 0.9rem;
+    }
+
+    .checkout-item-row:last-child {
+      border-bottom: none;
+    }
+
+    .checkout-item-thumb {
+      width: 64px;
+      height: 64px;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #f4f1ea;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .checkout-item-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .checkout-item-main {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .checkout-item-name {
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .checkout-item-meta {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .checkout-item-price {
+      font-weight: 600;
+      white-space: nowrap;
+      align-self: flex-start;
+    }
+
+    .checkout-totals {
+      border-top: 1px dashed var(--line);
+      padding-top: 12px;
+      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.9rem;
+    }
+
+    .checkout-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .checkout-total-row.grand {
+      font-weight: 700;
+      font-size: 0.98rem;
+      margin-top: 4px;
+      color: var(--ink);
+    }
+
+    .checkout-warning {
+      margin-top: 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 9px 10px;
+      border-radius: 10px;
+      background: #fff7e5;
+      font-size: 0.8rem;
+      color: var(--ink-2);
+    }
+
+    .checkout-warning i {
+      margin-top: 2px;
+    }
+
+    /* ============ SHIPPING + PAYMENT (RIGHT COLUMN) ============ */
+
+    .checkout-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 16px;
+      font-size: 0.9rem;
+    }
+
+    .checkout-form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .checkout-form-row:nth-child(1),
+    .checkout-form-row:nth-child(2),
+    .checkout-form-row:nth-child(4),
+    .checkout-form-row:nth-child(9) {
+      grid-column: 1 / -1;
+    }
+
+    .checkout-label {
+      font-size: 0.84rem;
+      color: var(--ink-2);
+    }
+
+    .checkout-form input,
+    .checkout-form select {
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      padding: 9px 11px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      background: #faf7f0;
+      transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+    }
+
+    .checkout-form input:focus,
+    .checkout-form select:focus {
+      border-color: var(--brand);
+      background: #fff;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(109, 106, 51, 0.25);
+    }
+
+    .checkout-note {
+      grid-column: 1 / -1;
+      margin-top: 4px;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .checkout-paypal-wrapper {
+      grid-column: 1 / -1;
+      margin-top: 8px;
+    }
+
+    .checkout-paypal-wrapper > p.checkout-label {
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    #paypal-button-container {
+      border-radius: 10px;
+      background: #f5f3ea;
+      padding: 12px 10px;
+      border: 1px dashed var(--line);
+    }
+
+    .checkout-cta-row {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+      font-size: 0.82rem;
+    }
+
+    .checkout-back-link {
+      text-decoration: none;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .checkout-back-link i {
+      font-size: 0.8rem;
+    }
+
+    .checkout-back-link:hover {
+      color: var(--ink);
+    }
+
+    @media (max-width: 600px) {
+      .checkout-form {
+        grid-template-columns: 1fr;
+      }
+      .checkout-cta-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+    }
+
+    /* === Extra styles for Qty +/- and Edit popup === */
+
+    /* name + small remove "x" */
+    .checkout-item-main-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .checkout-item-remove {
+      border: none;
+      background: transparent;
+      font-size: 0.9rem;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .checkout-item-remove:hover {
+      color: #b91c1c;
+    }
+
+    /* qty + edit row */
+    .checkout-item-actions {
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 0.84rem;
+    }
+
+    .checkout-item-actions span {
+      color: var(--muted);
+    }
+
+    /* Qty control */
+    .checkout-qty-control {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      overflow: hidden;
+      background: #faf7f0;
+    }
+
+    .checkout-qty-control button {
+        width: 26px;
+        height: 26px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--brand); /* Olive green text */
+    }
+
+    .checkout-qty-control button:hover {
+        background: var(--brand); /* Olive green hover bg */
+        color: white;             /* White + / -  */
+        }
+
+
+    /* 🔽 Your input CSS STARTS HERE — make sure this is NOT inside another block */
+    .checkout-qty-control input {
+    width: 40px;
+    height: 26px;
+    border: none;
+    text-align: center;
+    font-size: 0.85rem;
+    background: transparent;
+    -moz-appearance: textfield; /* Firefox: hide spinners */
+    }
+
+    /* Chrome / Edge / Safari: hide number input arrows */
+    .checkout-qty-control input[type="number"]::-webkit-outer-spin-button,
+    .checkout-qty-control input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+    }
+
+    /* Edit link-style button */
+    .checkout-item-edit {
+  border: none;
+  background: none !important;
+  padding: 0;
+  cursor: pointer;
+  color: var(--ink-2);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.checkout-item-edit:hover {
+  color: var(--brand) !important; /* Olive green */
+  background: none !important;
+}
+
+    /* ===== Edit modal ===== */
+    .checkout-edit-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .checkout-edit-overlay.active {
+      display: flex;
+    }
+
+    .checkout-edit-modal {
+      background: #fff;
+      border-radius: 18px;
+      max-width: 720px;
+      width: min(95vw, 720px);
+      max-height: 90vh;
+      overflow: auto;
+      padding: 20px 22px 18px;
+      box-shadow: 0 18px 50px rgba(0,0,0,.28);
+      font-family: Montserrat, system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    .checkout-edit-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .checkout-edit-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .checkout-edit-close {
+      border: none;
+      background: transparent;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .checkout-edit-body {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      gap: 16px;
+    }
+
+    .checkout-edit-media img {
+      width: 100%;
+      border-radius: 12px;
+      object-fit: cover;
+      background: #f4f1ea;
+    }
+
+    .checkout-edit-info-label {
+      font-size: 0.84rem;
+      color: var(--ink-2);
+      display: block;
+      margin-top: 6px;
+      margin-bottom: 4px;
+    }
+
+    .checkout-edit-info input {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      font-size: 0.9rem;
+      background: #faf7f0;
+    }
+
+    .checkout-edit-info input:focus {
+      border-color: var(--brand);
+      outline: none;
+      background: #fff;
+    }
+
+    .checkout-edit-footer {
+      margin-top: 12px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .checkout-edit-footer .button {
+      padding-inline: 20px;
+    }
+
+    @media (max-width: 640px) {
+      .checkout-edit-body {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== HEADER (same structure as cart.html, root paths) ===== -->
+  <header class="header">
+    <div class="logo">
+      <a href="index.html" aria-label="Home">
+        <img src="images/projectlogo.png" alt="Lokal Logo" />
+      </a>
+    </div>
+
+    <div class="nav-center">
+      <!-- Search Bar -->
+      <form class="site-search" action="search.html" method="GET">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <input type="search" name="q" placeholder="Search products, categories..." autocomplete="off" />
+        <button type="submit">Search</button>
+      </form>
+
+      <!-- Main Links -->
+      <nav class="main-links">
+        <ul>
+          <li><a href="best-pick/best-picks.html">Best Picks</a></li>
+          <li><a href="shop-all.html">Shop All</a></li>
+          <li class="has-megamenu">
+            <a href="#" class="catmenu-toggle" aria-expanded="false">
+              Shop by Category <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+            </a>
+            <div class="mega" id="catMega" role="menu" aria-label="Shop by Category">
+              <h3 class="cat-heading">All Categories</h3>
+              <ul class="cat-list">
+                <li><a href="shop-all.html?cat=flavors"><i class="fa-solid fa-cookie-bite"></i> Flavors</a></li>
+                <li><a href="shop-all.html?cat=accessories"><i class="fa-solid fa-gear"></i> Accessories</a></li>
+                <li><a href="shop-all.html?cat=bags"><i class="fa-solid fa-bag-shopping"></i> Bags</a></li>
+                <li><a href="shop-all.html?cat=clothing"><i class="fa-solid fa-shirt"></i> Clothing</a></li>
+                <li><a href="shop-all.html?cat=home"><i class="fa-solid fa-mug-hot"></i> Home</a></li>
+                <li><a href="shop-all.html?cat=crafts"><i class="fa-solid fa-scissors"></i> Crafts</a></li>
+                <li><a href="shop-all.html?cat=christmas"><i class="fa-solid fa-snowflake"></i> Christmas</a></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Utilities -->
+    <nav class="utils">
+      <ul class="nav-links">
+        <li><a href="#" id="accountLink" aria-label="Account"><i class="fa-solid fa-user"></i></a></li>
+        <li class="cart-icon">
+          <a href="#" id="openCart" aria-label="Cart">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span class="cart-count">0</span>
+          </a>
+        </li>
+        <li style="position: relative;">
+            <a href="wishlist.html" aria-label="Favorites" id="wishlistLink">
+              <i class="fa-regular fa-heart"></i>
+              <span class="wishlist-count" id="wishlistCount">0</span>
+            </a>
+          </li>
+          
+        <li><a href="support.html" aria-label="Support"><i class="fa-solid fa-headset"></i></a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- ===== CART DRAWER (same as cart.html) ===== -->
+  <div class="cd-overlay" id="cdOverlay" aria-hidden="true"></div>
+  <aside class="cd-drawer" id="cdDrawer" aria-hidden="true" role="dialog" aria-label="Cart drawer">
+    <div class="cd-header">
+      <h2>Cart</h2>
+      <button id="cdClose" class="cd-close" aria-label="Close cart">×</button>
+    </div>
+    <div class="cd-body">
+      <div id="cdItems" class="cd-items"></div>
+      <div class="cd-summary">
+        <div class="cd-row">
+          <span>Subtotal</span>
+          <strong id="cdSubtotal">₱0.00</strong>
+        </div>
+        <p class="cd-note">Shipping, taxes, and discount codes calculated at checkout.</p>
+        <label class="cd-terms">
+          <input id="cdAgree" type="checkbox">
+          <span>I agree with the <a href="terms.html" target="_blank" rel="noopener">terms and conditions</a></span>
+        </label>
+        <!-- simple link to checkout; cart.js can still manage counts -->
+        <a href="checkout.html" class="cart-checkout-btn">Proceed to checkout</a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== CHECKOUT PAGE CONTENT ===== -->
+  <main class="checkout-page" aria-live="polite">
+    <header>
+      <h1>Checkout</h1>
+      <p class="checkout-kicker">
+        Review your items, add your details, and complete your order securely.
+      </p>
+    </header>
+
+    <section class="checkout-grid">
+
+      <!-- LEFT: Order Summary -->
+      <article class="checkout-card" aria-labelledby="order-summary-title">
+        <h2 id="order-summary-title">Order Summary</h2>
+
+        <div id="checkout-items" class="checkout-items">
+          <p class="checkout-item-meta">Loading your cart…</p>
+        </div>
+
+        <div class="checkout-totals">
+          <div class="checkout-total-row">
+            <span>Subtotal</span>
+            <span id="checkout-subtotal">₱0.00</span>
+          </div>
+          <div class="checkout-total-row">
+            <span>Shipping</span>
+            <span id="checkout-shipping">₱0.00</span>
+          </div>
+          <div class="checkout-total-row grand">
+            <span>Total</span>
+            <span id="checkout-total">₱0.00</span>
+          </div>
+        </div>
+
+        <div class="checkout-warning">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>Your payment is processed securely. We never store your full card details on Lokal.</span>
+        </div>
+      </article>
+
+      <!-- RIGHT: Shipping + Payment -->
+      <article class="checkout-card" aria-labelledby="shipping-payment-title">
+        <h2 id="shipping-payment-title">Shipping &amp; Payment</h2>
+
+        <form class="checkout-form" id="checkout-form">
+          <div class="checkout-form-row">
+            <label for="full-name" class="checkout-label">Full Name</label>
+            <input type="text" id="full-name" name="fullName" autocomplete="name" required>
+          </div>
+
+          <div class="checkout-form-row">
+            <label for="email" class="checkout-label">Email</label>
+            <input type="email" id="email" name="email" autocomplete="email" required>
+          </div>
+
+          <div class="checkout-form-row">
+            <label for="phone" class="checkout-label">Phone</label>
+            <input type="tel" id="phone" name="phone" autocomplete="tel">
+          </div>
+
+          <div class="checkout-form-row">
+            <label for="address" class="checkout-label">Street Address</label>
+            <input type="text" id="address" name="address" autocomplete="street-address" required>
+          </div>
+
+          <div class="checkout-form-row">
+            <label for="city" class="checkout-label">City</label>
+            <input type="text" id="city" name="city" required>
+          </div>
+
+          <div class="checkout-form-row">
+            <label for="state" class="checkout-label">State / Province</label>
+            <input type="text" id="state" name="state" required>
+          </div>
+
+          <div class="checkout-form-row">
+            <label for="zip" class="checkout-label">ZIP / Postal Code</label>
+            <input type="text" id="zip" name="zip" required>
+          </div>
+
+          <div class="checkout-form-row">
+            <label for="country" class="checkout-label">Country</label>
+            <select id="country" name="country" required>
+              <option value="">Select country</option>
+              <option value="US">United States</option>
+              <option value="PH">Philippines</option>
+              <option value="CA">Canada</option>
+              <option value="GB">United Kingdom</option>
+            </select>
+          </div>
+
+          <p class="checkout-note">
+            We’ll use this information only to ship your order and send updates.
+          </p>
+
+          <!-- PAYMENT PLACEHOLDER -->
+          <div class="checkout-paypal-wrapper">
+            <p class="checkout-label">Payment</p>
+            <div id="paypal-button-container">
+              <p class="checkout-item-meta">Payment options will appear here.</p>
+            </div>
+          </div>
+
+          <div class="checkout-cta-row">
+            <a href="cart.html" class="checkout-back-link">
+              <i class="fa-solid fa-chevron-left"></i>
+              Back to cart
+            </a>
+            <button type="submit" class="button">Place order (Demo)</button>
+          </div>
+        </form>
+      </article>
+
+    </section>
+  </main>
+
+  <!-- ===== Edit item modal (Checkout) ===== -->
+  <div class="checkout-edit-overlay" id="chkEditOverlay" aria-hidden="true">
+    <div class="checkout-edit-modal" role="dialog" aria-modal="true" aria-labelledby="chkEditTitle">
+      <div class="checkout-edit-header">
+        <h2 class="checkout-edit-title" id="chkEditTitle">Edit item</h2>
+        <button type="button" class="checkout-edit-close" id="chkEditClose" aria-label="Close edit popup">×</button>
+      </div>
+      <div class="checkout-edit-body">
+        <div class="checkout-edit-media">
+          <img id="chkEditImg" src="" alt="">
+        </div>
+        <div class="checkout-edit-info">
+          <p id="chkEditName" style="font-weight:600; margin-bottom:4px;"></p>
+          <p id="chkEditPrice" style="font-size:.9rem; color:var(--muted); margin-bottom:8px;"></p>
+
+          <label class="checkout-edit-info-label" for="chkEditSize">Size</label>
+          <input id="chkEditSize" type="text" placeholder="e.g. Small, 7.5, One Size">
+
+          <label class="checkout-edit-info-label" for="chkEditQty">Quantity</label>
+          <div class="checkout-qty-control">
+            <button type="button" id="chkEditDec" aria-label="Decrease quantity">−</button>
+            <input id="chkEditQty" type="number" min="1" value="1">
+            <button type="button" id="chkEditInc" aria-label="Increase quantity">+</button>
+          </div>
+
+          <div class="checkout-edit-footer">
+            <button type="button" class="button" id="chkEditSave">Update item</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FOOTER (same as cart.html, root paths) ===== -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer-grid" aria-label="Site footer">
+
+      <section class="footer-section" aria-labelledby="ft-contact-title">
+        <h2 id="ft-contact-title" class="ft-title">Contact Us</h2>
+        <ul class="footer-list">
+          <li>
+            <a href="mailto:shoplokalphilippines@gmail.com?subject=Lokal%20Support%20Request&body=Hi%20Lokal%20Team%2C%0A%0AIssue%3A%20%0AOrder%20%23%3A%20%0ABrowser%2FDevice%3A%20%0A%0AThanks%2C%0A"
+               aria-label="Email shoplokalphilippines at gmail dot com">
+              shoplokalphilippines@gmail.com
+            </a>
+          </li>
+          <li><address style="font-style:normal">Manila, Philippines</address></li>
+          <li class="border-list" aria-hidden="true"></li>
+          <li class="socials" aria-label="Social links">
+            <a href="#" aria-label="Instagram"><i class="fa-brands fa-square-instagram" aria-hidden="true"></i></a>
+            <a href="#" aria-label="Facebook"><i class="fa-brands fa-square-facebook" aria-hidden="true"></i></a>
+            <a href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok" aria-hidden="true"></i></a>
+          </li>
+        </ul>
+        <p class="ft-note" style="margin-top:8px">
+          Need help? Visit our <a href="support.html">Support</a> page or email us.
+        </p>
+      </section>
+
+      <nav class="footer-section" aria-labelledby="ft-links-title">
+        <h2 id="ft-links-title" class="ft-title">Quick Links</h2>
+        <ul class="footer-list">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="shop-all.html">Shop All</a></li>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="terms.html">Terms &amp; Conditions</a></li>
+          <li><a href="support.html">Support</a></li>
+        </ul>
+      </nav>
+
+      <section class="footer-section" aria-labelledby="ft-news-title">
+        <h2 id="ft-news-title" class="ft-title">Subscribe to Newsletter</h2>
+        <p class="ft-subcopy">
+          Get product drops, deals, and stories from local makers—straight to your inbox.
+        </p>
+        <form id="newsletterForm" class="ft-news-form" novalidate>
+          <label class="sr-only" for="newsletterEmail">Email address</label>
+          <input id="newsletterEmail" name="email" type="email" inputmode="email"
+                 autocomplete="email" placeholder="Your email" required
+                 aria-describedby="newsletterNote" />
+          <button class="button" id="newsletterBtn" type="submit" aria-label="Subscribe to newsletter">
+            Subscribe
+          </button>
+          <div class="ft-consent">
+            <input id="newsletterConsent" name="consent" type="checkbox" required />
+            <label for="newsletterConsent">
+              I agree to the <a href="terms.html">Terms &amp; Conditions</a> and
+              <a href="terms.html#privacy">Privacy Policy</a>.
+            </label>
+          </div>
+          <p id="newsletterNote" class="ft-note">
+            We never share your email. Unsubscribe anytime.
+          </p>
+          <div id="newsletterMsg" class="ft-msg" role="status" aria-live="polite"></div>
+        </form>
+      </section>
+    </div>
+
+    <div class="ft-legal">
+      <small>&copy; <span id="yearNow"></span> Lokal. All rights reserved.</small>
+    </div>
+  </footer>
+
+  <!-- ===== SCRIPTS ===== -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+
+  <!-- Optional cloud sync if you use it elsewhere -->
+  <script src="persist-sync.js"></script>
+
+  <!-- Core site scripts -->
+  <script src="cart.js"></script>
+  <script src="wishlist.js" defer></script>
+  <script src="newsletter.js" defer></script>
+  <script src="checkout.js"></script>
+
+  <!-- Header account icon + footer year -->
+  <script>
+    // Account icon -> login/user via Supabase
+    document.addEventListener('click', async (e) => {
+      const a = e.target.closest('#accountLink,[aria-label="Account"]');
+      if (!a) return;
+      e.preventDefault();
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (session) {
+          location.href = 'user.html';
+        } else {
+          location.href = 'login.html';
+        }
+      } catch {
+        location.href = 'login.html';
+      }
+    });
+
+    // Footer year
+    document.addEventListener('DOMContentLoaded', () => {
+      const y = document.getElementById('yearNow');
+      if (y) y.textContent = new Date().getFullYear();
+    });
+  </script>
+</body>
+</html>

@@ -290,6 +290,12 @@
     if (checkoutEl) checkoutEl.disabled = !(agreeEl.checked && subtotal > 0);
   });
 
+  // Drawer → checkout.html (only if enabled)
+  checkoutEl?.addEventListener("click", () => {
+    if (checkoutEl.disabled) return;
+    location.href = "checkout.html";
+  });
+
   // ---------- Cart page render ----------
   function renderPage() {
     if (!pageItems) return;
@@ -394,9 +400,10 @@
   pageAgree?.addEventListener("change", syncPageCheckoutState);
   syncPageCheckoutState();
 
+  // Cart page → checkout.html
   pageCheckout?.addEventListener("click", () => {
     if (pageCheckout.disabled) return;
-    alert("Checkout flow not connected yet. Add your payment/checkout integration.");
+    location.href = "checkout.html";
   });
 
   // ---------- cross-tab / cross-page sync ----------
@@ -436,6 +443,9 @@
 
   // ---------- initial paint (after DOM ready) ----------
   function initialPaint() {
+    const y = document.getElementById("yearNow");
+    if (y) y.textContent = new Date().getFullYear();
+
     updateBadge();
     renderDrawer();
     renderPage();
@@ -449,5 +459,19 @@
 
   window.addEventListener("pageshow", () => {
     updateBadge();
+  });
+
+  // ---------- Account icon: Supabase-based redirect ----------
+  document.addEventListener("click", async (e) => {
+    const a = e.target.closest('#accountLink,[aria-label="Account"]');
+    if (!a) return;
+    e.preventDefault();
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) location.href = "user.html";
+      else location.href = "login.html";
+    } catch {
+      location.href = "login.html";
+    }
   });
 })();
