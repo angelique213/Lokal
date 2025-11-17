@@ -1060,25 +1060,43 @@
 
   <!-- Account link controller + Greeting + Auth popup (same logic as index) -->
   <script>
-    (function(){
-      const $ = (s)=>document.querySelector(s);
-      const overlay = $('#lokalAuthOverlay');
-      const emailForm = $('#laEmailForm'), passForm = $('#laPassForm');
-      const emailInput = $('#laEmail'),  passInput = $('#laPass');
-      const accountLink = $('#accountLink');
-      const hiTag = $('#hiTag');
+  (function(){
+  const $ = (s)=>document.querySelector(s);
+  const overlay = $('#lokalAuthOverlay');
+  const emailForm = $('#laEmailForm'), passForm = $('#laPassForm');
+  const emailInput = $('#laEmail'),  passInput = $('#laPass');
+  const accountLink = $('#accountLink');
+  const hiTag = $('#hiTag');
 
-      const cap = s => { s = String(s||'').trim(); return s ? s[0].toUpperCase()+s.slice(1) : ''; };
+  // ✅ Only treat homepage as place to show greeting
+  const path = window.location.pathname || '';
+  const isHome =
+    path.endsWith('index.html') ||
+    path === '/' ||
+    path.endsWith('/Lokal/') || path.endsWith('/Lokal/index.html'); // adjust if your folder name is different
+
+
+    const cap = s => { s = String(s||'').trim(); return s ? s[0].toUpperCase()+s.slice(1) : ''; };
       function firstFromUser(user){
         const md = (user && user.user_metadata) || {};
         return md.first_name || md.given_name || (md.full_name||md.name||'').split(/\s+/)[0] || '';
       }
+
       function showGreeting(name){
-        if (!name){ hiTag.hidden = true; return; }
+        // If there's no hiTag OR this is not the homepage, never show the chip
+        if (!hiTag || !isHome || !name){
+          if (hiTag) hiTag.hidden = true;
+          return;
+        }
         hiTag.textContent = 'Hi, ' + cap(name);
         hiTag.hidden = false;
       }
-      function hideGreeting(){ hiTag.hidden = true; }
+
+      function hideGreeting(){
+        if (!hiTag) return;
+        hiTag.hidden = true;
+      }
+
 
       const openAuth = ()=>{ overlay?.setAttribute('aria-hidden','false'); emailForm.hidden=false; passForm.hidden=true; setTimeout(()=>emailInput?.focus(),50); };
       const closeAuth = ()=> overlay?.setAttribute('aria-hidden','true');
