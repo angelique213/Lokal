@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Best Picks | Lokal</title>
 
+  <!-- Optional: set base for GH Pages -->
+  <meta name="site-base" content="/Lokal/">
+
   <!-- Icons (FA6 stable) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
 
@@ -132,10 +135,8 @@
       pointer-events: none !important;
     }
   
-    /* Your greeting tag should never block clicks */
     .hi-tag{ pointer-events: none; }
   </style>
-  
 </head>
 <body>
 
@@ -150,14 +151,12 @@
       <div class="la-body">
         <p class="la-intro">Sign in with your email or sign up to become a Lokal Member.</p>
 
-        <!-- Step 1: Email -->
         <form id="laEmailForm" novalidate>
           <label class="la-label" for="laEmail">Email <span style="color:#b02a37">*</span></label>
           <input class="la-input" id="laEmail" type="email" placeholder="Email" required />
           <button class="la-btn" type="submit">CONTINUE</button>
         </form>
 
-        <!-- Step 2: Password -->
         <form id="laPassForm" hidden novalidate>
           <label class="la-label" for="laPass">Password</label>
           <input class="la-input" id="laPass" type="password" placeholder="••••••" required minlength="6" />
@@ -174,7 +173,7 @@
   </div>
   <!-- ========== /AUTH POPUP ========== -->
 
-  <!-- HEADER (paths are relative to /best-pick/) -->
+  <!-- HEADER -->
   <header class="header">
     <div class="logo">
       <a href="../index.html" aria-label="Home">
@@ -311,8 +310,6 @@
 
   <footer class="footer" role="contentinfo">
     <div class="footer-grid" aria-label="Site footer">
-  
-      <!-- Contact -->
       <section class="footer-section" aria-labelledby="ft-contact-title">
         <h2 id="ft-contact-title" class="ft-title">Contact Us</h2>
         <ul class="footer-list">
@@ -337,7 +334,6 @@
         </p>
       </section>
   
-      <!-- Quick Links -->
       <nav class="footer-section" aria-labelledby="ft-links-title">
         <h2 id="ft-links-title" class="ft-title">Quick Links</h2>
         <ul class="footer-list">
@@ -349,7 +345,6 @@
         </ul>
       </nav>
   
-      <!-- Newsletter -->
       <section class="footer-section" aria-labelledby="ft-news-title">
         <h2 id="ft-news-title" class="ft-title">Subscribe to Newsletter</h2>
         <p class="ft-subcopy">
@@ -395,10 +390,7 @@
 
   <!-- PAGE SCRIPTS -->
   <script>
-    /* ============== Helpers ============== */
-    // Make all asset paths absolute so cart/wishlist images remain correct from subfolders
     const toAbs = (p) => { try { return new URL(p, location.href).href; } catch { return p; } };
-
     const PRODUCT_PAGE = 'product.html';
 
     function renderStars(r){
@@ -422,7 +414,6 @@
       location.href = PRODUCT_PAGE;
     }
 
-    /* ============== Demo Data (20 items) ============== */
     const productImages = [
       "../images/flavors/flavors1.png","../images/flavors/flavors2.png","../images/flavors/flavors5.png","../images/flavors/flavors6.png","../images/crafts/crafts1.png",
       "../images/clothing/clothing1.png","../images/bags/bag1.png","../images/accessories/accessories3.png","../images/accessories/accessories4.png","../images/clothing/clothing2.png",
@@ -494,7 +485,6 @@
       ["Calming scent","Made in PH","Long-lasting"]
     ];
 
-    /* ============== Render cards ============== */
     const productsContainer = document.querySelector('.products-list');
     const pageMain = document.getElementById('pageMain');
 
@@ -506,7 +496,7 @@
     function slugify(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
 
     for (let i=0;i<productNames.length;i++){
-      const absImg = toAbs(productImages[i]); // ensure absolute for wishlist/cart
+      const absImg = toAbs(productImages[i]);
       const card = document.createElement('article');
       card.className = 'best-product';
       card.innerHTML = `
@@ -514,7 +504,6 @@
           <img src="${productImages[i]}" alt="${productNames[i]}" loading="lazy">
         </a>
 
-        <!-- ❤️ Favorites button (picked up by wishlist.js) -->
         <button type="button" class="wishlist-btn" aria-label="Add to favorites"
           data-id="${slugify(productNames[i])}"
           data-name="${productNames[i]}"
@@ -534,7 +523,6 @@
       productsContainer.appendChild(card);
     }
 
-    /* ============== Quick View ============== */
     const qvOverlay = document.getElementById('qvOverlay');
     const qvModal   = document.getElementById('qvModal');
     const qvImg     = document.getElementById('qvImg');
@@ -592,7 +580,6 @@
     qvClose.addEventListener('click',closeQV); qvOverlay.addEventListener('click',closeQV);
     document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && qvModal.classList.contains('active')) closeQV(); });
 
-    // Add to cart using the global cart.js API
     qvAdd.addEventListener('click', ()=>{
       if(currentIndex==null) return;
       const clothing = isClothingIndex(currentIndex);
@@ -636,7 +623,6 @@
       });
     });
 
-    /* ============== Card link -> product ============== */
     document.addEventListener('click',(e)=>{
       const link = e.target.closest('.product-link');
       if (!link || link.dataset.i === undefined) return;
@@ -657,11 +643,15 @@
     });
   </script>
 
+  <!-- Supabase library + client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../supabase.js"></script>
+
   <!-- Global cart API -->
   <script src="../cart.js"></script>
 
   <script>
-    /* ---------- Safety shim: ensure the cart can open ---------- */
+    /* Cart drawer shim */
     window.openCartDrawer = window.openCartDrawer || function(){
       const drawer = document.getElementById('cdDrawer');
       const overlay = document.getElementById('cdOverlay');
@@ -670,7 +660,6 @@
       document.body.classList.add('lock-scroll');
     };
 
-    // Header cart icon opens the drawer
     document.addEventListener('click', function (e) {
       const btn = e.target.closest('#openCart');
       if (!btn) return;
@@ -678,7 +667,6 @@
       window.openCartDrawer();
     });
 
-    // Close handlers
     const cdClose = document.getElementById('cdClose');
     const cdOverlay = document.getElementById('cdOverlay');
     function closeCart(){
@@ -689,7 +677,6 @@
     cdClose?.addEventListener('click', closeCart);
     cdOverlay?.addEventListener('click', closeCart);
 
-    // Lock body scroll when cart drawer toggles
     const drawer = document.getElementById('cdDrawer');
     if (drawer){
       new MutationObserver(() => {
@@ -698,132 +685,137 @@
     }
   </script>
 
-  <!-- 1) Supabase library -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- 2) Your client (creates window.sb) -->
-  <script src="../supabase.js"></script>
-  
-  <!-- 3) Make the Account icon consistent on EVERY page -->
+  <!-- Account icon -> popup -->
   <script>
-  (function(){
-    // Open the popup programmatically
-    window.openAuthPopup = () => {
-      const overlay = document.getElementById('lokalAuthOverlay');
-      const emailForm = document.getElementById('laEmailForm');
-      const passForm  = document.getElementById('laPassForm');
-      const emailIn   = document.getElementById('laEmail');
-      if (!overlay || !emailForm || !passForm || !emailIn) return;
-      overlay.setAttribute('aria-hidden','false');
-      emailForm.hidden = false;
-      passForm.hidden  = true;
-      setTimeout(()=> emailIn.focus(), 50);
-    };
+    (function () {
+      window.openAuthPopup = function () {
+        const overlay  = document.getElementById('lokalAuthOverlay');
+        const emailForm = document.getElementById('laEmailForm');
+        const passForm  = document.getElementById('laPassForm');
+        const emailIn   = document.getElementById('laEmail');
+        if (!overlay || !emailForm || !passForm || !emailIn) return;
 
-    // Intercept Account icon click
-    document.addEventListener('click', async (e) => {
-      const a = e.target.closest('a[aria-label="Account"]');
-      if (!a) return;
-      e.preventDefault();
-
-      const { data: { session } } = await sb.auth.getSession();
-      if (session) {
-        // already signed in -> go profile
-        location.href = '../user.html';
-      } else {
-        // not signed in -> open popup
-        window.openAuthPopup();
-      }
-    });
-  })();
-  </script>
-  
-  <!-- 4) LOKAL AUTH POPUP (Supabase controller) -->
-  <script>
-  (function(){
-    const $ = s => document.querySelector(s);
-    const overlay   = $('#lokalAuthOverlay');
-    const emailForm = $('#laEmailForm');
-    const passForm  = $('#laPassForm');
-    const emailIn   = $('#laEmail');
-    const passIn    = $('#laPass');
-
-    if (!overlay || !emailForm || !passForm) return;
-
-    const closeAuth = () => overlay.setAttribute('aria-hidden','true');
-
-    // Close actions
-    $('#laClose')?.addEventListener('click', closeAuth);
-    overlay?.addEventListener('click', e => { if (e.target === overlay) closeAuth(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAuth(); });
-
-    // Step 1: email
-    emailForm.onsubmit = (e) => {
-      e.preventDefault();
-      const email = (emailIn.value || '').trim().toLowerCase();
-      if (!email) { emailIn.focus(); return; }
-      passForm.dataset.email = email;
-      emailForm.hidden = true;
-      passForm.hidden  = false;
-      passIn.focus();
-      $('#laBackEmail')?.addEventListener('click', ev => {
-        ev.preventDefault();
+        overlay.setAttribute('aria-hidden', 'false');
         emailForm.hidden = false;
         passForm.hidden  = true;
-        emailIn.focus();
-      }, { once: true });
-    };
+        setTimeout(() => emailIn.focus(), 50);
+      };
 
-    // Step 2: sign-in (offer sign-up only if not found)
-    passForm.onsubmit = async (e) => {
-      e.preventDefault();
-      const email = passForm.dataset.email || '';
-      const password = passIn.value || '';
+      document.addEventListener('click', async function (e) {
+        const a = e.target.closest('a[aria-label="Account"]');
+        if (!a) return;
 
-      try {
-        const { data, error } = await sb.auth.signInWithPassword({ email, password });
-        if (!error && data?.user) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+
+        try {
+          const { data: { session } } = await sb.auth.getSession();
+          if (session) {
+            location.href = '../user.html';
+          } else {
+            window.openAuthPopup();
+          }
+        } catch (err) {
+          window.openAuthPopup();
+        }
+      }, true);
+    })();
+  </script>
+  
+  <!-- LOKAL AUTH POPUP controller -->
+  <script>
+    (function(){
+      const $ = s => document.querySelector(s);
+      const overlay   = $('#lokalAuthOverlay');
+      const emailForm = $('#laEmailForm');
+      const passForm  = $('#laPassForm');
+      const emailIn   = $('#laEmail');
+      const passIn    = $('#laPass');
+
+      if (!overlay || !emailForm || !passForm) return;
+
+      const closeAuth = () => overlay.setAttribute('aria-hidden','true');
+
+      $('#laClose')?.addEventListener('click', closeAuth);
+      overlay?.addEventListener('click', e => { if (e.target === overlay) closeAuth(); });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAuth(); });
+
+      emailForm.onsubmit = (e) => {
+        e.preventDefault();
+        const email = (emailIn.value || '').trim().toLowerCase();
+        if (!email) { emailIn.focus(); return; }
+        passForm.dataset.email = email;
+        emailForm.hidden = true;
+        passForm.hidden  = false;
+        passIn.focus();
+        $('#laBackEmail')?.addEventListener('click', ev => {
+          ev.preventDefault();
+          emailForm.hidden = false;
+          passForm.hidden  = true;
+          emailIn.focus();
+        }, { once: true });
+      };
+
+      passForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const email = passForm.dataset.email || '';
+        const password = passIn.value || '';
+
+        try {
+          const { data, error } = await sb.auth.signInWithPassword({ email, password });
+          if (!error && data?.user) {
+            closeAuth();
+            location.href = '../user.html';
+            return;
+          }
+
+          const code = error?.code || '';
+          if (code === 'invalid_credentials' || /invalid|password/i.test(error?.message||'')) {
+            alert('Incorrect email or password.');
+            return;
+          }
+
+          const make = confirm('Account not found. Create a new one with this email?');
+          if (!make) return;
+
+          const { error: signUpError } = await sb.auth.signUp({
+            email,
+            password,
+            options: { emailRedirectTo: 'https://angelique213.github.io/Lokal/user.html' }
+          });
+          if (signUpError) { alert(signUpError.message); return; }
+
+          alert('Check your email to verify, then sign in.');
           closeAuth();
-          location.href = '../user.html';
-          return;
+        } catch (err) {
+          alert((err && err.message) || 'Network error. Please try again.');
         }
-
-        // If credentials wrong, show a clear message.
-        const code = error?.code || '';
-        if (code === 'invalid_credentials' || /invalid|password/i.test(error?.message||'')) {
-          alert('Incorrect email or password.');
-          return;
-        }
-
-        // If user not found (or other “not exists” case), OFFER sign-up
-        const make = confirm('Account not found. Create a new one with this email?');
-        if (!make) return;
-
-        const { error: signUpError } = await sb.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: 'https://angelique213.github.io/Lokal/user.html' }
-        });
-        if (signUpError) { alert(signUpError.message); return; }
-
-        alert('Check your email to verify, then sign in.');
-        closeAuth();
-      } catch (err) {
-        alert((err && err.message) || 'Network error. Please try again.');
-      }
-    };
-  })();
+      };
+    })();
   </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="../supabase.js"></script>
+  <!-- 🔹 Checkout path fix for this subfolder page -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const drawerCheckout = document.getElementById('cdCheckout');
+      if (drawerCheckout) {
+        drawerCheckout.addEventListener('click', function (e) {
+          if (drawerCheckout.disabled) return;
+          e.preventDefault();
+          e.stopImmediatePropagation(); // stop cart.js handler that goes to "checkout.html"
+          window.location.href = '../checkout.html'; // go to root-level checkout
+        }, true); // capture so this runs before other listeners
+      }
+    });
+  </script>
+
   <script>
     document.addEventListener('DOMContentLoaded', ()=>{
       const y = document.getElementById('yearNow');
       if (y) y.textContent = new Date().getFullYear();
     });
   </script>
-  <!-- include this on every page that has the footer -->
   <script src="../newsletter.js" defer></script>
-  
 </body>
 </html>

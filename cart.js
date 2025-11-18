@@ -293,7 +293,8 @@
   // Drawer → checkout.html (only if enabled)
   checkoutEl?.addEventListener("click", () => {
     if (checkoutEl.disabled) return;
-    location.href = "checkout.html";
+    // ✅ use SITE_BASE so it works from subfolders like /best-pick/
+    location.href = SITE_BASE + "checkout.html";
   });
 
   // ---------- Cart page render ----------
@@ -403,7 +404,8 @@
   // Cart page → checkout.html
   pageCheckout?.addEventListener("click", () => {
     if (pageCheckout.disabled) return;
-    location.href = "checkout.html";
+    // ✅ use SITE_BASE here too
+    location.href = SITE_BASE + "checkout.html";
   });
 
   // ---------- cross-tab / cross-page sync ----------
