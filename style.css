@@ -53,13 +53,16 @@
   align-items:flex-end; justify-content:center;
   z-index:2; opacity:0; pointer-events:none; transition:opacity .25s ease;
 }
+
 .featured-box-1:hover .overlay,
 .featured-box-2:hover .overlay,
 .featured-box-2-box-1:hover .overlay,
 .featured-box-2-box-2:hover .overlay,
 .featured-box-2-box-3:hover .overlay,
+.featured-box-3:hover .overlay, 
 .overlay:hover{
-  opacity:1; pointer-events:auto;
+  opacity:1;
+  pointer-events:auto;
 }
 
 /* ========== PRODUCT GRIDS ========== */

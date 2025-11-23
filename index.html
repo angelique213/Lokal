@@ -43,28 +43,94 @@
 <!-- Minimal extra styles for popup + toast + greeting only (index page) -->
 <style>
 /* ——— Auth popup ——— */
-.lokal-auth.la-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;place-items:center;z-index:3000}
+.lokal-auth.la-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.55);
+  display:none;
+  place-items:center;
+  z-index:3000;
+}
 .lokal-auth.la-overlay[aria-hidden="false"]{display:grid}
 .lokal-auth .la-modal{
-  width:min(440px,92vw);background:#fff;border-radius:6px;border:1px solid #D7D6AA;
-  box-shadow:0 16px 50px rgba(0,0,0,.25);font-family:system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  width:min(440px,92vw);
+  background:#fff;
+  border-radius:6px;
+  border:1px solid #D7D6AA;
+  box-shadow:0 16px 50px rgba(0,0,0,.25);
+  font-family:system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   animation:fadeIn .25s ease;
 }
 @keyframes fadeIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
-.lokal-auth .la-head{display:flex;align-items:center;justify-content:space-between;padding:22px 26px 14px 26px;}
-.lokal-auth .la-title{font-size:1.05rem;font-weight:700;margin:0;color:#222;}
-.lokal-auth .la-close{background:none;border:none;font-size:22px;cursor:pointer;color:#222}
+.lokal-auth .la-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:22px 26px 14px 26px;
+}
+.lokal-auth .la-title{
+  font-size:1.05rem;
+  font-weight:700;
+  margin:0;
+  color:#222;
+}
+.lokal-auth .la-close{
+  background:none;
+  border:none;
+  font-size:22px;
+  cursor:pointer;
+  color:#222
+}
 .lokal-auth .la-body{padding:0 26px 20px 26px;}
 .lokal-auth .la-intro{font-weight:600;color:#222;margin-bottom:20px;}
-.lokal-auth .la-label{display:block;font-size:.9rem;font-weight:600;margin-bottom:6px;color:#222;}
-.lokal-auth .la-input{width:100%;padding:13px 12px;border:1px solid #222;border-radius:4px;font-size:.9rem;color:#222;outline:none;}
-.lokal-auth .la-input:focus{border-color:#A9A74F;box-shadow:0 0 0 2px rgba(169,167,79,.3);}
-.lokal-auth .la-btn{width:100%;padding:14px;border:none;border-radius:4px;background:#6A6932;color:#fff;font-weight:600;cursor:pointer;margin-top:16px;font-size:.95rem;}
+.lokal-auth .la-label{
+  display:block;
+  font-size:.9rem;
+  font-weight:600;
+  margin-bottom:6px;
+  color:#222;
+}
+.lokal-auth .la-input{
+  width:100%;
+  padding:13px 12px;
+  border:1px solid #222;
+  border-radius:4px;
+  font-size:.9rem;
+  color:#222;
+  outline:none;
+}
+.lokal-auth .la-input:focus{
+  border-color:#A9A74F;
+  box-shadow:0 0 0 2px rgba(169,167,79,.3);
+}
+.lokal-auth .la-btn{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:4px;
+  background:#6A6932;
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+  margin-top:16px;
+  font-size:.95rem;
+}
 .lokal-auth .la-btn:hover{background:#8A8841;}
 .lokal-auth .la-sub{text-align:center;margin-top:8px;}
 .lokal-auth .la-sub a{color:#222;text-decoration:underline;font-size:.88rem;}
-.lokal-auth .la-foot{text-align:center;border-top:1px solid #D7D6AA;padding:18px 0 20px 0;}
-.lokal-auth .la-mini{display:flex;justify-content:center;align-items:center;gap:6px;font-size:.85rem;color:#555;}
+.lokal-auth .la-foot{
+  text-align:center;
+  border-top:1px solid #D7D6AA;
+  padding:18px 0 20px 0;
+}
+.lokal-auth .la-mini{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:6px;
+  font-size:.85rem;
+  color:#555;
+}
 .lokal-auth .la-mini i{font-size:14px;}
 
 /* ——— Signed-out toast ——— */
@@ -82,8 +148,14 @@
   color:#2b1f1a;
 }
 .toast-signout button {
-  background:none; border:0; cursor:pointer; font-size:18px; line-height:1;
-  padding:0 4px; margin-left:10px; color:#2b1f1a;
+  background:none;
+  border:0;
+  cursor:pointer;
+  font-size:18px;
+  line-height:1;
+  padding:0 4px;
+  margin-left:10px;
+  color:#2b1f1a;
 }
 
 /* ——— Greeting chip (index only) ——— */
@@ -190,6 +262,7 @@
 
   <nav class="utils">
     <ul class="nav-links">
+      <!-- Account icon: SAME aria-label as best-pick -->
       <li><a href="#" id="accountLink" aria-label="Account"><i class="fa-solid fa-user"></i></a></li>
       <li>
         <a href="#" id="openCart" aria-label="Open cart">
@@ -240,43 +313,60 @@
 
 <!-- FEATURED -->
 <section class="featured">
+  <!-- Left: Shop Local Clothing -->
   <div class="featured-box-1">
     <div class="overlay">
-      <button class="button btn" onclick="location.href='shop-all.html?cat=clothing'">Shop Local Clothing</button>
+      <button class="button btn" onclick="location.href='shop-all.html?cat=clothing'">
+        Shop Local Clothing
+      </button>
     </div>
     <div class="bg-image">
       <img src="images/filipiniana.png" alt="Clothing">
     </div>
   </div>
+
+  <!-- Middle: three smaller tiles -->
   <div class="featured-box-2">
     <div class="featured-box-2-box-1">
       <div class="overlay">
-        <button class="button btn" onclick="location.href='shop-all.html?cat=crafts'">Shop Local Crafts</button>
+        <button class="button btn" onclick="location.href='shop-all.html?cat=crafts'">
+          Shop Local Crafts
+        </button>
       </div>
       <div class="bg-image">
         <img src="images/16.png" alt="Crafts">
       </div>
     </div>
+
     <div class="featured-box-2-box-2">
       <div class="overlay">
-        <button class="button btn" onclick="location.href='shop-all.html?cat=accessories'">Shop Accessories</button>
+        <button class="button btn" onclick="location.href='shop-all.html?cat=accessories'">
+          Shop Accessories
+        </button>
       </div>
       <div class="bg-image">
         <img src="images/4p.webp" alt="Accessories">
       </div>
     </div>
+
     <div class="featured-box-2-box-3">
       <div class="overlay">
-        <button class="button btn" onclick="location.href='shop-all.html?cat=bags'">Shop Bags</button>
+        <button class="button btn" onclick="location.href='shop-all.html?cat=bags'">
+          Shop Bags
+        </button>
       </div>
       <div class="bg-image">
         <img src="images/bags.png" alt="Bags">
       </div>
     </div>
   </div>
+
+  <!-- Right: Shop Local Flavors (THIS is the one you were missing) -->
   <div class="featured-box-3">
     <div class="overlay">
-      <button class="button btn" onclick="location.href='shop-all.html?cat=flavors'">Shop Local Flavors</button>
+      <button class="button btn" onclick="location.href='shop-all.html?cat=flavors'">
+        Shop Local Flavors
+      </button>
     </div>
     <div class="bg-image">
       <img src="images/delicacies.png" alt="Flavors">
@@ -477,14 +567,21 @@
 <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
 <script>AOS.init();</script>
 
-<!-- Account link controller + Greeting + Sign-out toast -->
+<!-- Supabase + Newsletter + Core scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="newsletter.js" defer></script>
+<script src="cart.js" defer></script>
+<script src="lokal.js"></script>
+<script src="wishlist.js" defer></script>
+
+<!-- LOKAL AUTH POPUP controller + greeting -->
 <script>
 (function(){
   const $ = (s)=>document.querySelector(s);
   const overlay = $('#lokalAuthOverlay');
   const emailForm = $('#laEmailForm'), passForm = $('#laPassForm');
   const emailInput = $('#laEmail'),  passInput = $('#laPass');
-  const accountLink = $('#accountLink');
   const hiTag = $('#hiTag');
 
   const cap = s => { s = String(s||'').trim(); return s ? s[0].toUpperCase()+s.slice(1) : ''; };
@@ -499,8 +596,20 @@
   }
   function hideGreeting(){ hiTag.hidden = true; }
 
-  const openAuth = ()=>{ overlay?.setAttribute('aria-hidden','false'); emailForm.hidden=false; passForm.hidden=true; setTimeout(()=>emailInput?.focus(),50); };
-  const closeAuth = ()=> overlay?.setAttribute('aria-hidden','true');
+  function openAuth(){
+    if (!overlay || !emailForm || !passForm) return;
+    overlay.setAttribute('aria-hidden','false');
+    emailForm.hidden=false;
+    passForm.hidden=true;
+    setTimeout(()=>emailInput?.focus(),50);
+  }
+  function closeAuth(){
+    overlay?.setAttribute('aria-hidden','true');
+  }
+
+  // expose so other scripts can call it (like the account click handler)
+  window.openAuthPopup = openAuth;
+
   $('#laClose')?.addEventListener('click', closeAuth);
   overlay?.addEventListener('click', e=>{ if(e.target===overlay) closeAuth(); });
   document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeAuth(); });
@@ -514,7 +623,13 @@
     passForm.hidden = false;
     passInput.focus();
   });
-  $('#laBackEmail')?.addEventListener('click', (e)=>{ e.preventDefault(); emailForm.hidden=false; passForm.hidden=true; emailInput.focus(); });
+
+  $('#laBackEmail')?.addEventListener('click', (e)=>{
+    e.preventDefault();
+    emailForm.hidden=false;
+    passForm.hidden=true;
+    emailInput.focus();
+  });
 
   passForm?.addEventListener('submit', async (e)=>{
     e.preventDefault();
@@ -550,19 +665,10 @@
     }
   });
 
-  accountLink?.addEventListener('click', async (e)=>{
-    e.preventDefault();
-    try{
-      const { data:{ session } } = await sb.auth.getSession();
-      if (session) location.href = 'user.html';
-      else openAuth();
-    }catch{
-      openAuth();
-    }
-  });
-
+  // Initial greeting from existing session
   document.addEventListener('DOMContentLoaded', async ()=>{
     try{
+      if (!window.sb?.auth) { hideGreeting(); return; }
       const { data:{ session } } = await sb.auth.getSession();
       if (session){
         const first = firstFromUser(session.user) || localStorage.getItem('lokalFirstName') || '';
@@ -573,6 +679,7 @@
     }catch{ hideGreeting(); }
   });
 
+  // keep greeting + signout state in sync
   if (window.sb?.auth?.onAuthStateChange){
     sb.auth.onAuthStateChange((evt, session)=>{
       if (evt === 'SIGNED_IN' || (session && session.user)){
@@ -592,6 +699,39 @@
 })();
 </script>
 
+<!-- Account icon click handler (matches best-pick behavior, overrides login.html redirect) -->
+<script>
+(function () {
+  document.addEventListener('click', async function (e) {
+    const a = e.target.closest('a[aria-label="Account"]');
+    if (!a) return;
+
+    // capture: stop ALL other click handlers (including lokal.js fallback)
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+
+    try {
+      if (!window.sb?.auth) {
+        window.openAuthPopup?.();
+        return;
+      }
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) {
+        // user is signed in -> go to account page
+        location.href = 'user.html';
+      } else {
+        // not signed in -> open popup
+        window.openAuthPopup?.();
+      }
+    } catch (err) {
+      // if something goes wrong, at least show the popup
+      window.openAuthPopup?.();
+    }
+  }, true); // <-- capture = true, fires before bubble handlers
+})();
+</script>
+
 <!-- Logout toast -->
 <script>
 (function(){
@@ -602,7 +742,7 @@
     box.className = 'toast-signout';
     box.setAttribute('role','status');
     box.setAttribute('aria-live','polite');
-    box.innerHTML = `<span>${msg}</span><button aria-label="Dismiss">×</button>`;
+    box.innerHTML = '<span>'+msg+'</span><button aria-label="Dismiss">×</button>';
     document.body.appendChild(box);
     const close = () => box.remove();
     box.querySelector('button')?.addEventListener('click', close);
@@ -625,17 +765,6 @@
     if (y) y.textContent = new Date().getFullYear();
   });
 </script>
-
-<!-- Supabase + Newsletter -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
-<script src="newsletter.js" defer></script>
-
-<!-- App scripts -->
-<!-- <script src="persist-sync.js"></script> -->
-<script src="cart.js" defer></script>
-<script src="lokal.js"></script>
-<script src="wishlist.js" defer></script>
 
 </body>
 </html>
