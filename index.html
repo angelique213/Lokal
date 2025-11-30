@@ -180,6 +180,127 @@
 #cdOverlay[aria-hidden="true"]{ display:none !important; pointer-events:none !important; }
 #cdDrawer[aria-hidden="true"]{ display:none !important; pointer-events:none !important; }
 .hi-tag{ pointer-events:none; }
+
+/* ——— Christmas promo popup ——— */
+.xmas-overlay{
+  position:fixed;
+  inset:0;
+  display:none;
+  place-items:center;
+  background:rgba(0,0,0,.55);
+  z-index:2500;
+}
+.xmas-overlay[aria-hidden="false"]{
+  display:grid;
+}
+
+.xmas-modal{
+  position:relative;
+  width:min(360px, 90vw);
+  padding:22px 22px 24px;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 18px 55px rgba(0,0,0,.35);
+  color:#fff;
+  font-family:'Montserrat', system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  background-image:
+    linear-gradient(135deg, rgba(0,0,0,.15), rgba(0,0,0,.35)),
+    url("images/christmas-pop.jpg");
+  background-size:cover;
+  background-position:center;
+  backdrop-filter: blur(2px);
+  animation:xmasPop .28s ease-out;
+}
+
+@keyframes xmasPop{
+  from{opacity:0; transform:translateY(12px) scale(.96);}
+  to{opacity:1; transform:translateY(0) scale(1);}
+}
+
+.xmas-modal::after{
+  content:"";
+  position:absolute;
+  inset:auto -40px -60px;
+  height:130px;
+  background:radial-gradient(circle at 10% 0%, rgba(255,255,255,.25), transparent 55%);
+  opacity:.9;
+  pointer-events:none;
+}
+
+.xmas-close{
+  position:absolute;
+  top:10px;
+  right:12px;
+  border:none;
+  background:rgba(0,0,0,.25);
+  color:#fff;
+  width:28px;
+  height:28px;
+  border-radius:999px;
+  font-size:18px;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+.xmas-tag{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:.78rem;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  padding:4px 10px;
+  border-radius:999px;
+  background:rgba(0,0,0,.32);
+  margin-bottom:8px;
+}
+
+.xmas-title{
+  font-size:1.32rem;
+  line-height:1.2;
+  margin:0 0 4px;
+  font-weight:800;
+}
+
+.xmas-sub{
+  font-size:.9rem;
+  line-height:1.5;
+  margin:0 0 14px;
+}
+
+.xmas-highlight{
+  font-weight:800;
+  font-size:1rem;
+}
+
+.xmas-btn{
+  position:relative;
+  z-index:1;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:10px 18px;
+  border-radius:999px;
+  border:none;
+  cursor:pointer;
+  font-weight:700;
+  font-size:.9rem;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  background:#ffffff;
+  color:#c62828;
+}
+.xmas-btn i{
+  font-size:.95rem;
+}
+.xmas-btn:hover{
+  background:#ffe9e9;
+}
 </style>
 </head>
 
@@ -219,6 +340,30 @@
   </div>
 </div>
 <!-- ========== /LOKAL AUTH POPUP ========== -->
+
+<!-- ========== CHRISTMAS PROMO POPUP ========== -->
+<div class="xmas-overlay" id="xmasPromo" aria-hidden="true">
+  <div class="xmas-modal" role="dialog" aria-modal="true" aria-labelledby="xmasTitle">
+    <button class="xmas-close" type="button" aria-label="Close Christmas offer">×</button>
+
+    <p class="xmas-tag">
+      <i class="fa-solid fa-snowflake" aria-hidden="true"></i>
+      Holiday Offer
+    </p>
+
+    <h2 class="xmas-title" id="xmasTitle">10% OFF Christmas Collection</h2>
+    <p class="xmas-sub">
+      Make your holidays extra cozy with local finds.
+      <span class="xmas-highlight">Enjoy 10% off all Christmas items</span> for a limited time.
+    </p>
+
+    <button class="xmas-btn" type="button" id="xmasShopBtn">
+      <span>Shop Christmas</span>
+      <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+    </button>
+  </div>
+</div>
+<!-- ========== /CHRISTMAS PROMO POPUP ========== -->
 
 <!-- HEADER -->
 <header class="header">
@@ -361,7 +506,7 @@
     </div>
   </div>
 
-  <!-- Right: Shop Local Flavors (THIS is the one you were missing) -->
+  <!-- Right: Shop Local Flavors -->
   <div class="featured-box-3">
     <div class="overlay">
       <button class="button btn" onclick="location.href='shop-all.html?cat=flavors'">
@@ -764,6 +909,39 @@
     const y = document.getElementById('yearNow');
     if (y) y.textContent = new Date().getFullYear();
   });
+</script>
+
+<!-- Christmas promo popup JS -->
+<script>
+(function(){
+  const overlay = document.getElementById('xmasPromo');
+  if (!overlay) return;
+
+  const closeBtn = overlay.querySelector('.xmas-close');
+  const shopBtn  = document.getElementById('xmasShopBtn');
+  const STORAGE_KEY = 'lokal_xmas_promo_date';
+  const today = new Date().toDateString();
+
+  function openPromo(){
+    overlay.setAttribute('aria-hidden','false');
+  }
+  function closePromo(){
+    overlay.setAttribute('aria-hidden','true');
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(openPromo, 2000); // show 2 seconds after refresh ALWAYS
+});
+
+  closeBtn?.addEventListener('click', closePromo);
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) closePromo();
+  });
+
+  shopBtn?.addEventListener('click', () => {
+    window.location.href = 'shop-all.html?cat=christmas';
+  });
+})();
 </script>
 
 </body>
