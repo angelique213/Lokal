@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Order Confirmation | Lokal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    body.order-confirmation-page {
+      background: #faf7f0;
+      font-family: Montserrat, system-ui, sans-serif;
+      color: var(--ink);
+      padding: 0;
+      margin: 0;
+    }
+
+    .confirmation-container {
+      max-width: 760px;
+      margin: 60px auto;
+      padding: 0 20px 40px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .confirmation-card {
+      background: #ffffff;
+      padding: 32px 28px 26px;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.07);
+      width: 100%;
+      animation: fadeIn 0.65s ease;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(10px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    .confirmation-card h1 {
+      font-size: clamp(26px, 4vw, 32px);
+      margin-bottom: 6px;
+      color: var(--ink);
+      text-align: center;
+    }
+
+    #confirmationIntro {
+      font-size: 0.95rem;
+      text-align: center;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .confirmation-number {
+      text-align: center;
+      background: #f5f3ea;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 1rem;
+      margin-bottom: 16px;
+      border: 1px dashed var(--line);
+    }
+
+    .confirmation-meta {
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--ink-2);
+      margin-bottom: 6px;
+    }
+
+    .confirmation-meta strong {
+      color: var(--ink);
+    }
+
+    h2.section-title {
+      margin-top: 26px;
+      font-size: 1.2rem;
+      color: var(--ink);
+      border-bottom: 2px solid var(--brand);
+      padding-bottom: 4px;
+      display: inline-block;
+    }
+
+    #confOrderSummary {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px 16px 10px;
+      background: #faf7f0;
+    }
+
+    .summary-items-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .summary-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 8px 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid #e7e1d6;
+      font-size: 0.9rem;
+      align-items: center;
+    }
+
+    .summary-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .summary-thumb {
+      width: 56px;
+      height: 56px;
+      border-radius: 10px;
+      overflow: hidden;
+      background:#f4f1ea;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .summary-thumb img {
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    .summary-name {
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .summary-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .summary-line-total {
+      font-weight: 600;
+      white-space: nowrap;
+      align-self: center;
+    }
+
+    .summary-totals {
+      margin-top: 10px;
+      border-top: 1px dashed #dccfb8;
+      padding-top: 10px;
+      font-size: 0.9rem;
+    }
+
+    .summary-total-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .summary-total-row.grand {
+      margin-top: 4px;
+      font-weight: 700;
+      font-size: 0.98rem;
+    }
+
+    .summary-total-row.discount span:last-child {
+      color:#b91c1c;
+    }
+
+    .order-total {
+      margin-top: 20px;
+      padding: 14px 16px;
+      background: #fff7e5;
+      border-radius: 12px;
+      border: 1px solid #f1e6c8;
+      font-size: 1.05rem;
+      text-align: center;
+    }
+
+    a.button {
+      display: block;
+      width: 100%;
+      text-align: center;
+      margin-top: 22px;
+      padding: 14px 0;
+      background: var(--brand);
+      color: white;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background .25s ease;
+    }
+
+    a.button:hover {
+      background: #5e5a2c;
+    }
+  </style>
+</head>
+
+<body class="order-confirmation-page">
+  <main class="confirmation-container">
+    <section class="confirmation-card">
+
+      <h1>Thank you for your purchase! 🎉</h1>
+
+      <p id="confirmationIntro">
+        Your order has been placed successfully. We’re getting it ready for you.
+      </p>
+
+      <p class="confirmation-number">
+        <strong>Order Confirmation #:</strong>
+        <span id="confNumber"></span>
+      </p>
+
+      <p class="confirmation-meta">
+        Order contact email:
+        <strong id="confEmail"></strong>
+      </p>
+
+      <p class="confirmation-meta" id="confDate"></p>
+
+      <h2 class="section-title">Order Summary</h2>
+      <div id="confOrderSummary">
+        <!-- Filled by order-confirmation.js -->
+      </div>
+
+      <p class="order-total">
+        <strong>Total Paid:</strong>
+        <span id="confTotal"></span>
+      </p>
+
+      <a href="index.html" class="button">Back to Home</a>
+
+    </section>
+  </main>
+
+  <script src="order-confirmation.js"></script>
+</body>
+</html>

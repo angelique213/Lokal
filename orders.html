@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Orders | Lokal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta name="site-base" content="/Lokal/">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+
+  <style>
+    body.orders-page {
+      background: #faf7f0;
+      font-family: Montserrat, system-ui, sans-serif;
+      color: var(--ink);
+      margin: 0;
+      padding: 0;
+    }
+
+    .orders-shell {
+      max-width: 1120px;
+      margin: 40px auto 80px auto;
+      padding: 0 20px 40px;
+    }
+
+    .orders-header {
+      margin-bottom: 18px;
+    }
+
+    .orders-header h1 {
+      font-size: clamp(26px, 3vw, 32px);
+      margin-bottom: 6px;
+    }
+
+    .orders-header p {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .orders-toolbar {
+      margin: 18px 0 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .orders-search {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .orders-search input {
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      padding: 8px 12px;
+      font-size: 0.86rem;
+      background: #fff;
+      min-width: 210px;
+    }
+
+    .orders-search button {
+      border-radius: 999px;
+      border: none;
+      padding: 8px 14px;
+      font-size: 0.86rem;
+      background: var(--brand);
+      color: #fff;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .orders-search button:hover {
+      background: #5e5a2c;
+    }
+
+    .orders-refresh {
+      font-size: 0.85rem;
+      color: var(--muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .orders-refresh i {
+      font-size: 0.85rem;
+    }
+
+    .orders-refresh:hover {
+      color: var(--ink);
+    }
+
+    .orders-card {
+      background: #fff;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.04);
+      padding: 18px 18px 10px;
+      overflow-x: auto;
+    }
+
+    table.orders-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+      min-width: 680px;
+    }
+
+    table.orders-table thead {
+      background: #f5f3ea;
+    }
+
+    table.orders-table th,
+    table.orders-table td {
+      padding: 10px 8px;
+      text-align: left;
+      border-bottom: 1px solid #ece4d6;
+    }
+
+    table.orders-table th {
+      font-weight: 600;
+      color: var(--ink-2);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    table.orders-table tbody tr:hover {
+      background: #faf7f0;
+    }
+
+    .orders-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      background: #e5f3ff;
+      color: #074f7a;
+    }
+
+    .orders-status-pill.shipped {
+      background: #e9fbe5;
+      color: #0f5132;
+    }
+
+    .orders-status-pill.cancelled {
+      background: #fde2e2;
+      color: #842029;
+    }
+
+    .orders-actions button {
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      padding: 5px 10px;
+      font-size: 0.8rem;
+      background: #fff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .orders-actions button:hover {
+      background: #f5f3ea;
+    }
+
+    .orders-empty {
+      padding: 14px 4px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    /* Detail panel */
+    .order-detail-panel {
+      margin-top: 22px;
+      background: #fff;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+      padding: 18px 18px 14px;
+      display: none;
+    }
+
+    .order-detail-panel.active {
+      display: block;
+    }
+
+    .order-detail-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .order-detail-header h2 {
+      font-size: 1.05rem;
+      margin: 0;
+    }
+
+    .order-detail-header small {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .order-detail-meta {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: var(--ink-2);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+    }
+
+    .order-detail-meta span {
+      white-space: nowrap;
+    }
+
+    .order-items-grid {
+      margin-top: 14px;
+      border-top: 1px dashed #e0d5c0;
+      padding-top: 10px;
+    }
+
+    .order-items-grid h3 {
+      font-size: 0.95rem;
+      margin: 0 0 6px;
+    }
+
+    .order-items-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .order-item-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 8px 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee0c9;
+      font-size: 0.86rem;
+      align-items: center;
+    }
+
+    .order-item-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .order-item-thumb {
+      width: 52px;
+      height: 52px;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #f4f1ea;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .order-item-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .order-item-name {
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .order-item-meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .order-item-line-total {
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .order-detail-totals {
+      margin-top: 10px;
+      border-top: 1px dashed #e0d5c0;
+      padding-top: 10px;
+      font-size: 0.86rem;
+    }
+
+    .order-detail-total-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .order-detail-total-row.grand {
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-top: 3px;
+    }
+  </style>
+</head>
+<body class="orders-page">
+
+  <main class="orders-shell">
+    <header class="orders-header">
+      <h1>Orders</h1>
+      <p>View orders placed on Lokal with their confirmation numbers and shipping details.</p>
+    </header>
+
+    <section class="orders-toolbar">
+      <div class="orders-search">
+        <input
+          type="search"
+          id="ordersSearch"
+          placeholder="Search by confirmation # or email..."
+          autocomplete="off"
+        />
+        <button id="ordersSearchBtn">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          Search
+        </button>
+      </div>
+
+      <button type="button" class="orders-refresh" id="ordersRefreshBtn">
+        <i class="fa-solid fa-rotate"></i>
+        Refresh
+      </button>
+    </section>
+
+    <section class="orders-card">
+      <table class="orders-table" aria-describedby="ordersTableCaption">
+        <caption id="ordersTableCaption" style="display:none;">List of orders</caption>
+        <thead>
+          <tr>
+            <th>Confirmation #</th>
+            <th>Email</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Placed</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="ordersTableBody">
+          <tr>
+            <td colspan="6" class="orders-empty">
+              Loading orders…
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="order-detail-panel" id="orderDetailPanel" aria-live="polite">
+      <div class="order-detail-header">
+        <div>
+          <h2 id="orderDetailTitle">Order details</h2>
+          <small id="orderDetailSubtitle"></small>
+        </div>
+        <button type="button" class="orders-actions button-ghost" id="orderDetailCloseBtn">
+          <i class="fa-solid fa-xmark"></i>
+          Close
+        </button>
+      </div>
+
+      <div class="order-detail-meta" id="orderDetailMeta"></div>
+
+      <div class="order-items-grid">
+        <h3>Items</h3>
+        <ul class="order-items-list" id="orderItemsList"></ul>
+      </div>
+
+      <div class="order-detail-totals" id="orderDetailTotals"></div>
+    </section>
+  </main>
+
+  <!-- Supabase client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+
+  <!-- Orders logic -->
+  <script src="orders.js"></script>
+</body>
+</html>

@@ -105,6 +105,14 @@
     }
     .card:hover .quick-btn{ opacity:.96; pointer-events:auto; }
 
+    /* ✅ Make Quick View tappable on phones (no hover) */
+    @media (hover: none) and (pointer: coarse) {
+      .quick-btn{
+        opacity:.96;
+        pointer-events:auto;
+      }
+    }
+
     .card .wishlist-btn{ position:absolute; right:10px; top:10px; z-index:2; }
 
     .pager{
@@ -1184,7 +1192,7 @@
             showGreeting(first);
           }
           if (evt === 'SIGNED_OUT'){
-            if (sessionStorage.getItem('hadSession') === '1'){
+            if (sessionSessionStorage.getItem('hadSession') === '1'){
               sessionStorage.setItem('justSignedOut','1');
             }
             hideGreeting();

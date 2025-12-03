@@ -108,6 +108,9 @@
       quantity: Number(src.quantity) > 0 ? Number(src.quantity) : 1,
       price: priceString,
       img: src.img || src.image || "",
+      // ✅ keep category data so promos (Christmas 10%) can detect it
+      category: src.category || src.cat || "",
+      cat: src.category || src.cat || "",
     };
   }
 

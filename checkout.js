@@ -8,12 +8,23 @@ const FREE_SHIPPING_THRESHOLD = 2500;
 const SITE_BASE = (document.querySelector('meta[name="site-base"]')?.content || "/").replace(/\/+$/, "/");
 const ORIGIN_BASE = location.origin + SITE_BASE;
 
+// global checkout summary
 window.lokalCheckout = {
   items: [],
   subtotal: 0,
   shipping: 0,
+  discount: 0,
   total: 0,
 };
+
+window.lokalBuyerId = null; // filled from Supabase session if logged in
+
+// Initialise EmailJS with your PUBLIC KEY
+if (window.emailjs) {
+  emailjs.init("PQkEaTYVhFkWrAo5g");
+} else {
+  console.warn("EmailJS SDK not loaded");
+}
 
 function parsePeso(p) {
   if (typeof p === "number") return p;
@@ -77,13 +88,37 @@ function resolveImg(p) {
   }
 }
 
-// ---------- render (with qty / edit) ----------
+// ----- Christmas promo helpers -----
+
+// keywords we consider "Christmas vibes"
+const CHRISTMAS_KEYWORDS = [
+  "christmas",
+  "santa",
+  "parol",
+  "orn",
+  "ornament",
+  "wreath",
+  "capiz",
+];
+
+function isChristmasItem(item) {
+  const name = (item.name || item.baseName || "").toLowerCase();
+  const cat = (item.category || item.cat || "").toLowerCase();
+  const img = (item.img || item.image || "").toLowerCase();
+
+  const haystack = `${name} ${cat} ${img}`;
+  return CHRISTMAS_KEYWORDS.some((kw) => haystack.includes(kw));
+}
+
+// ---------- render (with qty / edit & Christmas discount) ----------
 
 function renderCheckoutSummary() {
   const itemsEl = document.getElementById("checkout-items");
   const subtotalEl = document.getElementById("checkout-subtotal");
   const shippingEl = document.getElementById("checkout-shipping");
   const totalEl = document.getElementById("checkout-total");
+  const discountRowEl = document.getElementById("checkout-discount-row");
+  const discountEl = document.getElementById("checkout-discount");
 
   if (!itemsEl || !subtotalEl || !shippingEl || !totalEl) return;
 
@@ -104,11 +139,14 @@ function renderCheckoutSummary() {
     totalEl.textContent = formatPeso(0);
     window.lokalCheckout.subtotal = 0;
     window.lokalCheckout.shipping = 0;
+    window.lokalCheckout.discount = 0;
     window.lokalCheckout.total = 0;
+    if (discountRowEl) discountRowEl.style.display = "none";
     return;
   }
 
-  let subtotal = 0;
+  let subtotalBeforeDiscount = 0;
+  let discountTotal = 0;
 
   cartItems.forEach((item, index) => {
     const qty = Math.max(1, Number(item.quantity) || 1);
@@ -120,8 +158,18 @@ function renderCheckoutSummary() {
     const meta = getItemMeta(item);
     const imgUrl = resolveImg(item.img || item.image || "");
 
-    const line = lineTotal(item);
-    subtotal += line;
+    const rawLine = lineTotal(item);
+    const discountForItem = isChristmasItem(item) ? rawLine * 0.10 : 0;
+    const finalLine = rawLine - discountForItem;
+
+    subtotalBeforeDiscount += rawLine;
+    discountTotal += discountForItem;
+
+    const priceHtml =
+      discountForItem > 0
+        ? `<span class="price-original">${formatPeso(rawLine)}</span>
+           <span class="price-discounted">${formatPeso(finalLine)}</span>`
+        : formatPeso(finalLine);
 
     row.innerHTML = `
       <div class="checkout-item-thumb">
@@ -149,26 +197,41 @@ function renderCheckoutSummary() {
       </div>
 
       <div class="checkout-item-price">
-        ${formatPeso(line)}
+        ${priceHtml}
       </div>
     `;
 
     itemsEl.appendChild(row);
   });
 
-  let shipping = 0;
-  if (subtotal > 0) {
-    shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FLAT_RATE;
-  }
-  const total = subtotal + shipping;
+  const subtotalAfterDiscount = subtotalBeforeDiscount - discountTotal;
 
-  subtotalEl.textContent = formatPeso(subtotal);
+  let shipping = 0;
+  if (subtotalAfterDiscount > 0) {
+    shipping =
+      subtotalAfterDiscount >= FREE_SHIPPING_THRESHOLD
+        ? 0
+        : SHIPPING_FLAT_RATE;
+  }
+  const total = subtotalAfterDiscount + shipping;
+
+  subtotalEl.textContent = formatPeso(subtotalAfterDiscount);
+  if (discountRowEl && discountEl) {
+    if (discountTotal > 0.01) {
+      discountRowEl.style.display = "flex";
+      discountEl.textContent = "-" + formatPeso(discountTotal);
+    } else {
+      discountRowEl.style.display = "none";
+    }
+  }
+
   shippingEl.textContent =
-    shipping === 0 && subtotal > 0 ? "FREE" : formatPeso(shipping);
+    shipping === 0 && subtotalAfterDiscount > 0 ? "FREE" : formatPeso(shipping);
   totalEl.textContent = formatPeso(total);
 
-  window.lokalCheckout.subtotal = subtotal;
+  window.lokalCheckout.subtotal = subtotalAfterDiscount;
   window.lokalCheckout.shipping = shipping;
+  window.lokalCheckout.discount = discountTotal;
   window.lokalCheckout.total = total;
 }
 
@@ -315,13 +378,159 @@ function wireEditModal() {
   });
 }
 
-// ---------- Form handling (submit order) ----------
+// ---------- Supabase save (fixed to match your schema) ----------
+
+async function saveOrderToSupabase(order) {
+  if (!window.sb) {
+    console.warn("Supabase client (sb) not found. Skipping DB save.");
+    return null;
+  }
+
+  try {
+    const shipping = order.shippingData || {};
+    const shippingAddress = {
+      fullName: shipping.fullName || "",
+      phone: shipping.phone || "",
+      address: shipping.address || "",
+      city: shipping.city || "",
+      state: shipping.state || "",
+      zip: shipping.zip || "",
+      country: shipping.country || "",
+    };
+
+    // Insert into orders table
+    const { data: orderInsert, error: orderError } = await sb
+      .from("orders")
+      .insert({
+        confirmation_number: order.confirmationNumber,
+        email: shipping.email || null,
+        status: "paid",
+        subtotal: order.subtotal || 0,
+        shipping: order.shipping || 0,
+        discount: order.discount || 0,
+        total: order.total || 0,
+        currency: order.currency || "PHP",
+        shipping_address: shippingAddress,
+        buyer_id: order.supabaseBuyerId || null,
+      })
+      .select("id")
+      .single();
+
+    if (orderError) {
+      console.error("Supabase order insert error:", orderError);
+      return null;
+    }
+
+    const orderId = orderInsert.id;
+
+    // Insert items into order_items table
+    if (Array.isArray(order.items) && order.items.length) {
+      const itemRows = order.items.map((item) => {
+        const qty = Math.max(1, Number(item.quantity) || 1);
+        return {
+          order_id: orderId,
+          name: getItemName(item),
+          size: item.size || null,
+          quantity: qty,
+          price: parsePeso(item.price),
+          category: item.category || item.cat || null,
+          image_url: item.img || item.image || null,
+        };
+      });
+
+      const { error: itemsError } = await sb
+        .from("order_items")
+        .insert(itemRows);
+
+      if (itemsError) {
+        console.error("Supabase order_items insert error:", itemsError);
+      }
+    }
+
+    return orderId;
+  } catch (err) {
+    console.error("saveOrderToSupabase exception:", err);
+    return null;
+  }
+}
+
+// ---------- EmailJS send ----------
+
+async function sendOrderEmail(order) {
+  if (!window.emailjs) {
+    console.warn("EmailJS not available, skipping email send.");
+    return;
+  }
+
+  const shipping = order.shippingData || {};
+  const toEmail =
+    shipping.email ||
+    (order.payer && order.payer.email_address) ||
+    "";
+
+  if (!toEmail) {
+    console.warn("No email address on order; not sending email.");
+    return;
+  }
+
+  const fullName =
+    shipping.fullName ||
+    (order.payer &&
+      order.payer.name &&
+      `${order.payer.name.given_name || ""} ${order.payer.name.surname || ""}`.trim()) ||
+    "Customer";
+
+  // Build items array for EmailJS template loop
+  const items = (order.items || []).map((item) => {
+    const qty = Math.max(1, Number(item.quantity) || 1);
+    const price = parsePeso(item.price);
+    const line = price * qty;
+    return {
+      name: getItemName(item),
+      size: item.size || "",
+      quantity: qty,
+      price: price.toFixed(2),
+      lineTotal: line.toFixed(2),
+      img: resolveImg(item.img || item.image || ""),
+    };
+  });
+
+  const params = {
+    order_number: order.confirmationNumber || order.supabaseOrderId || "",
+    full_name: fullName,
+    email: toEmail,
+    address: shipping.address || "",
+    city: shipping.city || "",
+    state: shipping.state || "",
+    zip: shipping.zip || "",
+    country: shipping.country || "",
+    subtotal: (order.subtotal || 0).toFixed(2),
+    shipping: (order.shipping || 0).toFixed(2),
+    total: (order.total || 0).toFixed(2),
+    items,
+  };
+
+  const TEMPLATE_ID = "template_rcaugcr";
+
+  try {
+    const result = await emailjs.send(
+      "service_655ilxy",
+      TEMPLATE_ID,
+      params
+    );
+    console.log("EmailJS order email sent:", result.status, result.text);
+  } catch (err) {
+    console.error("EmailJS send error:", err);
+  }
+}
+
+// ---------- Form handling (fallback order without PayPal) ----------
 
 function handleCheckoutForm() {
   const form = document.getElementById("checkout-form");
   if (!form) return;
 
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const cartItems = loadCart();
@@ -342,14 +551,37 @@ function handleCheckoutForm() {
       country: formData.get("country"),
     };
 
+    const confirmationNumber = "LK-" + Date.now().toString().slice(-8);
+
     const order = {
+      confirmationNumber,
       createdAt: new Date().toISOString(),
       items: window.lokalCheckout.items,
       subtotal: window.lokalCheckout.subtotal,
       shipping: window.lokalCheckout.shipping,
+      discount: window.lokalCheckout.discount,
       total: window.lokalCheckout.total,
+      currency: "PHP",
       shippingData,
+      payer: null,
+      paypalOrderId: null,
+      supabaseBuyerId: window.lokalBuyerId || null,
     };
+
+    try {
+      const supabaseOrderId = await saveOrderToSupabase(order);
+      if (supabaseOrderId) {
+        order.supabaseOrderId = supabaseOrderId;
+      }
+    } catch (err) {
+      console.warn("Supabase save failed:", err);
+    }
+
+    try {
+      await sendOrderEmail(order);
+    } catch (err) {
+      console.warn("Email send failed:", err);
+    }
 
     try {
       localStorage.setItem("lokalLastOrder", JSON.stringify(order));
@@ -358,20 +590,32 @@ function handleCheckoutForm() {
     }
 
     alert(
-      "Order placed successfully! (Demo)\n\n" +
-        "Total charged: " +
+      "Order placed.\n\nYour confirmation # is " +
+        confirmationNumber +
+        "\nTotal: " +
         formatPeso(window.lokalCheckout.total)
     );
 
     saveCart([]); // clears + fires cart:updated
-    window.location.href = "index.html";
+    window.location.href = "order-confirmation.html";
   });
 }
 
 // ---------- init ----------
 
-function initCheckout() {
+async function initCheckout() {
   console.log("Checkout script loaded.");
+
+  // Get Supabase user id if logged in
+  if (window.sb && sb.auth) {
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      window.lokalBuyerId = session?.user?.id || null;
+    } catch (err) {
+      console.warn("Supabase getSession failed:", err);
+    }
+  }
+
   renderCheckoutSummary();
   wireInlineQtyControls();
   wireEditModal();
